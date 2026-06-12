@@ -2,6 +2,7 @@ import {
   addCustomPlayer,
   createInitialState,
   exportPredictionsText,
+  formatScoreOptionLabel,
   submitPrediction,
   toggleScorePick,
 } from './predictionStore.mjs';
@@ -28,22 +29,22 @@ const matches = [
 ];
 
 const scoreOptions = [
-  '0-0',
-  '1-0',
-  '0-1',
-  '1-1',
-  '2-0',
-  '0-2',
-  '2-1',
-  '1-2',
-  '2-2',
-  '3-0',
-  '0-3',
-  '3-1',
-  '1-3',
-  '3-2',
-  '2-3',
-  '其他',
+  { score: '0-0', odds: 9.5 },
+  { score: '1-0', odds: 7.2 },
+  { score: '0-1', odds: 8.0 },
+  { score: '1-1', odds: 6.5 },
+  { score: '2-0', odds: 9.0 },
+  { score: '0-2', odds: 10.5 },
+  { score: '2-1', odds: 8.5 },
+  { score: '1-2', odds: 9.5 },
+  { score: '2-2', odds: 12.0 },
+  { score: '3-0', odds: 18.0 },
+  { score: '0-3', odds: 21.0 },
+  { score: '3-1', odds: 16.0 },
+  { score: '1-3', odds: 19.0 },
+  { score: '3-2', odds: 23.0 },
+  { score: '2-3', odds: 26.0 },
+  { score: '其他' },
 ];
 
 const app = document.querySelector('#app');
@@ -230,13 +231,13 @@ function renderMatch(match) {
       <div class="score-grid">
         ${scoreOptions
           .map(
-            (score) => `
+            (option) => `
               <button
-                class="score-chip ${picks.includes(score) ? 'selected' : ''}"
+                class="score-chip ${picks.includes(option.score) ? 'selected' : ''}"
                 data-match-id="${match.id}"
-                data-score="${score}"
+                data-score="${option.score}"
                 ${state.selectedPlayerId ? '' : 'disabled'}
-              >${score}</button>
+              >${formatScoreOptionLabel(option)}</button>
             `,
           )
           .join('')}

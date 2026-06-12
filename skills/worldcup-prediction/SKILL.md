@@ -22,6 +22,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - The player picker starts with 10 known names but must allow adding a temporary custom name from the same panel.
 - Low-frequency actions live in compact header controls.
 - Buttons, score chips, and match rows use stable dimensions; text must not overlap or resize the layout.
+- Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`.
 - The board must remain usable at 390px wide.
 
 ## State Rules

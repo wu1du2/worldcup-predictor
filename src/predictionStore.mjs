@@ -32,6 +32,12 @@ export function toggleScorePick(scores, score) {
   return [...scores, score];
 }
 
+export function formatScoreOptionLabel(option) {
+  const displayScore = option.score.replace(/^(\d+)-(\d+)$/, '$1:$2');
+  if (!option.odds) return displayScore;
+  return `${displayScore}(${option.odds})`;
+}
+
 export function submitPrediction(state, { playerId, matchId, scores }) {
   const nextPredictions = {
     ...state.predictions,

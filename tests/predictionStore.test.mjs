@@ -5,6 +5,7 @@ import {
   addCustomPlayer,
   createInitialState,
   exportPredictionsText,
+  formatScoreOptionLabel,
   submitPrediction,
   toggleScorePick,
 } from '../src/predictionStore.mjs';
@@ -69,6 +70,11 @@ test('addCustomPlayer ignores blank names', () => {
   const state = createInitialState();
 
   assert.deepEqual(addCustomPlayer(state, '   '), state);
+});
+
+test('formatScoreOptionLabel displays odds without changing score values', () => {
+  assert.equal(formatScoreOptionLabel({ score: '1-1', odds: 6.5 }), '1:1(6.5)');
+  assert.equal(formatScoreOptionLabel({ score: '其他' }), '其他');
 });
 
 test('exportPredictionsText renders a WeChat-friendly grouped text dump', () => {

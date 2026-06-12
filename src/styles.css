@@ -179,8 +179,9 @@ h1 {
   border-radius: 8px;
   background: #fbfcfa;
   color: #1d2f27;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 .score-chip.selected {
@@ -300,9 +301,5 @@ textarea {
 @media (max-width: 380px) {
   .player-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .score-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
