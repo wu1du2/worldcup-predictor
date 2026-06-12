@@ -10,7 +10,10 @@
     "acceptance": "node tests/stage1.acceptance.mjs",
     "acceptance:supabase": "node tests/stage2.supabase.acceptance.mjs",
     "import:matches": "node scripts/importMatchesFromEspn.mjs",
-    "import:matches:dry": "node scripts/importMatchesFromEspn.mjs --dry-run"
+    "import:matches:dry": "node scripts/importMatchesFromEspn.mjs --dry-run",
+    "probe:odds": "node scripts/probeSportteryOdds.mjs",
+    "import:odds": "node scripts/importSportteryOdds.mjs",
+    "import:odds:dry": "node scripts/importSportteryOdds.mjs --dry-run"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",

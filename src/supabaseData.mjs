@@ -45,6 +45,43 @@ export async function loadMatches({ client }) {
   return (data || []).filter(isCompleteMatchRow).map(toAppMatch);
 }
 
+export async function loadScoreOdds({ client, matches }) {
+  const { data, error } = await client
+    .from('score_odds')
+    .select('home,away,kickoff_label,score,odds')
+    .order('source_match_key', { ascending: true });
+
+  if (error) throw error;
+  return mapScoreOddsByMatch(matches, data || []);
+}
+
+export function mapScoreOddsByMatch(matches, oddsRows) {
+  const rowsByMatchKey = new Map();
+
+  for (const row of oddsRows || []) {
+    const key = buildOddsMatchKey(row.home, row.away, row.kickoff_label);
+    rowsByMatchKey.set(key, [...(rowsByMatchKey.get(key) || []), row]);
+  }
+
+  const oddsByMatchId = {};
+
+  for (const match of matches || []) {
+    const kickoffLabel = `${match.date.slice(5)} ${match.time}`;
+    const key = buildOddsMatchKey(match.home, match.away, kickoffLabel);
+    const rows = rowsByMatchKey.get(key) || [];
+    if (!rows.length) continue;
+
+    oddsByMatchId[match.id] = [
+      ...rows
+        .map((row) => ({ score: row.score, odds: Number(row.odds) }))
+        .sort(compareScoreOptions),
+      { score: '其他' },
+    ];
+  }
+
+  return oddsByMatchId;
+}
+
 function isCompleteMatchRow(row) {
   return Boolean(row.match_code && row.match_date_cn && row.time_cn && row.home && row.away);
 }
@@ -127,4 +164,24 @@ async function findOrCreateGroup(client, groupCode) {
 
   if (error) throw error;
   return data;
+}
+
+function buildOddsMatchKey(home, away, kickoffLabel) {
+  return `${home}|${away}|${kickoffLabel}`;
+}
+
+function compareScoreOptions(a, b) {
+  return getScoreOrder(a.score) - getScoreOrder(b.score) || a.score.localeCompare(b.score);
+}
+
+function getScoreOrder(score) {
+  const preferred = [
+    '1-0', '2-0', '2-1', '3-0', '3-1', '3-2',
+    '4-0', '4-1', '4-2', '5-0', '5-1', '5-2',
+    '0-0', '1-1', '2-2', '3-3',
+    '0-1', '0-2', '1-2', '0-3', '1-3', '2-3',
+    '0-4', '1-4', '2-4', '0-5', '1-5', '2-5',
+  ];
+  const index = preferred.indexOf(score);
+  return index === -1 ? preferred.length : index;
 }

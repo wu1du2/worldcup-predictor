@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 
 import {
   getGroupCodeFromSearch,
+  loadScoreOdds,
   loadMatches,
+  mapScoreOddsByMatch,
   mapPredictionsByPlayer,
   mergePlayers,
 } from '../src/supabaseData.mjs';
@@ -130,5 +132,87 @@ test('loadMatches reads active matches sorted by kickoff and maps them for the a
     ],
     ['eq', 'active', true],
     ['order', 'kickoff_at_utc', { ascending: true }],
+  ]);
+});
+
+test('mapScoreOddsByMatch joins odds to app matches by Chinese teams and China kickoff label', () => {
+  const matches = [
+    {
+      id: 'espn-1',
+      date: '2026-06-13',
+      time: '03:00',
+      home: '加拿大',
+      away: '波黑',
+    },
+  ];
+  const oddsRows = [
+    {
+      home: '加拿大',
+      away: '波黑',
+      kickoff_label: '06-13 03:00',
+      score: '2-1',
+      odds: 5.3,
+    },
+    {
+      home: '加拿大',
+      away: '波黑',
+      kickoff_label: '06-13 03:00',
+      score: '1-0',
+      odds: 5.1,
+    },
+  ];
+
+  assert.deepEqual(mapScoreOddsByMatch(matches, oddsRows), {
+    'espn-1': [
+      { score: '1-0', odds: 5.1 },
+      { score: '2-1', odds: 5.3 },
+      { score: '其他' },
+    ],
+  });
+});
+
+test('loadScoreOdds reads score_odds and returns match-keyed options', async () => {
+  const calls = [];
+  const rows = [
+    {
+      home: '加拿大',
+      away: '波黑',
+      kickoff_label: '06-13 03:00',
+      score: '1-0',
+      odds: 5.1,
+    },
+  ];
+  const client = {
+    from(table) {
+      calls.push(['from', table]);
+      return {
+        select(columns) {
+          calls.push(['select', columns]);
+          return {
+            order(columnName, options) {
+              calls.push(['order', columnName, options]);
+              return Promise.resolve({ data: rows, error: null });
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const odds = await loadScoreOdds({
+    client,
+    matches: [{ id: 'm1', date: '2026-06-13', time: '03:00', home: '加拿大', away: '波黑' }],
+  });
+
+  assert.deepEqual(odds, {
+    m1: [
+      { score: '1-0', odds: 5.1 },
+      { score: '其他' },
+    ],
+  });
+  assert.deepEqual(calls, [
+    ['from', 'score_odds'],
+    ['select', 'home,away,kickoff_label,score,odds'],
+    ['order', 'source_match_key', { ascending: true }],
   ]);
 });

@@ -14,6 +14,7 @@ import {
   getGroupCodeFromSearch,
   loadGroupState,
   loadMatches,
+  loadScoreOdds,
   saveGroupPredictions,
 } from './supabaseData.mjs';
 import { buildDateTabs, formatChinaDateLabel, getDefaultMatchDateCn, getMatchScoreText } from './matchSchedule.mjs';
@@ -21,22 +22,22 @@ import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
 
-const scoreOptions = [
-  { score: '0-0', odds: 9.5 },
-  { score: '1-0', odds: 7.2 },
-  { score: '0-1', odds: 8.0 },
-  { score: '1-1', odds: 6.5 },
-  { score: '2-0', odds: 9.0 },
-  { score: '0-2', odds: 10.5 },
-  { score: '2-1', odds: 8.5 },
-  { score: '1-2', odds: 9.5 },
-  { score: '2-2', odds: 12.0 },
-  { score: '3-0', odds: 18.0 },
-  { score: '0-3', odds: 21.0 },
-  { score: '3-1', odds: 16.0 },
-  { score: '1-3', odds: 19.0 },
-  { score: '3-2', odds: 23.0 },
-  { score: '2-3', odds: 26.0 },
+const fallbackScoreOptions = [
+  { score: '0-0' },
+  { score: '1-0' },
+  { score: '0-1' },
+  { score: '1-1' },
+  { score: '2-0' },
+  { score: '0-2' },
+  { score: '2-1' },
+  { score: '1-2' },
+  { score: '2-2' },
+  { score: '3-0' },
+  { score: '0-3' },
+  { score: '3-1' },
+  { score: '1-3' },
+  { score: '3-2' },
+  { score: '2-3' },
   { score: '其他' },
 ];
 
@@ -55,6 +56,7 @@ function App() {
   const [state, setState] = useState(loadState);
   const [players, setPlayers] = useState([]);
   const [matches, setMatches] = useState([]);
+  const [scoreOddsByMatch, setScoreOddsByMatch] = useState({});
   const [group, setGroup] = useState(null);
   const [loadStatus, setLoadStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
@@ -73,14 +75,16 @@ function App() {
     setErrorMessage('');
 
     try {
-      const [loaded, loadedMatches] = await Promise.all([
+      const loadedMatches = await loadMatches({ client });
+      const [loaded, loadedScoreOdds] = await Promise.all([
         loadGroupState({ client, groupCode }),
-        loadMatches({ client }),
+        loadScoreOdds({ client, matches: loadedMatches }),
       ]);
       const availableDates = new Set(loadedMatches.map((match) => match.date));
       setGroup(loaded.group);
       setPlayers(loaded.players);
       setMatches(loadedMatches);
+      setScoreOddsByMatch(loadedScoreOdds);
       updateState((current) => ({
         ...current,
         selectedPlayerId: current.groupCode === groupCode ? current.selectedPlayerId : '',
@@ -300,6 +304,7 @@ function App() {
             match={match}
             picks={selectedScores(match.id)}
             selectedPlayerId={state.selectedPlayerId}
+            scoreOptions={scoreOddsByMatch[match.id] || fallbackScoreOptions}
             onToggle={toggleMatchScore}
           />
         ))}
@@ -338,7 +343,7 @@ function App() {
   );
 }
 
-function MatchCard({ match, picks, selectedPlayerId, onToggle }) {
+function MatchCard({ match, picks, selectedPlayerId, scoreOptions, onToggle }) {
   return (
     <article className="match-card">
       <div className="match-header">
