@@ -64,6 +64,8 @@ Stage 1 commands:
 - Supabase two-group acceptance: `npm run acceptance:supabase`.
 - Match import dry run: `npm run import:matches:dry`.
 - Match import write: `npm run import:matches`.
+- GitHub Actions imports matches daily at 18:17 UTC (02:17 UTC+8) and can be manually triggered from `Import World Cup Matches`.
+- GitHub Actions requires repository secrets `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
 - Render env vars required: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - For iPhone layout QA, prefer Playwright built-in device descriptors (`devices['iPhone SE']`, `devices['iPhone 13']`, `devices['iPhone 14 Pro Max']`) over hand-written viewport guesses.
 - Stage 3 real schedule screenshot: `docs/artifacts/stage3/real-schedule-score-iphone13.png`.
