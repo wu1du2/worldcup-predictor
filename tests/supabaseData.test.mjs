@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   getGroupCodeFromSearch,
+  loadMatches,
   mapPredictionsByPlayer,
   mergePlayers,
 } from '../src/supabaseData.mjs';
@@ -41,4 +42,89 @@ test('mapPredictionsByPlayer converts database rows to app prediction state', ()
       m01: ['1-1'],
     },
   });
+});
+
+test('loadMatches reads active matches sorted by kickoff and maps them for the app', async () => {
+  const calls = [];
+  const rows = [
+    {
+      id: 'legacy-row',
+      match_code: null,
+      kickoff_at_utc: null,
+      match_date_cn: null,
+      time_cn: null,
+      home: null,
+      away: null,
+      home_score: null,
+      away_score: null,
+      status: 'pre',
+      status_detail: null,
+      venue: null,
+      stage: null,
+    },
+    {
+      id: 'row-1',
+      match_code: 'espn-760415',
+      kickoff_at_utc: '2026-06-11T19:00:00.000Z',
+      match_date_cn: '2026-06-12',
+      time_cn: '03:00',
+      home: 'Mexico',
+      away: 'South Africa',
+      home_score: 2,
+      away_score: 0,
+      status: 'post',
+      status_detail: 'FT',
+      venue: 'Estadio Banorte, Mexico City, Mexico',
+      stage: 'Group Stage',
+    },
+  ];
+  const client = {
+    from(table) {
+      calls.push(['from', table]);
+      return {
+        select(columns) {
+          calls.push(['select', columns]);
+          return {
+            eq(column, value) {
+              calls.push(['eq', column, value]);
+              return {
+                order(columnName, options) {
+                  calls.push(['order', columnName, options]);
+                  return Promise.resolve({ data: rows, error: null });
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const matches = await loadMatches({ client });
+
+  assert.deepEqual(matches, [
+    {
+      id: 'espn-760415',
+      matchCode: 'espn-760415',
+      date: '2026-06-12',
+      time: '03:00',
+      home: 'Mexico',
+      away: 'South Africa',
+      homeScore: 2,
+      awayScore: 0,
+      status: 'post',
+      statusDetail: 'FT',
+      venue: 'Estadio Banorte, Mexico City, Mexico',
+      stage: 'Group Stage',
+    },
+  ]);
+  assert.deepEqual(calls, [
+    ['from', 'matches'],
+    [
+      'select',
+      'id,match_code,kickoff_at_utc,match_date_cn,time_cn,home,away,home_score,away_score,status,status_detail,venue,stage',
+    ],
+    ['eq', 'active', true],
+    ['order', 'kickoff_at_utc', { ascending: true }],
+  ]);
 });

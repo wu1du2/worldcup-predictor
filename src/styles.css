@@ -57,6 +57,7 @@ h1 {
 .primary-button,
 .player-chip,
 .score-chip,
+.date-chip,
 .icon-button,
 .copy-button {
   border: 0;
@@ -79,6 +80,55 @@ h1 {
   border: 1px solid #dde2db;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.78);
+}
+
+.date-panel {
+  margin-bottom: 12px;
+}
+
+.date-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.date-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.date-chip {
+  flex: 0 0 auto;
+  min-width: 82px;
+  height: 46px;
+  border: 1px solid #d2d9d0;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #25332d;
+  font-weight: 900;
+}
+
+.date-chip span,
+.date-chip small {
+  display: block;
+  line-height: 1.1;
+}
+
+.date-chip small {
+  margin-top: 4px;
+  color: #6b7771;
+  font-size: 11px;
+}
+
+.date-chip.selected {
+  border-color: #126252;
+  background: #126252;
+  color: #ffffff;
+}
+
+.date-chip.selected small {
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .section-title {
@@ -167,8 +217,35 @@ h1 {
   font-weight: 700;
 }
 
-.count-pill {
+.match-meta {
+  max-width: 250px;
+  margin: 5px 0 0;
+  color: #75817b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.match-side {
   flex: 0 0 auto;
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+}
+
+.score-pill {
+  min-width: 48px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: #e4f1ed;
+  color: #105244;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.count-pill {
   min-width: 44px;
   padding: 5px 8px;
   border-radius: 999px;

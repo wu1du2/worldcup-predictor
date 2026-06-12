@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
+import { toAppMatch } from './matchSchedule.mjs';
+
 export function createSupabaseBrowserClient() {
   const url = import.meta.env.VITE_SUPABASE_URL;
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -30,6 +32,21 @@ export function mapPredictionsByPlayer(rows) {
   }
 
   return predictions;
+}
+
+export async function loadMatches({ client }) {
+  const { data, error } = await client
+    .from('matches')
+    .select('id,match_code,kickoff_at_utc,match_date_cn,time_cn,home,away,home_score,away_score,status,status_detail,venue,stage')
+    .eq('active', true)
+    .order('kickoff_at_utc', { ascending: true });
+
+  if (error) throw error;
+  return (data || []).filter(isCompleteMatchRow).map(toAppMatch);
+}
+
+function isCompleteMatchRow(row) {
+  return Boolean(row.match_code && row.match_date_cn && row.time_cn && row.home && row.away);
 }
 
 export async function loadGroupState({ client, groupCode }) {

@@ -35,8 +35,8 @@ try {
   await page.locator('[data-new-player-name]').fill(playerName);
   await page.getByRole('button', { name: '确定新增' }).click();
   await page.getByRole('button', { name: playerName }).waitFor();
-  await page.locator('[data-match-id="m01"][data-score="1-0"]').click();
-  await page.locator('[data-match-id="m01"][data-score="2-1"]').click();
+  await page.locator('[data-score="1-0"]').first().click();
+  await page.locator('[data-score="2-1"]').first().click();
   await page.getByRole('button', { name: '确定录入' }).click();
   await page.getByText('已保存，可以回群里继续催大家交卷。').waitFor();
 

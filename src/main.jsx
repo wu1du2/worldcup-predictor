@@ -13,17 +13,13 @@ import {
   createSupabaseBrowserClient,
   getGroupCodeFromSearch,
   loadGroupState,
+  loadMatches,
   saveGroupPredictions,
 } from './supabaseData.mjs';
+import { buildDateTabs, formatChinaDateLabel, getDefaultMatchDateCn, getMatchScoreText } from './matchSchedule.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
-
-const matches = [
-  { id: 'm01', date: '2026-06-13', time: '03:00', home: '德国', away: '日本' },
-  { id: 'm02', date: '2026-06-13', time: '18:00', home: '西班牙', away: '巴西' },
-  { id: 'm03', date: '2026-06-13', time: '21:00', home: '阿根廷', away: '法国' },
-];
 
 const scoreOptions = [
   { score: '0-0', odds: 9.5 },
@@ -58,6 +54,7 @@ function loadState() {
 function App() {
   const [state, setState] = useState(loadState);
   const [players, setPlayers] = useState([]);
+  const [matches, setMatches] = useState([]);
   const [group, setGroup] = useState(null);
   const [loadStatus, setLoadStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
@@ -75,15 +72,21 @@ function App() {
     setErrorMessage('');
 
     try {
-      const loaded = await loadGroupState({ client, groupCode });
+      const [loaded, loadedMatches] = await Promise.all([
+        loadGroupState({ client, groupCode }),
+        loadMatches({ client }),
+      ]);
+      const availableDates = new Set(loadedMatches.map((match) => match.date));
       setGroup(loaded.group);
       setPlayers(loaded.players);
+      setMatches(loadedMatches);
       updateState((current) => ({
         ...current,
         selectedPlayerId: current.groupCode === groupCode ? current.selectedPlayerId : '',
         draftPicks: current.groupCode === groupCode ? current.draftPicks : {},
         predictions: loaded.predictions,
         groupCode,
+        selectedDate: availableDates.has(current.selectedDate) ? current.selectedDate : getDefaultMatchDateCn(loadedMatches),
       }));
       setLoadStatus('ready');
     } catch (error) {
@@ -105,6 +108,10 @@ function App() {
   }
 
   const selectedPlayer = players.find((player) => player.id === state.selectedPlayerId);
+  const dateTabs = buildDateTabs(matches);
+  const selectedDate = state.selectedDate || getDefaultMatchDateCn(matches);
+  const visibleMatches = matches.filter((match) => match.date === selectedDate);
+  const dateLabel = selectedDate ? formatChinaDateLabel(selectedDate) : '暂无赛程';
 
   function selectedScores(matchId, currentState = state) {
     const playerId = currentState.selectedPlayerId;
@@ -117,6 +124,15 @@ function App() {
       ...current,
       selectedPlayerId: playerId,
       draftPicks: {},
+    }));
+  }
+
+  function selectDate(selectedDate) {
+    updateState((current) => ({
+      ...current,
+      selectedDate,
+      draftPicks: {},
+      exportText: '',
     }));
   }
 
@@ -135,7 +151,7 @@ function App() {
   async function submitAll() {
     if (!state.selectedPlayerId || !group || !client) return;
 
-    const entries = matches
+    const entries = visibleMatches
       .map((match) => ({ matchId: match.id, scores: selectedScores(match.id) }))
       .filter((entry) => entry.scores.length > 0);
 
@@ -166,8 +182,8 @@ function App() {
 
   function showExport() {
     const text = exportPredictionsText({
-      dateLabel: '6月13日',
-      matches,
+      dateLabel,
+      matches: visibleMatches,
       players,
       state,
     });
@@ -211,13 +227,29 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">明天比赛 · {groupCode}</p>
-          <h1>6月13日波胆预测</h1>
+          <p className="eyebrow">北京时间 · {groupCode}</p>
+          <h1>{dateLabel}波胆预测</h1>
         </div>
         <button className="ghost-button" data-action="export" onClick={showExport}>
           导出文本
         </button>
       </header>
+
+      <section className="date-panel" aria-label="选择比赛日期">
+        <div className="date-scroll">
+          {dateTabs.map((tab) => (
+            <button
+              key={tab.date}
+              className={`date-chip ${tab.date === selectedDate ? 'selected' : ''}`}
+              data-match-date={tab.date}
+              onClick={() => selectDate(tab.date)}
+            >
+              <span>{tab.label}</span>
+              <small>{tab.count}场</small>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <section className="player-panel" aria-label="选择自己">
         <div className="section-title">
@@ -253,7 +285,7 @@ function App() {
       ) : null}
 
       <section className="match-board" aria-label="比赛预测">
-        {matches.map((match) => (
+        {visibleMatches.map((match) => (
           <MatchCard
             key={match.id}
             match={match}
@@ -264,6 +296,11 @@ function App() {
             onToggle={toggleMatchScore}
           />
         ))}
+        {loadStatus === 'ready' && visibleMatches.length === 0 ? (
+          <section className="status-panel" aria-label="暂无比赛">
+            当天暂无比赛
+          </section>
+        ) : null}
       </section>
 
       <div className="submit-bar">
@@ -305,9 +342,13 @@ function MatchCard({ match, picks, players, predictions, selectedPlayerId, onTog
           <h2>
             {match.home} <span>vs</span> {match.away}
           </h2>
+          <p className="match-meta">{match.venue || match.stage}</p>
         </div>
-        <div className="count-pill">
-          {predictionCount}/{players.length}
+        <div className="match-side">
+          <div className="score-pill">{getMatchScoreText(match)}</div>
+          <div className="count-pill">
+            {predictionCount}/{players.length}
+          </div>
         </div>
       </div>
       <div className="score-grid">
