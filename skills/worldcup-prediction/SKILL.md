@@ -19,7 +19,7 @@ After each completed task, update this skill when new project-specific lessons, 
 
 - Mobile first: the first screen must show the date, player picker, match board, and clear primary action without hunting.
 - Main path: choose player -> choose one or more correct scores per match -> submit -> export text.
-- The player picker starts with 10 known names but must allow adding a temporary custom name from the same panel.
+- New groups start with no members. The player picker shows only group-specific Supabase players plus a `+` button.
 - Export dialog must support one-tap clipboard copy and show an immediate copied/failed state.
 - Low-frequency actions live in compact header controls.
 - Buttons, score chips, and match rows use stable dimensions; text must not overlap or resize the layout.
@@ -31,7 +31,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Supabase is the single authority for groups, players, and predictions. Optimistic UI is allowed only if it reconciles back to Supabase.
 - Predictions are keyed by `playerId + matchId`. Re-submitting overwrites that player's prior picks for the match.
 - Group isolation is URL-driven: `?group=wx-a` and `?group=wx-b` must not share players or predictions.
-- Custom players live in Supabase under the current group; adding one selects it immediately after the write succeeds.
+- Players live in Supabase under the current group; adding one selects it immediately after the write succeeds.
 
 ## Verification SOP
 

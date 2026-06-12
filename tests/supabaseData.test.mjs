@@ -13,21 +13,14 @@ test('getGroupCodeFromSearch reads group query param and falls back to default',
   assert.equal(getGroupCodeFromSearch(''), 'default');
 });
 
-test('mergePlayers keeps default players and appends group-specific custom players', () => {
-  const merged = mergePlayers(
-    [
-      { id: 'p01', name: '阿哲' },
-      { id: 'p02', name: '北北' },
-    ],
-    [
-      { id: 'db-p01', name: '阿哲' },
-      { id: 'db-custom', name: '小吴' },
-    ],
-  );
+test('mergePlayers returns only group-specific database players', () => {
+  const merged = mergePlayers([
+    { id: 'db-p01', name: '阿哲' },
+    { id: 'db-custom', name: '小吴' },
+  ]);
 
   assert.deepEqual(merged, [
     { id: 'db-p01', name: '阿哲' },
-    { id: 'p02', name: '北北' },
     { id: 'db-custom', name: '小吴' },
   ]);
 });

@@ -30,6 +30,7 @@ try {
 
   await page.goto(`${baseUrl}/?group=${groupA}`, { waitUntil: 'networkidle' });
   await page.getByText('正在加载群数据...').waitFor({ state: 'detached' });
+  assert.equal(await page.getByRole('button', { name: '阿哲' }).count(), 0);
   await page.getByRole('button', { name: '新增名字' }).click();
   await page.locator('[data-new-player-name]').fill(playerName);
   await page.getByRole('button', { name: '确定新增' }).click();
@@ -48,6 +49,7 @@ try {
 
   await page.goto(`${baseUrl}/?group=${groupB}`, { waitUntil: 'networkidle' });
   await page.getByText('正在加载群数据...').waitFor({ state: 'detached' });
+  assert.equal(await page.getByRole('button', { name: '阿哲' }).count(), 0);
   assert.equal(await page.getByRole('button', { name: playerName }).count(), 0);
   await page.getByRole('button', { name: '导出文本' }).click();
   const groupBText = await page.locator('[data-export-text]').inputValue();

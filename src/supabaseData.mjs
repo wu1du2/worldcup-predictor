@@ -17,13 +17,8 @@ export function getGroupCodeFromSearch(search) {
   return code || 'default';
 }
 
-export function mergePlayers(defaultPlayers, dbPlayers) {
-  const playersByName = new Map(dbPlayers.map((player) => [player.name, player]));
-  const merged = defaultPlayers.map((player) => playersByName.get(player.name) || player);
-  const defaultNames = new Set(defaultPlayers.map((player) => player.name));
-  const customPlayers = dbPlayers.filter((player) => !defaultNames.has(player.name));
-
-  return [...merged, ...customPlayers];
+export function mergePlayers(dbPlayers) {
+  return dbPlayers || [];
 }
 
 export function mapPredictionsByPlayer(rows) {
@@ -37,9 +32,8 @@ export function mapPredictionsByPlayer(rows) {
   return predictions;
 }
 
-export async function loadGroupState({ client, groupCode, defaultPlayers }) {
+export async function loadGroupState({ client, groupCode }) {
   const group = await findOrCreateGroup(client, groupCode);
-  await ensureDefaultPlayers(client, group.id, defaultPlayers);
 
   const [{ data: players, error: playersError }, { data: predictions, error: predictionsError }] = await Promise.all([
     client.from('players').select('id,name').eq('group_id', group.id).order('created_at', { ascending: true }),
@@ -51,7 +45,7 @@ export async function loadGroupState({ client, groupCode, defaultPlayers }) {
 
   return {
     group,
-    players: mergePlayers(defaultPlayers, players || []),
+    players: mergePlayers(players || []),
     predictions: mapPredictionsByPlayer(predictions || []),
   };
 }
@@ -116,10 +110,4 @@ async function findOrCreateGroup(client, groupCode) {
 
   if (error) throw error;
   return data;
-}
-
-async function ensureDefaultPlayers(client, groupId, defaultPlayers) {
-  for (const player of defaultPlayers) {
-    await createGroupPlayer({ client, groupId, name: player.name });
-  }
 }

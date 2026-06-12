@@ -19,19 +19,6 @@ import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
 
-const defaultPlayers = [
-  { id: 'p01', name: '阿哲' },
-  { id: 'p02', name: '北北' },
-  { id: 'p03', name: '大宇' },
-  { id: 'p04', name: '小林' },
-  { id: 'p05', name: '老周' },
-  { id: 'p06', name: 'Mia' },
-  { id: 'p07', name: 'Kevin' },
-  { id: 'p08', name: 'Nina' },
-  { id: 'p09', name: 'Tony' },
-  { id: 'p10', name: 'Yuki' },
-];
-
 const matches = [
   { id: 'm01', date: '2026-06-13', time: '03:00', home: '德国', away: '日本' },
   { id: 'm02', date: '2026-06-13', time: '18:00', home: '西班牙', away: '巴西' },
@@ -70,7 +57,7 @@ function loadState() {
 
 function App() {
   const [state, setState] = useState(loadState);
-  const [players, setPlayers] = useState(defaultPlayers);
+  const [players, setPlayers] = useState([]);
   const [group, setGroup] = useState(null);
   const [loadStatus, setLoadStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
@@ -88,7 +75,7 @@ function App() {
     setErrorMessage('');
 
     try {
-      const loaded = await loadGroupState({ client, groupCode, defaultPlayers });
+      const loaded = await loadGroupState({ client, groupCode });
       setGroup(loaded.group);
       setPlayers(loaded.players);
       updateState((current) => ({
@@ -161,7 +148,7 @@ function App() {
         playerId: state.selectedPlayerId,
         entries,
       });
-      const loaded = await loadGroupState({ client, groupCode, defaultPlayers });
+      const loaded = await loadGroupState({ client, groupCode });
       setPlayers(loaded.players);
       updateState((current) => ({
         ...current,
@@ -202,7 +189,7 @@ function App() {
       });
       if (!player) return;
 
-      const loaded = await loadGroupState({ client, groupCode, defaultPlayers });
+      const loaded = await loadGroupState({ client, groupCode });
       setPlayers(loaded.players);
       updateState((current) => ({
         ...current,
