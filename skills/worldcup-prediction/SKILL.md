@@ -7,7 +7,7 @@ description: Use when building or changing the World Cup friend-group score pred
 
 ## Product North Star
 
-Build a tiny mobile-first tool for a fixed 10-person WeChat group to collect next-day correct-score predictions. Phase 1 is data collection only: no ROI, rankings, odds math, or login.
+Build a tiny mobile-first tool for WeChat groups to collect next-day correct-score predictions. Phase 2 is data collection with Supabase persistence and `?group=` URL isolation: no ROI, rankings, odds math, or login.
 
 ## Development Flywheel
 
@@ -28,10 +28,10 @@ After each completed task, update this skill when new project-specific lessons, 
 
 ## State Rules
 
-- Phase 1 uses local browser state as a prototype authority.
-- Later phases must treat Supabase as the single authority. Optimistic UI is allowed only if it reconciles back to Supabase.
+- Supabase is the single authority for groups, players, and predictions. Optimistic UI is allowed only if it reconciles back to Supabase.
 - Predictions are keyed by `playerId + matchId`. Re-submitting overwrites that player's prior picks for the match.
-- Custom phase-1 players live in local state under `customPlayers`; adding one selects it immediately.
+- Group isolation is URL-driven: `?group=wx-a` and `?group=wx-b` must not share players or predictions.
+- Custom players live in Supabase under the current group; adding one selects it immediately after the write succeeds.
 
 ## Verification SOP
 
@@ -54,6 +54,8 @@ Stage 1 commands:
 - Local server: `npm run dev`
 - Mobile browser acceptance: `npm run acceptance`
 - Render Static Site: build command `npm run build`, publish directory `dist`.
+- Supabase two-group acceptance: `npm run acceptance:supabase`.
+- Render env vars required: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - For iPhone layout QA, prefer Playwright built-in device descriptors (`devices['iPhone SE']`, `devices['iPhone 13']`, `devices['iPhone 14 Pro Max']`) over hand-written viewport guesses.
 
 ## Current Pitfalls

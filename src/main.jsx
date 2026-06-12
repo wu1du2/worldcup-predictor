@@ -1,18 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import {
-  addCustomPlayer,
   createInitialState,
   exportPredictionsText,
   formatScoreOptionLabel,
   getCopyStatusText,
-  submitPrediction,
   toggleScorePick,
 } from './predictionStore.mjs';
+import {
+  createGroupPlayer,
+  createSupabaseBrowserClient,
+  getGroupCodeFromSearch,
+  loadGroupState,
+  saveGroupPredictions,
+} from './supabaseData.mjs';
 import './styles.css';
 
-const storageKey = 'worldcup-prediction-stage1';
+const storageKey = 'worldcup-prediction-stage2';
 
 const defaultPlayers = [
   { id: 'p01', name: '阿哲' },
@@ -65,6 +70,44 @@ function loadState() {
 
 function App() {
   const [state, setState] = useState(loadState);
+  const [players, setPlayers] = useState(defaultPlayers);
+  const [group, setGroup] = useState(null);
+  const [loadStatus, setLoadStatus] = useState('loading');
+  const [errorMessage, setErrorMessage] = useState('');
+  const client = useMemo(() => createSupabaseBrowserClient(), []);
+  const groupCode = getGroupCodeFromSearch(window.location.search);
+
+  async function refreshGroupState() {
+    if (!client) {
+      setLoadStatus('error');
+      setErrorMessage('Supabase 配置缺失');
+      return;
+    }
+
+    setLoadStatus('loading');
+    setErrorMessage('');
+
+    try {
+      const loaded = await loadGroupState({ client, groupCode, defaultPlayers });
+      setGroup(loaded.group);
+      setPlayers(loaded.players);
+      updateState((current) => ({
+        ...current,
+        selectedPlayerId: current.groupCode === groupCode ? current.selectedPlayerId : '',
+        draftPicks: current.groupCode === groupCode ? current.draftPicks : {},
+        predictions: loaded.predictions,
+        groupCode,
+      }));
+      setLoadStatus('ready');
+    } catch (error) {
+      setLoadStatus('error');
+      setErrorMessage(error.message || '加载失败');
+    }
+  }
+
+  useEffect(() => {
+    refreshGroupState();
+  }, [client, groupCode]);
 
   function updateState(updater) {
     setState((current) => {
@@ -74,7 +117,6 @@ function App() {
     });
   }
 
-  const players = [...defaultPlayers, ...(state.customPlayers || [])];
   const selectedPlayer = players.find((player) => player.id === state.selectedPlayerId);
 
   function selectedScores(matchId, currentState = state) {
@@ -103,28 +145,36 @@ function App() {
     }));
   }
 
-  function submitAll() {
-    if (!state.selectedPlayerId) return;
+  async function submitAll() {
+    if (!state.selectedPlayerId || !group || !client) return;
 
-    updateState((current) => {
-      let next = current;
-      for (const match of matches) {
-        const scores = selectedScores(match.id, current);
-        if (scores.length > 0) {
-          next = submitPrediction(next, {
-            playerId: current.selectedPlayerId,
-            matchId: match.id,
-            scores,
-          });
-        }
-      }
+    const entries = matches
+      .map((match) => ({ matchId: match.id, scores: selectedScores(match.id) }))
+      .filter((entry) => entry.scores.length > 0);
 
-      return {
-        ...next,
+    updateState((current) => ({ ...current, flash: '保存中...' }));
+
+    try {
+      await saveGroupPredictions({
+        client,
+        groupId: group.id,
+        playerId: state.selectedPlayerId,
+        entries,
+      });
+      const loaded = await loadGroupState({ client, groupCode, defaultPlayers });
+      setPlayers(loaded.players);
+      updateState((current) => ({
+        ...current,
+        predictions: loaded.predictions,
         draftPicks: {},
         flash: '已保存，可以回群里继续催大家交卷。',
-      };
-    });
+      }));
+    } catch (error) {
+      updateState((current) => ({
+        ...current,
+        flash: error.message || '保存失败',
+      }));
+    }
   }
 
   function showExport() {
@@ -141,19 +191,40 @@ function App() {
     }));
   }
 
-  function confirmAddPlayer() {
-    updateState((current) => ({
-      ...addCustomPlayer(current, current.newPlayerName || ''),
-      addingPlayer: false,
-      newPlayerName: '',
-    }));
+  async function confirmAddPlayer() {
+    if (!group || !client) return;
+
+    try {
+      const player = await createGroupPlayer({
+        client,
+        groupId: group.id,
+        name: state.newPlayerName || '',
+      });
+      if (!player) return;
+
+      const loaded = await loadGroupState({ client, groupCode, defaultPlayers });
+      setPlayers(loaded.players);
+      updateState((current) => ({
+        ...current,
+        predictions: loaded.predictions,
+        selectedPlayerId: player.id,
+        addingPlayer: false,
+        newPlayerName: '',
+        draftPicks: {},
+      }));
+    } catch (error) {
+      updateState((current) => ({
+        ...current,
+        flash: error.message || '新增失败',
+      }));
+    }
   }
 
   return (
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">明天比赛</p>
+          <p className="eyebrow">明天比赛 · {groupCode}</p>
           <h1>6月13日波胆预测</h1>
         </div>
         <button className="ghost-button" data-action="export" onClick={showExport}>
@@ -187,6 +258,12 @@ function App() {
           </button>
         </div>
       </section>
+
+      {loadStatus !== 'ready' ? (
+        <section className="status-panel" aria-label="加载状态">
+          {loadStatus === 'loading' ? '正在加载群数据...' : errorMessage}
+        </section>
+      ) : null}
 
       <section className="match-board" aria-label="比赛预测">
         {matches.map((match) => (

@@ -8,6 +8,7 @@ const { chromium } = require(
 );
 
 const baseUrl = process.env.APP_URL || 'http://127.0.0.1:5173';
+const groupCode = `stage1-${Date.now()}`;
 const artifactDir = new URL('../docs/artifacts/stage1/', import.meta.url);
 
 await mkdir(artifactDir, { recursive: true });
@@ -22,7 +23,8 @@ const page = await context.newPage();
 
 try {
   await page.addInitScript(() => window.localStorage.clear());
-  await page.goto(baseUrl, { waitUntil: 'networkidle' });
+  await page.goto(`${baseUrl}/?group=${groupCode}`, { waitUntil: 'networkidle' });
+  await page.getByText('正在加载群数据...').waitFor({ state: 'detached' });
   await page.screenshot({ path: new URL('home-empty.png', artifactDir).pathname, fullPage: true });
 
   await page.getByRole('button', { name: '新增名字' }).click();
@@ -36,6 +38,7 @@ try {
   await page.screenshot({ path: new URL('selected-scores.png', artifactDir).pathname, fullPage: true });
 
   await page.getByRole('button', { name: '确定录入' }).click();
+  await page.getByText('已保存，可以回群里继续催大家交卷。').waitFor();
   await page.getByRole('button', { name: '导出文本' }).click();
   const exportedText = await page.locator('[data-export-text]').inputValue();
 
