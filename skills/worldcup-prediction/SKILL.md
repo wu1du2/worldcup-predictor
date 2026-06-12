@@ -20,6 +20,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Mobile first: the first screen must show the date, player picker, match board, and clear primary action without hunting.
 - Main path: choose player -> choose one or more correct scores per match -> submit -> export text.
 - The player picker starts with 10 known names but must allow adding a temporary custom name from the same panel.
+- Export dialog must support one-tap clipboard copy and show an immediate copied/failed state.
 - Low-frequency actions live in compact header controls.
 - Buttons, score chips, and match rows use stable dimensions; text must not overlap or resize the layout.
 - Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`.

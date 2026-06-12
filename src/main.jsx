@@ -6,6 +6,7 @@ import {
   createInitialState,
   exportPredictionsText,
   formatScoreOptionLabel,
+  getCopyStatusText,
   submitPrediction,
   toggleScorePick,
 } from './predictionStore.mjs';
@@ -290,14 +291,30 @@ function AddPlayerDialog({ name, onNameChange, onClose, onConfirm }) {
 }
 
 function ExportDialog({ text, onClose }) {
+  const [copyStatus, setCopyStatus] = useState('idle');
+
+  async function copyText() {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyStatus('copied');
+    } catch {
+      setCopyStatus('failed');
+    }
+  }
+
   return (
     <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="导出文本">
       <div className="dialog">
         <div className="dialog-header">
           <h2>复制到微信群</h2>
-          <button className="icon-button" data-action="close-export" aria-label="关闭" onClick={onClose}>
-            ×
-          </button>
+          <div className="dialog-actions">
+            <button className="copy-button" data-action="copy-export" onClick={copyText}>
+              {getCopyStatusText(copyStatus)}
+            </button>
+            <button className="icon-button" data-action="close-export" aria-label="关闭" onClick={onClose}>
+              ×
+            </button>
+          </div>
         </div>
         <textarea readOnly data-export-text value={text} />
       </div>

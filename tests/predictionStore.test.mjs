@@ -6,6 +6,7 @@ import {
   createInitialState,
   exportPredictionsText,
   formatScoreOptionLabel,
+  getCopyStatusText,
   submitPrediction,
   toggleScorePick,
 } from '../src/predictionStore.mjs';
@@ -75,6 +76,12 @@ test('addCustomPlayer ignores blank names', () => {
 test('formatScoreOptionLabel displays odds without changing score values', () => {
   assert.equal(formatScoreOptionLabel({ score: '1-1', odds: 6.5 }), '1:1(6.5)');
   assert.equal(formatScoreOptionLabel({ score: '其他' }), '其他');
+});
+
+test('getCopyStatusText returns user-facing copy feedback', () => {
+  assert.equal(getCopyStatusText('idle'), '一键复制');
+  assert.equal(getCopyStatusText('copied'), '已复制');
+  assert.equal(getCopyStatusText('failed'), '复制失败');
 });
 
 test('exportPredictionsText renders a WeChat-friendly grouped text dump', () => {

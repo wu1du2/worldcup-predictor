@@ -13,7 +13,12 @@ const artifactDir = new URL('../docs/artifacts/stage1/', import.meta.url);
 await mkdir(artifactDir, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+const context = await browser.newContext({
+  viewport: { width: 390, height: 844 },
+  deviceScaleFactor: 2,
+  permissions: ['clipboard-read', 'clipboard-write'],
+});
+const page = await context.newPage();
 
 try {
   await page.addInitScript(() => window.localStorage.clear());
@@ -38,6 +43,11 @@ try {
   assert.match(exportedText, /03:00 德国 vs 日本/);
   assert.match(exportedText, /小吴：1-0, 2-1/);
   assert.match(exportedText, /21:00 阿根廷 vs 法国/);
+
+  await page.getByRole('button', { name: '一键复制' }).click();
+  await page.getByRole('button', { name: '已复制' }).waitFor();
+  const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+  assert.equal(clipboardText, exportedText);
 
   await page.screenshot({ path: new URL('dump-text.png', artifactDir).pathname, fullPage: true });
 

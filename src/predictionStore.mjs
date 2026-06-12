@@ -38,6 +38,12 @@ export function formatScoreOptionLabel(option) {
   return `${displayScore}(${option.odds})`;
 }
 
+export function getCopyStatusText(status) {
+  if (status === 'copied') return '已复制';
+  if (status === 'failed') return '复制失败';
+  return '一键复制';
+}
+
 export function submitPrediction(state, { playerId, matchId, scores }) {
   const nextPredictions = {
     ...state.predictions,
