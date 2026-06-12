@@ -12,6 +12,63 @@ const chinaClockFormatter = new Intl.DateTimeFormat('en-GB', {
   hour12: false,
 });
 
+const teamNameCnByEnglish = {
+  Argentina: '阿根廷',
+  Australia: '澳大利亚',
+  'Bosnia-Herzegovina': '波黑',
+  Brazil: '巴西',
+  Cameroon: '喀麦隆',
+  Canada: '加拿大',
+  Chile: '智利',
+  Colombia: '哥伦比亚',
+  'Costa Rica': '哥斯达黎加',
+  Croatia: '克罗地亚',
+  Cuba: '古巴',
+  Czechia: '捷克',
+  Denmark: '丹麦',
+  Ecuador: '厄瓜多尔',
+  Egypt: '埃及',
+  England: '英格兰',
+  France: '法国',
+  Germany: '德国',
+  Ghana: '加纳',
+  Haiti: '海地',
+  Iran: '伊朗',
+  Italy: '意大利',
+  Jamaica: '牙买加',
+  Japan: '日本',
+  Mexico: '墨西哥',
+  Morocco: '摩洛哥',
+  Netherlands: '荷兰',
+  Nigeria: '尼日利亚',
+  Norway: '挪威',
+  Panama: '巴拿马',
+  Paraguay: '巴拉圭',
+  Peru: '秘鲁',
+  Poland: '波兰',
+  Portugal: '葡萄牙',
+  Qatar: '卡塔尔',
+  'Republic of Ireland': '爱尔兰',
+  Romania: '罗马尼亚',
+  'Saudi Arabia': '沙特阿拉伯',
+  Scotland: '苏格兰',
+  Senegal: '塞内加尔',
+  Serbia: '塞尔维亚',
+  Slovakia: '斯洛伐克',
+  Slovenia: '斯洛文尼亚',
+  'South Africa': '南非',
+  'South Korea': '韩国',
+  Spain: '西班牙',
+  Sweden: '瑞典',
+  Switzerland: '瑞士',
+  Tunisia: '突尼斯',
+  Turkey: '土耳其',
+  Ukraine: '乌克兰',
+  Uruguay: '乌拉圭',
+  USA: '美国',
+  Wales: '威尔士',
+};
+
 export function normalizeEspnScoreboard(scoreboard) {
   return (scoreboard.events || [])
     .map((event) => normalizeEspnEvent(event))
@@ -69,8 +126,8 @@ export function toAppMatch(row) {
     matchCode: row.match_code || row.id,
     date: row.match_date_cn,
     time: row.time_cn,
-    home: row.home,
-    away: row.away,
+    home: row.home_cn || row.home,
+    away: row.away_cn || row.away,
     homeScore: row.home_score,
     awayScore: row.away_score,
     status: row.status || 'pre',
@@ -87,6 +144,8 @@ export function toMatchUpsertRows(matches, updatedAt = new Date().toISOString())
     kickoff_at: match.kickoff_at_utc,
     home_team: match.home,
     away_team: match.away,
+    home_team_cn: match.home_cn,
+    away_team_cn: match.away_cn,
     active: true,
     updated_at: updatedAt,
   }));
@@ -104,14 +163,19 @@ function normalizeEspnEvent(event) {
 
   const state = event.status?.type?.state || 'pre';
 
+  const homeName = getTeamName(home);
+  const awayName = getTeamName(away);
+
   return {
     id: event.id,
     match_code: `espn-${event.id}`,
     kickoff_at_utc: kickoff.toISOString(),
     match_date_cn: getChinaDate(kickoff),
     time_cn: chinaClockFormatter.format(kickoff),
-    home: getTeamName(home),
-    away: getTeamName(away),
+    home: homeName,
+    away: awayName,
+    home_cn: getTeamNameCn(homeName),
+    away_cn: getTeamNameCn(awayName),
     home_score: normalizeScore(home.score, state),
     away_score: normalizeScore(away.score, state),
     status: state,
@@ -129,6 +193,10 @@ function getChinaDate(date) {
 function getTeamName(competitor) {
   if (typeof competitor.team === 'string') return competitor.team;
   return competitor.team?.displayName || competitor.team?.name || competitor.team?.abbreviation || '';
+}
+
+function getTeamNameCn(name) {
+  return teamNameCnByEnglish[name] || name;
 }
 
 function normalizeScore(score, state) {

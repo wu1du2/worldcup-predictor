@@ -37,7 +37,7 @@ export function mapPredictionsByPlayer(rows) {
 export async function loadMatches({ client }) {
   const { data, error } = await client
     .from('matches')
-    .select('id,match_code,kickoff_at_utc,match_date_cn,time_cn,home,away,home_score,away_score,status,status_detail,venue,stage')
+    .select('id,match_code,kickoff_at_utc,match_date_cn,time_cn,home,away,home_cn,away_cn,home_score,away_score,status,status_detail,venue,stage')
     .eq('active', true)
     .order('kickoff_at_utc', { ascending: true });
 

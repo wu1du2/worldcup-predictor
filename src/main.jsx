@@ -228,7 +228,7 @@ function App() {
       <header className="topbar">
         <div>
           <p className="eyebrow">北京时间 · {groupCode}</p>
-          <h1>{dateLabel}波胆预测</h1>
+          <h1>{dateLabel}比分预测</h1>
         </div>
         <button className="ghost-button" data-action="export" onClick={showExport}>
           导出文本
@@ -290,8 +290,6 @@ function App() {
             key={match.id}
             match={match}
             picks={selectedScores(match.id)}
-            players={players}
-            predictions={state.predictions}
             selectedPlayerId={state.selectedPlayerId}
             onToggle={toggleMatchScore}
           />
@@ -331,9 +329,7 @@ function App() {
   );
 }
 
-function MatchCard({ match, picks, players, predictions, selectedPlayerId, onToggle }) {
-  const predictionCount = players.filter((player) => predictions[player.id]?.[match.id]?.length).length;
-
+function MatchCard({ match, picks, selectedPlayerId, onToggle }) {
   return (
     <article className="match-card">
       <div className="match-header">
@@ -342,13 +338,9 @@ function MatchCard({ match, picks, players, predictions, selectedPlayerId, onTog
           <h2>
             {match.home} <span>vs</span> {match.away}
           </h2>
-          <p className="match-meta">{match.venue || match.stage}</p>
         </div>
         <div className="match-side">
           <div className="score-pill">{getMatchScoreText(match)}</div>
-          <div className="count-pill">
-            {predictionCount}/{players.length}
-          </div>
         </div>
       </div>
       <div className="score-grid">

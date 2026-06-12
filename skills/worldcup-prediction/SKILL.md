@@ -24,6 +24,8 @@ After each completed task, update this skill when new project-specific lessons, 
 - Low-frequency actions live in compact header controls.
 - Buttons, score chips, and match rows use stable dimensions; text must not overlap or resize the layout.
 - Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`.
+- Use “比分预测” in user-facing titles and export headers. Avoid “波胆预测” in visible copy.
+- Match cards show Chinese team names and the match score/status. Do not show venue text or per-match prediction counts in the card.
 - The board must remain usable at 390px wide.
 
 ## State Rules
@@ -35,6 +37,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Players live in Supabase under the current group; adding one selects it immediately after the write succeeds.
 - Match dates and displayed kickoff times are always UTC+8 (`Asia/Shanghai`). Date tabs and export labels use the UTC+8 match date.
 - The match importer upserts by `match_code` and overwrites schedule/status/score fields from the source. Keep legacy compatibility fields (`match_date`, `kickoff_at`, `home_team`, `away_team`) in sync while the old table shape exists.
+- Match importer writes `home_cn` and `away_cn`; frontend prefers those Chinese names and falls back to source names only if missing.
 
 ## Verification SOP
 

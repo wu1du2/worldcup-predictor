@@ -5,6 +5,8 @@ add column if not exists match_date_cn date,
 add column if not exists time_cn text,
 add column if not exists home text,
 add column if not exists away text,
+add column if not exists home_cn text,
+add column if not exists away_cn text,
 add column if not exists stage text default 'Group Stage',
 add column if not exists group_name text,
 add column if not exists venue text,
@@ -16,6 +18,10 @@ add column if not exists winner text,
 add column if not exists source text,
 add column if not exists active boolean default true,
 add column if not exists updated_at timestamptz default now();
+
+alter table matches
+add column if not exists home_team_cn text,
+add column if not exists away_team_cn text;
 
 create unique index if not exists matches_match_code_key on matches(match_code);
 create index if not exists matches_match_date_cn_idx on matches(match_date_cn);

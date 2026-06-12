@@ -89,6 +89,8 @@ test('normalizeEspnScoreboard converts ESPN events into UTC+8 match rows with sc
       time_cn: '03:00',
       home: 'Mexico',
       away: 'South Africa',
+      home_cn: '墨西哥',
+      away_cn: '南非',
       home_score: 2,
       away_score: 0,
       status: 'post',
@@ -105,6 +107,8 @@ test('normalizeEspnScoreboard converts ESPN events into UTC+8 match rows with sc
       time_cn: '09:00',
       home: 'Canada',
       away: 'Qatar',
+      home_cn: '加拿大',
+      away_cn: '卡塔尔',
       home_score: null,
       away_score: null,
       status: 'pre',
@@ -170,6 +174,8 @@ test('toMatchUpsertRows excludes external ids and keeps match_code as the confli
   assert.equal(rows[0].kickoff_at, '2026-06-11T19:00:00.000Z');
   assert.equal(rows[0].home_team, 'Mexico');
   assert.equal(rows[0].away_team, 'South Africa');
+  assert.equal(rows[0].home_team_cn, '墨西哥');
+  assert.equal(rows[0].away_team_cn, '南非');
   assert.equal(rows[0].active, true);
   assert.equal(rows[0].updated_at, '2026-06-12T12:00:00.000Z');
 });
