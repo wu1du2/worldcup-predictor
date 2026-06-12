@@ -236,7 +236,6 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">北京时间 · {groupCode}</p>
           <h1>{dateLabel}比分预测</h1>
         </div>
         <button className="ghost-button" data-action="export" onClick={showExport}>
@@ -261,9 +260,9 @@ function App() {
         </div>
       </section>
 
-      <section className="player-panel" aria-label="选择自己">
+      <section className="player-panel" aria-label="用户名">
         <div className="section-title">
-          <span>选择自己</span>
+          <span>用户名</span>
           <strong>{selectedPlayer ? selectedPlayer.name : '未选择'}</strong>
         </div>
         <div className="player-grid">
