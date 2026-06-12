@@ -47,13 +47,17 @@ Stage 1 artifact directory: `docs/artifacts/stage1/`.
 
 Stage 1 commands:
 
-- Unit logic: `node --test tests/predictionStore.test.mjs`
-- Local server: `python3 -m http.server 4173`
-- Mobile browser acceptance: `node tests/stage1.acceptance.mjs`
+- Install deps: `npm install`
+- Unit and config tests: `npm test`
+- Production build: `npm run build`
+- Local server: `npm run dev`
+- Mobile browser acceptance: `npm run acceptance`
+- Render Static Site: build command `npm run build`, publish directory `dist`.
 
 ## Current Pitfalls
 
 - The local PATH has `node` but no `npm`, `pnpm`, or `yarn`; use zero-dependency static assets and Node's built-in test runner until a package manager is available.
+- Current workspace has npm available at `/opt/homebrew/bin/npm`; use standard Vite + React workflow.
 - Use bundled Playwright from Codex runtime when browser automation is needed.
 - ESM does not resolve bundled Playwright through `NODE_PATH`; acceptance scripts should use `createRequire()` with the bundled runtime path.
 - Full-page mobile screenshots can show fixed bottom bars over later content. Verify the actual viewport path as well as saved screenshots.

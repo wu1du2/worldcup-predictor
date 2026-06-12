@@ -7,7 +7,7 @@ const { chromium } = require(
   '/Users/bytedance/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright',
 );
 
-const baseUrl = process.env.APP_URL || 'http://127.0.0.1:4173';
+const baseUrl = process.env.APP_URL || 'http://127.0.0.1:5173';
 const artifactDir = new URL('../docs/artifacts/stage1/', import.meta.url);
 
 await mkdir(artifactDir, { recursive: true });
