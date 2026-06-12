@@ -54,6 +54,7 @@ Stage 1 commands:
 - Local server: `npm run dev`
 - Mobile browser acceptance: `npm run acceptance`
 - Render Static Site: build command `npm run build`, publish directory `dist`.
+- For iPhone layout QA, prefer Playwright built-in device descriptors (`devices['iPhone SE']`, `devices['iPhone 13']`, `devices['iPhone 14 Pro Max']`) over hand-written viewport guesses.
 
 ## Current Pitfalls
 
@@ -62,3 +63,4 @@ Stage 1 commands:
 - Use bundled Playwright from Codex runtime when browser automation is needed.
 - ESM does not resolve bundled Playwright through `NODE_PATH`; acceptance scripts should use `createRequire()` with the bundled runtime path.
 - Full-page mobile screenshots can show fixed bottom bars over later content. Verify the actual viewport path as well as saved screenshots.
+- Hand-written `375x667` is not the narrowest iPhone check. Playwright's built-in `iPhone SE` descriptor uses a `320x568` CSS viewport and caught score-chip overflow.

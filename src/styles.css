@@ -321,3 +321,23 @@ textarea {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+@media (max-width: 340px) {
+  .app-shell {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .match-card {
+    padding: 10px;
+  }
+
+  .score-grid {
+    gap: 6px;
+  }
+
+  .score-chip {
+    height: 36px;
+    font-size: 11px;
+  }
+}
