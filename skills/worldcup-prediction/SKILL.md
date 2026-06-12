@@ -37,7 +37,8 @@ After each completed task, update this skill when new project-specific lessons, 
 - Players live in Supabase under the current group; adding one selects it immediately after the write succeeds.
 - Match dates and displayed kickoff times are always UTC+8 (`Asia/Shanghai`). Date tabs and export labels use the UTC+8 match date.
 - The match importer upserts by `match_code` and overwrites schedule/status/score fields from the source. Keep legacy compatibility fields (`match_date`, `kickoff_at`, `home_team`, `away_team`) in sync while the old table shape exists.
-- Match importer writes `home_cn` and `away_cn`; frontend prefers those Chinese names and falls back to source names only if missing.
+- Team Chinese names live in the `teams` table as the translation authority. Importers upsert teams from `data/team-name-mapping.csv`, write `home_team_id` and `away_team_id` to matches, and keep `home_cn` / `away_cn` only as snapshots.
+- Frontend match loading should use Supabase embedded joins (`home_team:teams!matches_home_team_id_fkey`, `away_team:teams!matches_away_team_id_fkey`) and prefer joined `teams.name_cn` over snapshot fields.
 
 ## Verification SOP
 

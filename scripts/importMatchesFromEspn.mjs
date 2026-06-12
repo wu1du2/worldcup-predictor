@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { fetchJsonWithRetry } from '../src/matchImport.mjs';
 import { normalizeEspnScoreboard, toMatchUpsertRows } from '../src/matchSchedule.mjs';
+import { attachTeamsToMatches, parseTeamNameCsv, toTeamUpsertRows } from '../src/teamNames.mjs';
 
 const scoreboardUrl = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260627&limit=200';
 const dryRun = process.argv.includes('--dry-run');
@@ -14,6 +15,7 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SU
 
 const scoreboard = await fetchScoreboard();
 const matches = normalizeEspnScoreboard(scoreboard);
+const teamNames = parseTeamNameCsv(await readFile(new URL('../data/team-name-mapping.csv', import.meta.url), 'utf8'));
 validateMatches(matches);
 
 console.log(`Fetched ${matches.length} World Cup group-stage matches from ESPN.`);
@@ -30,12 +32,27 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 const client = createClient(supabaseUrl, supabaseKey);
+
+const { error: teamsError } = await client
+  .from('teams')
+  .upsert(toTeamUpsertRows(teamNames), { onConflict: 'source,name_en' });
+
+if (teamsError) throw teamsError;
+
+const { data: teams, error: loadTeamsError } = await client
+  .from('teams')
+  .select('id,source,name_en,name_cn')
+  .eq('source', 'espn');
+
+if (loadTeamsError) throw loadTeamsError;
+
 const { error } = await client
   .from('matches')
-  .upsert(toMatchUpsertRows(matches), { onConflict: 'match_code' });
+  .upsert(toMatchUpsertRows(attachTeamsToMatches(matches, teams || [])), { onConflict: 'match_code' });
 
 if (error) throw error;
 
+console.log(`Upserted ${teamNames.length} teams into Supabase.`);
 console.log(`Upserted ${matches.length} matches into Supabase.`);
 
 async function fetchScoreboard() {
