@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import {
@@ -58,6 +58,7 @@ function App() {
   const [group, setGroup] = useState(null);
   const [loadStatus, setLoadStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
+  const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
 
@@ -112,6 +113,14 @@ function App() {
   const selectedDate = state.selectedDate || getDefaultMatchDateCn(matches);
   const visibleMatches = matches.filter((match) => match.date === selectedDate);
   const dateLabel = selectedDate ? formatChinaDateLabel(selectedDate) : '暂无赛程';
+
+  useEffect(() => {
+    selectedDateButtonRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'start',
+    });
+  }, [selectedDate, dateTabs.length]);
 
   function selectedScores(matchId, currentState = state) {
     const playerId = currentState.selectedPlayerId;
@@ -240,6 +249,7 @@ function App() {
           {dateTabs.map((tab) => (
             <button
               key={tab.date}
+              ref={tab.date === selectedDate ? selectedDateButtonRef : null}
               className={`date-chip ${tab.date === selectedDate ? 'selected' : ''}`}
               data-match-date={tab.date}
               onClick={() => selectDate(tab.date)}

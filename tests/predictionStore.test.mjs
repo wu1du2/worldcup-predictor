@@ -107,7 +107,7 @@ test('exportPredictionsText renders a WeChat-friendly grouped text dump', () => 
   assert.equal(
     text,
     [
-      '6月13日波胆预测',
+      '6月13日比分预测',
       '',
       '03:00 德国 vs 日本',
       '阿哲：1-0, 2-1',

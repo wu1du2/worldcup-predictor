@@ -26,6 +26,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`.
 - Use “比分预测” in user-facing titles and export headers. Avoid “波胆预测” in visible copy.
 - Match cards show Chinese team names and the match score/status. Do not show venue text or per-match prediction counts in the card.
+- Date tabs include all imported group-stage dates, but the selected today/next match day should auto-scroll to the left edge so future dates are immediately visible.
 - The board must remain usable at 390px wide.
 
 ## State Rules

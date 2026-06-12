@@ -60,7 +60,7 @@ export function submitPrediction(state, { playerId, matchId, scores }) {
 }
 
 export function exportPredictionsText({ dateLabel, matches, players, state }) {
-  const lines = [`${dateLabel}波胆预测`];
+  const lines = [`${dateLabel}比分预测`];
 
   for (const match of matches) {
     lines.push('', `${match.time} ${match.home} vs ${match.away}`);

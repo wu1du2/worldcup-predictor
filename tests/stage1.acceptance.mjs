@@ -43,7 +43,7 @@ try {
   await page.getByRole('button', { name: '导出文本' }).click();
   const exportedText = await page.locator('[data-export-text]').inputValue();
 
-  assert.match(exportedText, /\d+月\d+日波胆预测/);
+  assert.match(exportedText, /\d+月\d+日比分预测/);
   assert.match(exportedText, /\d\d:\d\d .+ vs .+/);
   assert.match(exportedText, /小吴：1-0, 2-1/);
 
