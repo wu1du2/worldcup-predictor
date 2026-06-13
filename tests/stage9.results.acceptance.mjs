@@ -115,7 +115,7 @@ try {
   assert.match(exportedText, /\[预测情况\]\n03:00 加拿大 vs 波黑/);
   assert.match(exportedText, /张三：1-0, 1-1/);
   assert.match(exportedText, /李四：1-1/);
-  assert.match(exportedText, /\[欢迎点击预测后续比赛 http:\/\/127\.0\.0\.1:\d+\/\?group=stage9-results\]/);
+  assert.match(exportedText, /\[欢迎预测\] http:\/\/127\.0\.0\.1:\d+\/\?group=stage9-results/);
 
   await page.screenshot({ path: new URL('export-results-iphone13.png', artifactDir).pathname, fullPage: true });
   await writeFile(new URL('export-results-text.txt', artifactDir), `${exportedText}\n`);

@@ -149,7 +149,7 @@ export function exportPredictionsText({
   }
 
   if (currentGroupUrl) {
-    lines.push('', `[欢迎点击预测后续比赛 ${currentGroupUrl}]`);
+    lines.push('', `[欢迎预测] ${currentGroupUrl}`);
   }
 
   return lines.join('\n').trimEnd();

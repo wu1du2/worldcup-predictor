@@ -16,4 +16,4 @@
 09:00 美国 vs 巴拉圭
 张三：2-0
 
-[欢迎点击预测后续比赛 http://127.0.0.1:5173/?group=stage9-results]
+[欢迎预测] http://127.0.0.1:5173/?group=stage9-results

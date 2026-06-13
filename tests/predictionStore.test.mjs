@@ -136,7 +136,7 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
       '21:00 西班牙 vs 巴西',
       '阿哲：0-0',
       '',
-      '[欢迎点击预测后续比赛 https://worldcup-predictor.example/?group=friends]',
+      '[欢迎预测] https://worldcup-predictor.example/?group=friends',
     ].join('\n'),
   );
 });
