@@ -199,6 +199,8 @@ function App() {
       matches: visibleMatches,
       players,
       state,
+      scoreOddsByMatch,
+      currentGroupUrl: window.location.href,
     });
 
     setState((current) => ({

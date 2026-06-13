@@ -59,11 +59,86 @@ export function submitPrediction(state, { playerId, matchId, scores }) {
   };
 }
 
-export function exportPredictionsText({ dateLabel, matches, players, state }) {
-  const lines = [`${dateLabel}比分预测`];
+export function buildPredictionResultRows({ matches, players, state, scoreOddsByMatch = {} }) {
+  const completedMatches = (matches || []).filter(isCompletedMatch);
+  const completedById = new Map(completedMatches.map((match) => [match.id, match]));
+  const rows = [];
 
-  for (const match of matches) {
-    lines.push('', `${match.time} ${match.home} vs ${match.away}`);
+  for (const player of players || []) {
+    const playerPredictions = state.predictions?.[player.id] || {};
+    let cost = 0;
+    let revenue = 0;
+    const hits = [];
+
+    for (const [matchId, scores] of Object.entries(playerPredictions)) {
+      const match = completedById.get(matchId);
+      if (!match || !Array.isArray(scores) || scores.length === 0) continue;
+
+      cost += scores.length;
+      const actualScore = `${match.homeScore}-${match.awayScore}`;
+      if (!scores.includes(actualScore)) continue;
+
+      const odds = findScoreOdds(scoreOddsByMatch[matchId], actualScore);
+      if (!Number.isFinite(odds)) continue;
+
+      revenue += odds;
+      hits.push({
+        matchLabel: `${match.home} vs ${match.away}`,
+        score: actualScore,
+        odds,
+      });
+    }
+
+    if (!hits.length || cost === 0) continue;
+
+    rows.push({
+      playerId: player.id,
+      playerName: player.name,
+      cost,
+      revenue,
+      roiPercent: Math.round(((revenue - cost) / cost) * 100),
+      hits,
+    });
+  }
+
+  return rows.sort((a, b) => (
+    b.roiPercent - a.roiPercent
+    || b.revenue - a.revenue
+    || a.playerName.localeCompare(b.playerName, 'zh-Hans-CN')
+  ));
+}
+
+export function exportPredictionsText({
+  dateLabel,
+  matches,
+  players,
+  state,
+  scoreOddsByMatch = {},
+  currentGroupUrl = '',
+}) {
+  const lines = [`${dateLabel}比分预测`];
+  const completedMatches = (matches || []).filter(isCompletedMatch);
+  const resultRows = buildPredictionResultRows({ matches, players, state, scoreOddsByMatch });
+
+  lines.push('', '[结果展示]', '今日懂球帝');
+
+  if (!completedMatches.length) {
+    lines.push('暂无完场比赛');
+  } else if (!resultRows.length) {
+    lines.push('暂无命中');
+  } else {
+    for (const row of resultRows) {
+      lines.push(`${row.playerName} ROI = ${row.roiPercent}%`);
+      for (const hit of row.hits) {
+        lines.push(`${hit.matchLabel} [${hit.score}(${formatOdds(hit.odds)})]`);
+      }
+    }
+  }
+
+  lines.push('', '[预测情况]');
+  for (const [index, match] of matches.entries()) {
+    if (index > 0) lines.push('');
+    lines.push(`${match.time} ${match.home} vs ${match.away}`);
 
     for (const player of players) {
       const scores = state.predictions[player.id]?.[match.id] || [];
@@ -73,7 +148,28 @@ export function exportPredictionsText({ dateLabel, matches, players, state }) {
     }
   }
 
+  if (currentGroupUrl) {
+    lines.push('', `[欢迎点击预测后续比赛 ${currentGroupUrl}]`);
+  }
+
   return lines.join('\n').trimEnd();
+}
+
+function isCompletedMatch(match) {
+  return match.status === 'post'
+    && Number.isInteger(match.homeScore)
+    && Number.isInteger(match.awayScore);
+}
+
+function findScoreOdds(scoreOptions = [], score) {
+  const option = scoreOptions.find((item) => item.score === score);
+  if (!option) return null;
+  const odds = Number(option.odds);
+  return Number.isFinite(odds) ? odds : null;
+}
+
+function formatOdds(odds) {
+  return Number.isInteger(odds) ? String(odds) : String(odds);
 }
 
 function slugifyName(name) {

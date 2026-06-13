@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   addCustomPlayer,
+  buildPredictionResultRows,
   createInitialState,
   exportPredictionsText,
   formatScoreOptionLabel,
@@ -23,6 +24,9 @@ const matches = [
     time: '03:00',
     home: '德国',
     away: '日本',
+    homeScore: 1,
+    awayScore: 0,
+    status: 'post',
   },
   {
     id: 'm2',
@@ -30,6 +34,9 @@ const matches = [
     time: '21:00',
     home: '西班牙',
     away: '巴西',
+    homeScore: null,
+    awayScore: null,
+    status: 'pre',
   },
 ];
 
@@ -84,7 +91,7 @@ test('getCopyStatusText returns user-facing copy feedback', () => {
   assert.equal(getCopyStatusText('failed'), '复制失败');
 });
 
-test('exportPredictionsText renders a WeChat-friendly grouped text dump', () => {
+test('exportPredictionsText renders results, raw predictions, and group URL', () => {
   const state = {
     predictions: {
       alice: {
@@ -102,6 +109,13 @@ test('exportPredictionsText renders a WeChat-friendly grouped text dump', () => 
     matches,
     players,
     state,
+    scoreOddsByMatch: {
+      m1: [
+        { score: '1-0', odds: 6 },
+        { score: '2-1', odds: 12 },
+      ],
+    },
+    currentGroupUrl: 'https://worldcup-predictor.example/?group=friends',
   });
 
   assert.equal(
@@ -109,12 +123,128 @@ test('exportPredictionsText renders a WeChat-friendly grouped text dump', () => 
     [
       '6月13日比分预测',
       '',
+      '[结果展示]',
+      '今日懂球帝',
+      '阿哲 ROI = 200%',
+      '德国 vs 日本 [1-0(6)]',
+      '',
+      '[预测情况]',
       '03:00 德国 vs 日本',
       '阿哲：1-0, 2-1',
       '北北：1-1',
       '',
       '21:00 西班牙 vs 巴西',
       '阿哲：0-0',
+      '',
+      '[欢迎点击预测后续比赛 https://worldcup-predictor.example/?group=friends]',
     ].join('\n'),
   );
+});
+
+test('buildPredictionResultRows counts only completed matches and sorts by ROI then revenue then name', () => {
+  const resultRows = buildPredictionResultRows({
+    matches: [
+      {
+        id: 'm1',
+        home: '加拿大',
+        away: '波黑',
+        homeScore: 1,
+        awayScore: 1,
+        status: 'post',
+      },
+      {
+        id: 'm2',
+        home: '美国',
+        away: '巴拉圭',
+        homeScore: 2,
+        awayScore: 0,
+        status: 'post',
+      },
+      {
+        id: 'm3',
+        home: '德国',
+        away: '日本',
+        homeScore: null,
+        awayScore: null,
+        status: 'pre',
+      },
+    ],
+    players: [
+      { id: 'zhang', name: '张三' },
+      { id: 'li', name: '李四' },
+      { id: 'wang', name: '王五' },
+    ],
+    state: {
+      predictions: {
+        zhang: {
+          m1: ['1-0', '1-1'],
+          m2: ['2-0'],
+          m3: ['3-0'],
+        },
+        li: {
+          m1: ['1-1'],
+        },
+        wang: {
+          m2: ['1-0'],
+        },
+      },
+    },
+    scoreOddsByMatch: {
+      m1: [
+        { score: '1-1', odds: 8 },
+      ],
+      m2: [
+        { score: '2-0', odds: 6 },
+      ],
+      m3: [
+        { score: '3-0', odds: 20 },
+      ],
+    },
+  });
+
+  assert.deepEqual(resultRows, [
+    {
+      playerId: 'li',
+      playerName: '李四',
+      cost: 1,
+      revenue: 8,
+      roiPercent: 700,
+      hits: [
+        { matchLabel: '加拿大 vs 波黑', score: '1-1', odds: 8 },
+      ],
+    },
+    {
+      playerId: 'zhang',
+      playerName: '张三',
+      cost: 3,
+      revenue: 14,
+      roiPercent: 367,
+      hits: [
+        { matchLabel: '加拿大 vs 波黑', score: '1-1', odds: 8 },
+        { matchLabel: '美国 vs 巴拉圭', score: '2-0', odds: 6 },
+      ],
+    },
+  ]);
+});
+
+test('exportPredictionsText reports empty result states', () => {
+  const base = {
+    dateLabel: '6月13日',
+    players,
+    currentGroupUrl: 'https://worldcup-predictor.example/?group=friends',
+  };
+
+  assert.match(exportPredictionsText({
+    ...base,
+    matches: [{ id: 'm1', time: '03:00', home: '德国', away: '日本', status: 'pre' }],
+    state: { predictions: { alice: { m1: ['1-0'] } } },
+    scoreOddsByMatch: {},
+  }), /暂无完场比赛/);
+
+  assert.match(exportPredictionsText({
+    ...base,
+    matches: [{ id: 'm1', time: '03:00', home: '德国', away: '日本', status: 'post', homeScore: 0, awayScore: 0 }],
+    state: { predictions: { alice: { m1: ['1-0'] } } },
+    scoreOddsByMatch: { m1: [{ score: '0-0', odds: 9.5 }] },
+  }), /暂无命中/);
 });

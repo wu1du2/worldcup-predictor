@@ -21,6 +21,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Main path: choose player -> choose one or more correct scores per match -> submit -> export text.
 - New groups start with no members. The player picker shows only group-specific Supabase players plus a `+` button.
 - Export dialog must support one-tap clipboard copy and show an immediate copied/failed state.
+- Export text includes a results section before raw predictions. ROI counts only completed matches, treats each selected score as one unit of cost, pays the matched score odds as revenue, and sorts hit players by ROI, then revenue, then name.
 - Low-frequency actions live in compact header controls.
 - Buttons, score chips, and match rows use stable dimensions; text must not overlap or resize the layout.
 - Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`.
@@ -72,6 +73,7 @@ Stage 1 commands:
 - Render env vars required: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - For iPhone layout QA, prefer Playwright built-in device descriptors (`devices['iPhone SE']`, `devices['iPhone 13']`, `devices['iPhone 14 Pro Max']`) over hand-written viewport guesses.
 - Stage 3 real schedule screenshot: `docs/artifacts/stage3/real-schedule-score-iphone13.png`.
+- Results export acceptance: `npm run acceptance:results` with a local Vite server verifies an iPhone 13 export dialog using mocked Supabase responses and writes `docs/artifacts/stage9/export-results-*`.
 
 ## Current Pitfalls
 
