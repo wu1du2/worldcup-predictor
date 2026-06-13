@@ -3,7 +3,7 @@ name: Import World Cup Matches
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 18 * * *'
+    - cron: '*/5 * * * *'
 
 jobs:
   import-matches:
