@@ -109,8 +109,8 @@ try {
   const exportedText = await page.locator('[data-export-text]').inputValue();
   assert.match(exportedText, /^6月13日比分预测/);
   assert.match(exportedText, /\[结果展示\]\n今日懂球帝/);
-  assert.match(exportedText, /李四 ROI = 700%\n加拿大 vs 波黑 \[1-1\(8\)\]/);
-  assert.match(exportedText, /张三 ROI = 367%/);
+  assert.match(exportedText, /李四 ROI = 700%｜净收益 \+7｜命中 1\/1｜成本 1\n加拿大 vs 波黑 \[1-1\(8\)\]/);
+  assert.match(exportedText, /张三 ROI = 367%｜净收益 \+11｜命中 2\/2｜成本 3/);
   assert.match(exportedText, /美国 vs 巴拉圭 \[2-0\(6\)\]/);
   assert.match(exportedText, /\[预测情况\]\n03:00 加拿大 vs 波黑/);
   assert.match(exportedText, /张三：1-0, 1-1/);

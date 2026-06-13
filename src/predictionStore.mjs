@@ -68,12 +68,14 @@ export function buildPredictionResultRows({ matches, players, state, scoreOddsBy
     const playerPredictions = state.predictions?.[player.id] || {};
     let cost = 0;
     let revenue = 0;
+    let settledMatchCount = 0;
     const hits = [];
 
     for (const [matchId, scores] of Object.entries(playerPredictions)) {
       const match = completedById.get(matchId);
       if (!match || !Array.isArray(scores) || scores.length === 0) continue;
 
+      settledMatchCount += 1;
       cost += scores.length;
       const actualScore = `${match.homeScore}-${match.awayScore}`;
       if (!scores.includes(actualScore)) continue;
@@ -96,6 +98,8 @@ export function buildPredictionResultRows({ matches, players, state, scoreOddsBy
       playerName: player.name,
       cost,
       revenue,
+      netProfit: roundMetric(revenue - cost),
+      settledMatchCount,
       roiPercent: Math.round(((revenue - cost) / cost) * 100),
       hits,
     });
@@ -128,7 +132,7 @@ export function exportPredictionsText({
     lines.push('暂无命中');
   } else {
     for (const row of resultRows) {
-      lines.push(`${row.playerName} ROI = ${row.roiPercent}%`);
+      lines.push(`${row.playerName} ROI = ${row.roiPercent}%｜净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
       for (const hit of row.hits) {
         lines.push(`${hit.matchLabel} [${hit.score}(${formatOdds(hit.odds)})]`);
       }
@@ -170,6 +174,20 @@ function findScoreOdds(scoreOptions = [], score) {
 
 function formatOdds(odds) {
   return Number.isInteger(odds) ? String(odds) : String(odds);
+}
+
+function formatSignedAmount(value) {
+  const amount = formatMetric(value);
+  return value > 0 ? `+${amount}` : amount;
+}
+
+function formatMetric(value) {
+  const rounded = roundMetric(value);
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/0+$/, '').replace(/\.$/, '');
+}
+
+function roundMetric(value) {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
 function slugifyName(name) {

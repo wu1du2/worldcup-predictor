@@ -125,7 +125,7 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
       '',
       '[结果展示]',
       '今日懂球帝',
-      '阿哲 ROI = 200%',
+      '阿哲 ROI = 200%｜净收益 +4｜命中 1/1｜成本 2',
       '德国 vs 日本 [1-0(6)]',
       '',
       '[预测情况]',
@@ -139,6 +139,49 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
       '[欢迎预测] https://worldcup-predictor.example/?group=friends',
     ].join('\n'),
   );
+});
+
+test('exportPredictionsText reports net profit, hit rate, and cost in result rows', () => {
+  const text = exportPredictionsText({
+    dateLabel: '6月13日',
+    matches: [
+      {
+        id: 'm1',
+        date: '2026-06-13',
+        time: '03:00',
+        home: '加拿大',
+        away: '波黑',
+        homeScore: 1,
+        awayScore: 0,
+        status: 'post',
+      },
+      {
+        id: 'm2',
+        date: '2026-06-13',
+        time: '09:00',
+        home: '美国',
+        away: '巴拉圭',
+        homeScore: 2,
+        awayScore: 0,
+        status: 'post',
+      },
+    ],
+    players: [{ id: 'zhang', name: '张三' }],
+    state: {
+      predictions: {
+        zhang: {
+          m1: ['1-0'],
+          m2: ['1-1'],
+        },
+      },
+    },
+    scoreOddsByMatch: {
+      m1: [{ score: '1-0', odds: 5.3 }],
+      m2: [{ score: '2-0', odds: 6 }],
+    },
+  });
+
+  assert.match(text, /张三 ROI = 165%｜净收益 \+3\.3｜命中 1\/2｜成本 2/);
 });
 
 test('buildPredictionResultRows counts only completed matches and sorts by ROI then revenue then name', () => {
@@ -208,6 +251,8 @@ test('buildPredictionResultRows counts only completed matches and sorts by ROI t
       playerName: '李四',
       cost: 1,
       revenue: 8,
+      netProfit: 7,
+      settledMatchCount: 1,
       roiPercent: 700,
       hits: [
         { matchLabel: '加拿大 vs 波黑', score: '1-1', odds: 8 },
@@ -218,6 +263,8 @@ test('buildPredictionResultRows counts only completed matches and sorts by ROI t
       playerName: '张三',
       cost: 3,
       revenue: 14,
+      netProfit: 11,
+      settledMatchCount: 2,
       roiPercent: 367,
       hits: [
         { matchLabel: '加拿大 vs 波黑', score: '1-1', odds: 8 },
