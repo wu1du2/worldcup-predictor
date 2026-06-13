@@ -69,11 +69,13 @@ Stage 1 commands:
 - GitHub Actions imports matches daily at 18:17 UTC (02:17 UTC+8) and can be manually triggered from `Import World Cup Matches`.
 - GitHub Actions requires repository secrets `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
 - Correct-score odds probe: `npm run probe:odds` fetches 500.com Sporttery score odds, decodes GB18030 HTML, parses to `docs/artifacts/odds-probe/sporttery-score-odds.json`, and does not write Supabase.
-- Correct-score odds import: after `sql/stage4_score_odds.sql` is applied, run `npm run import:odds:dry` to validate live parsing, then `npm run import:odds` to upsert `score_odds`. The GitHub Actions workflow `Import Sporttery Odds` runs daily at 18:37 UTC (02:37 UTC+8).
+- Correct-score odds import: after `sql/stage4_score_odds.sql` is applied, run `npm run import:odds:dry` to validate live parsing, then `npm run import:odds` to upsert `score_odds`. The GitHub Actions workflow `Import Sporttery Odds` runs every five minutes.
+- Backend import reports: after `sql/stage10_import_reports.sql` is applied, match and odds importers write success/failed rows to `import_reports`. The right-header `...` button reads this table as a compact backend report.
 - Render env vars required: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - For iPhone layout QA, prefer Playwright built-in device descriptors (`devices['iPhone SE']`, `devices['iPhone 13']`, `devices['iPhone 14 Pro Max']`) over hand-written viewport guesses.
 - Stage 3 real schedule screenshot: `docs/artifacts/stage3/real-schedule-score-iphone13.png`.
 - Results export acceptance: `npm run acceptance:results` with a local Vite server verifies an iPhone 13 export dialog using mocked Supabase responses and writes `docs/artifacts/stage9/export-results-*`.
+- Backend report acceptance: `npm run acceptance:reports` with a local Vite server verifies the iPhone 13 `...` report dialog with mocked success/failed reports and writes `docs/artifacts/stage10/backend-report-*`.
 
 ## Current Pitfalls
 
@@ -87,5 +89,6 @@ Stage 1 commands:
 - 500.com Sporttery pages are GB18030 encoded. Decode with `new TextDecoder('gb18030')`, not UTF-8, or Chinese teams and odds text will be unreliable.
 - 500.com date URLs can return overlapping rolling sales windows. Odds importers must dedupe by source match key and then filter by UTC+8 kickoff date before writing/reviewing rows.
 - Frontend odds display reads `score_odds` with the browser anon key. If service role sees rows but the page shows fallback scores without odds, check the `score_odds_public_read` RLS select policy.
+- Import report writes are best-effort and must not make an otherwise successful import fail. If the report dialog errors while import logs look healthy, first check that `sql/stage10_import_reports.sql` was applied and the public read policy exists.
 - Old/incomplete `matches` rows may remain in Supabase from earlier phases. Data loading must filter out rows missing `match_code`, UTC+8 date, kickoff time, home, or away before rendering.
 - Shared schedule helpers may receive raw importer rows (`match_date_cn`) or app rows (`date`). Tests should cover both shapes to prevent UI crashes.

@@ -6,49 +6,77 @@ import {
   dedupeParsedMatches,
   parseSportteryScoreOddsHtml,
   toScoreOptionRows,
+  validateParsedOddsMatches,
   validateScoreOddsRows,
 } from '../src/sportteryOdds.mjs';
+import { getGithubRunUrl, writeImportReport } from '../src/importReports.mjs';
 
 const artifactDir = new URL('../docs/artifacts/odds-import/', import.meta.url);
 const dryRun = process.argv.includes('--dry-run');
 const dateArg = process.argv.find((arg) => arg.startsWith('--date='))?.slice('--date='.length);
 const date = dateArg || formatChinaDate(new Date());
+const startedAt = new Date().toISOString();
 
 await loadLocalEnv();
 await mkdir(artifactDir, { recursive: true });
 
-const url = buildSportteryScoreUrl(date);
-const html = await fetchGb18030WithRetry(url);
-await writeFile(new URL(`500-score-${date}.html`, artifactDir), html);
-
-const matches = dedupeParsedMatches(parseSportteryScoreOddsHtml(html));
-const rows = validateScoreOddsRows(toScoreOptionRows(matches));
-await writeFile(new URL('sporttery-score-odds-import.json', artifactDir), `${JSON.stringify({ date, sourceUrl: url, matches, rows }, null, 2)}\n`);
-
-console.log(`Fetched Sporttery score odds from ${url}`);
-console.log(`Parsed ${matches.length} unique matches and ${rows.length} score odds rows.`);
-
-if (dryRun) {
-  console.log('Dry run: not writing Supabase.');
-  console.log(JSON.stringify(matches.slice(0, 5), null, 2));
-  process.exit(0);
-}
-
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars.');
+let client = null;
+let matches = [];
+let rows = [];
+
+try {
+  const url = buildSportteryScoreUrl(date);
+  const html = await fetchGb18030WithRetry(url);
+  await writeFile(new URL(`500-score-${date}.html`, artifactDir), html);
+
+  matches = validateParsedOddsMatches(dedupeParsedMatches(parseSportteryScoreOddsHtml(html)));
+  rows = validateScoreOddsRows(toScoreOptionRows(matches));
+  await writeFile(new URL('sporttery-score-odds-import.json', artifactDir), `${JSON.stringify({ date, sourceUrl: url, matches, rows }, null, 2)}\n`);
+
+  console.log(`Fetched Sporttery score odds from ${url}`);
+  console.log(`Parsed ${matches.length} unique matches and ${rows.length} score odds rows.`);
+
+  if (dryRun) {
+    console.log('Dry run: not writing Supabase.');
+    console.log(JSON.stringify(matches.slice(0, 5), null, 2));
+  } else {
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars.');
+    }
+
+    client = createClient(supabaseUrl, supabaseKey);
+    const { error } = await client
+      .from('score_odds')
+      .upsert(rows, { onConflict: 'source,source_match_key,score' });
+
+    if (error) throw error;
+
+    console.log(`Upserted ${rows.length} score odds rows into Supabase.`);
+    await reportImport({
+      client,
+      status: 'success',
+      rowsWritten: rows.length,
+      itemsSeen: matches.length,
+      message: `Upserted ${rows.length} score odds rows.`,
+    });
+  }
+} catch (error) {
+  if (!dryRun && supabaseUrl && supabaseKey) {
+    client ||= createClient(supabaseUrl, supabaseKey);
+    await reportImport({
+      client,
+      status: 'failed',
+      rowsWritten: 0,
+      itemsSeen: matches.length,
+      message: error.message || 'Odds import failed.',
+      errorDetail: error.stack || String(error),
+    });
+  }
+  throw error;
 }
-
-const client = createClient(supabaseUrl, supabaseKey);
-const { error } = await client
-  .from('score_odds')
-  .upsert(rows, { onConflict: 'source,source_match_key,score' });
-
-if (error) throw error;
-
-console.log(`Upserted ${rows.length} score odds rows into Supabase.`);
 
 async function fetchGb18030WithRetry(urlToFetch, options = {}) {
   const {
@@ -106,4 +134,20 @@ async function loadLocalEnv() {
   } catch {
     // .env.local is optional; CI should use real environment variables.
   }
+}
+
+async function reportImport({ client: reportClient, status, rowsWritten, itemsSeen, message, errorDetail = '' }) {
+  await writeImportReport({
+    client: reportClient,
+    report: {
+      jobName: 'odds',
+      status,
+      startedAt,
+      rowsWritten,
+      itemsSeen,
+      message,
+      errorDetail,
+      runUrl: getGithubRunUrl(),
+    },
+  });
 }

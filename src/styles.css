@@ -38,6 +38,12 @@ textarea {
   margin-bottom: 14px;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .eyebrow,
 .match-time {
   margin: 0 0 4px;
@@ -375,6 +381,96 @@ h1 {
   color: #1f2c27;
   font-size: 22px;
   line-height: 1;
+}
+
+.topbar-menu-button {
+  flex: 0 0 auto;
+  background: #ffffff;
+  border: 1px solid #cad2ca;
+  color: #126252;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 0.8;
+}
+
+.report-dialog {
+  max-height: min(78vh, 660px);
+  overflow: hidden;
+}
+
+.report-list {
+  display: grid;
+  gap: 10px;
+  max-height: calc(min(78vh, 660px) - 58px);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.report-item {
+  padding: 10px;
+  border: 1px solid #d8e0da;
+  border-radius: 8px;
+  background: #fbfcfa;
+}
+
+.report-item.failed {
+  border-color: #e5b9ad;
+  background: #fff7f4;
+}
+
+.report-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.report-item-header strong,
+.report-item-header span {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.report-item.success .report-item-header span {
+  color: #126252;
+}
+
+.report-item.failed .report-item-header span {
+  color: #b13d26;
+}
+
+.report-item p {
+  margin: 7px 0 5px;
+  color: #24352d;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.report-item small {
+  color: #6a766f;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.report-item pre {
+  max-height: 108px;
+  overflow: auto;
+  margin: 8px 0 0;
+  padding: 8px;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #5b2a20;
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+
+.report-empty {
+  padding: 18px 10px;
+  color: #5f6b65;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
 }
 
 textarea {

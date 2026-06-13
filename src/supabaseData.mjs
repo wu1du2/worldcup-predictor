@@ -55,6 +55,33 @@ export async function loadScoreOdds({ client, matches }) {
   return mapScoreOddsByMatch(matches, data || []);
 }
 
+export async function loadImportReports({ client, limit = 8 }) {
+  const { data, error } = await client
+    .from('import_reports')
+    .select('id,job_name,status,started_at,finished_at,rows_written,items_seen,message,error_detail,run_url,created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return (data || []).map(toAppImportReport);
+}
+
+function toAppImportReport(row) {
+  return {
+    id: row.id,
+    jobName: row.job_name,
+    status: row.status,
+    startedAt: row.started_at,
+    finishedAt: row.finished_at,
+    rowsWritten: row.rows_written,
+    itemsSeen: row.items_seen,
+    message: row.message || '',
+    errorDetail: row.error_detail || '',
+    runUrl: row.run_url || '',
+    createdAt: row.created_at,
+  };
+}
+
 export function mapScoreOddsByMatch(matches, oddsRows) {
   const rowsByMatchKey = new Map();
 

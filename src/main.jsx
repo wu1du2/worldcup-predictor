@@ -12,11 +12,13 @@ import {
   createGroupPlayer,
   createSupabaseBrowserClient,
   getGroupCodeFromSearch,
+  loadImportReports,
   loadGroupState,
   loadMatches,
   loadScoreOdds,
   saveGroupPredictions,
 } from './supabaseData.mjs';
+import { formatReportStatusText } from './importReports.mjs';
 import { buildDateTabs, formatChinaDateLabel, getDefaultMatchDateCn, getMatchScoreText } from './matchSchedule.mjs';
 import './styles.css';
 
@@ -60,6 +62,7 @@ function App() {
   const [group, setGroup] = useState(null);
   const [loadStatus, setLoadStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
+  const [reportDialog, setReportDialog] = useState({ open: false, status: 'idle', reports: [], error: '' });
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -209,6 +212,27 @@ function App() {
     }));
   }
 
+  async function showBackendReports() {
+    if (!client) {
+      setReportDialog({ open: true, status: 'error', reports: [], error: 'Supabase 配置缺失' });
+      return;
+    }
+
+    setReportDialog({ open: true, status: 'loading', reports: [], error: '' });
+
+    try {
+      const reports = await loadImportReports({ client, limit: 8 });
+      setReportDialog({ open: true, status: 'ready', reports, error: '' });
+    } catch (error) {
+      setReportDialog({
+        open: true,
+        status: 'error',
+        reports: [],
+        error: error.message || '后台报告加载失败',
+      });
+    }
+  }
+
   async function confirmAddPlayer() {
     if (!group || !client) return;
 
@@ -244,9 +268,14 @@ function App() {
         <div>
           <h1>{dateLabel}比分预测</h1>
         </div>
-        <button className="ghost-button" data-action="export" onClick={showExport}>
-          导出文本
-        </button>
+        <div className="topbar-actions">
+          <button className="ghost-button" data-action="export" onClick={showExport}>
+            导出文本
+          </button>
+          <button className="icon-button topbar-menu-button" data-action="backend-report" aria-label="后台报告" onClick={showBackendReports}>
+            ...
+          </button>
+        </div>
       </header>
 
       <section className="date-panel" aria-label="选择比赛日期">
@@ -341,6 +370,13 @@ function App() {
           onConfirm={confirmAddPlayer}
         />
       ) : null}
+
+      {reportDialog.open ? (
+        <BackendReportDialog
+          dialog={reportDialog}
+          onClose={() => setReportDialog({ open: false, status: 'idle', reports: [], error: '' })}
+        />
+      ) : null}
     </main>
   );
 }
@@ -433,6 +469,65 @@ function ExportDialog({ text, onClose }) {
       </div>
     </div>
   );
+}
+
+function BackendReportDialog({ dialog, onClose }) {
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="后台报告">
+      <div className="dialog report-dialog" data-backend-report-dialog>
+        <div className="dialog-header">
+          <h2>后台报告</h2>
+          <button className="icon-button" data-action="close-report" aria-label="关闭" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        {dialog.status === 'loading' ? (
+          <div className="report-empty">正在读取...</div>
+        ) : null}
+
+        {dialog.status === 'error' ? (
+          <div className="report-empty">{dialog.error}</div>
+        ) : null}
+
+        {dialog.status === 'ready' && dialog.reports.length === 0 ? (
+          <div className="report-empty">暂无后台报告</div>
+        ) : null}
+
+        {dialog.status === 'ready' && dialog.reports.length > 0 ? (
+          <div className="report-list">
+            {dialog.reports.map((report) => (
+              <article className={`report-item ${report.status}`} key={report.id}>
+                <div className="report-item-header">
+                  <strong>{report.jobName === 'odds' ? '赔率更新' : '比分更新'}</strong>
+                  <span>{formatReportStatusText(report)}</span>
+                </div>
+                <p>{report.message || '无消息'}</p>
+                <small>
+                  {formatReportTime(report.finishedAt || report.createdAt)}
+                  {` · ${report.itemsSeen}项 · 写入${report.rowsWritten}行`}
+                </small>
+                {report.errorDetail ? <pre>{report.errorDetail.slice(0, 420)}</pre> : null}
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function formatReportTime(value) {
+  if (!value) return '时间未知';
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) return '时间未知';
+  return new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
 }
 
 createRoot(document.getElementById('root')).render(

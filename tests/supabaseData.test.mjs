@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   getGroupCodeFromSearch,
+  loadImportReports,
   loadScoreOdds,
   loadMatches,
   mapScoreOddsByMatch,
@@ -214,5 +215,67 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
     ['from', 'score_odds'],
     ['select', 'home,away,kickoff_label,score,odds'],
     ['order', 'source_match_key', { ascending: true }],
+  ]);
+});
+
+test('loadImportReports reads recent backend reports ordered by creation time', async () => {
+  const calls = [];
+  const rows = [
+    {
+      id: 'r1',
+      job_name: 'odds',
+      status: 'failed',
+      started_at: '2026-06-13T00:00:00.000Z',
+      finished_at: '2026-06-13T00:01:00.000Z',
+      rows_written: 0,
+      items_seen: 0,
+      message: 'parse failed',
+      error_detail: 'No score odds matches parsed.',
+      run_url: 'https://github.com/run/1',
+      created_at: '2026-06-13T00:01:00.000Z',
+    },
+  ];
+  const client = {
+    from(table) {
+      calls.push(['from', table]);
+      return {
+        select(columns) {
+          calls.push(['select', columns]);
+          return {
+            order(columnName, options) {
+              calls.push(['order', columnName, options]);
+              return {
+                limit(count) {
+                  calls.push(['limit', count]);
+                  return Promise.resolve({ data: rows, error: null });
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  assert.deepEqual(await loadImportReports({ client, limit: 6 }), [
+    {
+      id: 'r1',
+      jobName: 'odds',
+      status: 'failed',
+      startedAt: '2026-06-13T00:00:00.000Z',
+      finishedAt: '2026-06-13T00:01:00.000Z',
+      rowsWritten: 0,
+      itemsSeen: 0,
+      message: 'parse failed',
+      errorDetail: 'No score odds matches parsed.',
+      runUrl: 'https://github.com/run/1',
+      createdAt: '2026-06-13T00:01:00.000Z',
+    },
+  ]);
+  assert.deepEqual(calls, [
+    ['from', 'import_reports'],
+    ['select', 'id,job_name,status,started_at,finished_at,rows_written,items_seen,message,error_detail,run_url,created_at'],
+    ['order', 'created_at', { ascending: false }],
+    ['limit', 6],
   ]);
 });

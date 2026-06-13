@@ -31,3 +31,7 @@ jobs:
 
       - name: Import matches
         run: npm run import:matches
+
+      - name: Report workflow failure
+        if: failure()
+        run: node scripts/reportActionFailure.mjs --job=matches --message="Matches workflow failed before import completed."

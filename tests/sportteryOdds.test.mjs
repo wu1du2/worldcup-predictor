@@ -7,6 +7,7 @@ import {
   filterMatchesByKickoffDates,
   parseSportteryScoreOddsHtml,
   toScoreOptionRows,
+  validateParsedOddsMatches,
   validateScoreOddsRows,
 } from '../src/sportteryOdds.mjs';
 
@@ -111,6 +112,20 @@ test('validateScoreOddsRows accepts complete unique rows', () => {
   const rows = toScoreOptionRows(parseSportteryScoreOddsHtml(html), '2026-06-12T10:00:00.000Z');
 
   assert.equal(validateScoreOddsRows(rows), rows);
+});
+
+test('validateParsedOddsMatches rejects empty and thin parsed match batches', () => {
+  assert.throws(() => validateParsedOddsMatches([]), /No score odds matches/);
+  assert.throws(() => validateParsedOddsMatches([
+    {
+      issue: '周五003',
+      competition: '世界杯',
+      kickoffLabel: '06-13 03:00',
+      home: '加拿大',
+      away: '波黑',
+      scores: [{ score: '1-0', odds: 5.3 }],
+    },
+  ]), /too few score odds/);
 });
 
 test('validateScoreOddsRows rejects malformed odds payloads before upsert', () => {

@@ -76,6 +76,23 @@ export function validateScoreOddsRows(rows) {
   return rows;
 }
 
+export function validateParsedOddsMatches(matches) {
+  if (!Array.isArray(matches) || matches.length === 0) {
+    throw new Error('No score odds matches parsed.');
+  }
+
+  for (const [index, match] of matches.entries()) {
+    for (const field of ['issue', 'competition', 'kickoffLabel', 'home', 'away']) {
+      if (!match[field]) throw new Error(`Score odds match ${index} missing ${field}.`);
+    }
+    if (!Array.isArray(match.scores) || match.scores.length < 20) {
+      throw new Error(`Score odds match ${match.issue || index} has too few score odds.`);
+    }
+  }
+
+  return matches;
+}
+
 export function dedupeParsedMatches(matches) {
   const byKey = new Map();
 
