@@ -129,7 +129,7 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
       '德国 vs 日本 [1-0(6)]',
       '',
       '[预测情况]',
-      '03:00 德国 vs 日本',
+      '03:00 德国 vs 日本[1-0]',
       '阿哲：1-0, 2-1',
       '北北：1-1',
       '',
@@ -139,6 +139,37 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
       '[欢迎预测] 6月13日比赛 德国 vs 日本、西班牙 vs 巴西 https://worldcup-predictor.example/?group=friends',
     ].join('\n'),
   );
+});
+
+test('exportPredictionsText labels completed matches with the final score in prediction headers', () => {
+  const text = exportPredictionsText({
+    dateLabel: '6月14日',
+    matches: [
+      {
+        id: 'm1',
+        time: '03:00',
+        home: '加拿大',
+        away: '波黑',
+        homeScore: 1,
+        awayScore: 1,
+        status: 'post',
+      },
+      {
+        id: 'm2',
+        time: '09:00',
+        home: '美国',
+        away: '巴拉圭',
+        homeScore: null,
+        awayScore: null,
+        status: 'pre',
+      },
+    ],
+    players,
+    state: { predictions: {} },
+  });
+
+  assert.match(text, /\[预测情况\]\n03:00 加拿大 vs 波黑\[1-1\]\n\n09:00 美国 vs 巴拉圭/);
+  assert.doesNotMatch(text, /美国 vs 巴拉圭\[/);
 });
 
 test('exportPredictionsText appends selected date matches before the group URL', () => {

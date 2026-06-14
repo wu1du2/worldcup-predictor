@@ -142,7 +142,7 @@ export function exportPredictionsText({
   lines.push('', '[预测情况]');
   for (const [index, match] of matches.entries()) {
     if (index > 0) lines.push('');
-    lines.push(`${match.time} ${match.home} vs ${match.away}`);
+    lines.push(formatPredictionMatchHeader(match));
 
     for (const player of players) {
       const scores = state.predictions[player.id]?.[match.id] || [];
@@ -163,6 +163,12 @@ function isCompletedMatch(match) {
   return match.status === 'post'
     && Number.isInteger(match.homeScore)
     && Number.isInteger(match.awayScore);
+}
+
+function formatPredictionMatchHeader(match) {
+  const baseLabel = `${match.time} ${match.home} vs ${match.away}`;
+  if (!isCompletedMatch(match)) return baseLabel;
+  return `${baseLabel}[${match.homeScore}-${match.awayScore}]`;
 }
 
 function findScoreOdds(scoreOptions = [], score) {
