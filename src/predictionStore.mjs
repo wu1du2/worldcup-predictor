@@ -153,7 +153,7 @@ export function exportPredictionsText({
   }
 
   if (currentGroupUrl) {
-    lines.push('', `[欢迎预测] ${currentGroupUrl}`);
+    lines.push('', buildInviteLine({ dateLabel, matches, currentGroupUrl }));
   }
 
   return lines.join('\n').trimEnd();
@@ -174,6 +174,16 @@ function findScoreOdds(scoreOptions = [], score) {
 
 function formatOdds(odds) {
   return Number.isInteger(odds) ? String(odds) : String(odds);
+}
+
+function buildInviteLine({ dateLabel, matches = [], currentGroupUrl }) {
+  const matchList = matches
+    .map((match) => `${match.home} vs ${match.away}`)
+    .filter(Boolean)
+    .join('、');
+
+  if (!matchList) return `[欢迎预测] ${currentGroupUrl}`;
+  return `[欢迎预测] ${dateLabel}比赛 ${matchList} ${currentGroupUrl}`;
 }
 
 function formatSignedAmount(value) {

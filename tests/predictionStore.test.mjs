@@ -136,8 +136,38 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
       '21:00 西班牙 vs 巴西',
       '阿哲：0-0',
       '',
-      '[欢迎预测] https://worldcup-predictor.example/?group=friends',
+      '[欢迎预测] 6月13日比赛 德国 vs 日本、西班牙 vs 巴西 https://worldcup-predictor.example/?group=friends',
     ].join('\n'),
+  );
+});
+
+test('exportPredictionsText appends selected date matches before the group URL', () => {
+  const text = exportPredictionsText({
+    dateLabel: '6月14日',
+    matches: [
+      {
+        id: 'm1',
+        time: '03:00',
+        home: '加拿大',
+        away: '波黑',
+        status: 'pre',
+      },
+      {
+        id: 'm2',
+        time: '09:00',
+        home: '美国',
+        away: '巴拉圭',
+        status: 'pre',
+      },
+    ],
+    players,
+    state: { predictions: {} },
+    currentGroupUrl: 'https://worldcup-predictor.example/?group=friends',
+  });
+
+  assert.match(
+    text,
+    /\[欢迎预测\] 6月14日比赛 加拿大 vs 波黑、美国 vs 巴拉圭 https:\/\/worldcup-predictor\.example\/\?group=friends$/,
   );
 });
 
