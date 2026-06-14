@@ -50,6 +50,44 @@ const matches = [
     home_team: { name_cn: '美国', name_en: 'USA' },
     away_team: { name_cn: '巴拉圭', name_en: 'Paraguay' },
   },
+  {
+    id: 'row-3',
+    match_code: 'm-ger-jpn',
+    kickoff_at_utc: '2026-06-13T19:00:00.000Z',
+    match_date_cn: '2026-06-14',
+    time_cn: '03:00',
+    home: 'Germany',
+    away: 'Japan',
+    home_cn: '德国',
+    away_cn: '日本',
+    home_score: null,
+    away_score: null,
+    status: 'pre',
+    status_detail: '',
+    venue: '',
+    stage: 'Group Stage',
+    home_team: { name_cn: '德国', name_en: 'Germany' },
+    away_team: { name_cn: '日本', name_en: 'Japan' },
+  },
+  {
+    id: 'row-4',
+    match_code: 'm-esp-bra',
+    kickoff_at_utc: '2026-06-14T01:00:00.000Z',
+    match_date_cn: '2026-06-14',
+    time_cn: '09:00',
+    home: 'Spain',
+    away: 'Brazil',
+    home_cn: '西班牙',
+    away_cn: '巴西',
+    home_score: null,
+    away_score: null,
+    status: 'pre',
+    status_detail: '',
+    venue: '',
+    stage: 'Group Stage',
+    home_team: { name_cn: '西班牙', name_en: 'Spain' },
+    away_team: { name_cn: '巴西', name_en: 'Brazil' },
+  },
 ];
 
 const players = [
@@ -104,6 +142,8 @@ try {
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto(`${baseUrl}/?group=${groupCode}`, { waitUntil: 'networkidle' });
   await page.getByText('正在加载群数据...').waitFor({ state: 'detached' });
+  await page.getByRole('button', { name: /6月13日/ }).click();
+  await page.getByRole('heading', { name: '6月13日比分预测' }).waitFor();
   await page.getByRole('button', { name: '导出文本' }).click();
 
   const exportedText = await page.locator('[data-export-text]').inputValue();
@@ -116,7 +156,7 @@ try {
   assert.match(exportedText, /\n09:00 美国 vs 巴拉圭\[2-0\]/);
   assert.match(exportedText, /张三：1-0, 1-1/);
   assert.match(exportedText, /李四：1-1/);
-  assert.match(exportedText, /\[欢迎预测\] 6月13日比赛 加拿大 vs 波黑、美国 vs 巴拉圭 http:\/\/127\.0\.0\.1:\d+\/\?group=stage9-results/);
+  assert.match(exportedText, /\[欢迎预测\] 6月14日比赛 德国 vs 日本、西班牙 vs 巴西 http:\/\/127\.0\.0\.1:\d+\/\?group=stage9-results/);
 
   await page.screenshot({ path: new URL('export-results-iphone13.png', artifactDir).pathname, fullPage: true });
   await writeFile(new URL('export-results-text.txt', artifactDir), `${exportedText}\n`);

@@ -19,7 +19,13 @@ import {
   saveGroupPredictions,
 } from './supabaseData.mjs';
 import { formatReportStatusText } from './importReports.mjs';
-import { buildDateTabs, formatChinaDateLabel, getDefaultMatchDateCn, getMatchScoreText } from './matchSchedule.mjs';
+import {
+  buildDateTabs,
+  formatChinaDateLabel,
+  getDefaultMatchDateCn,
+  getMatchScoreText,
+  getNextMatchDateCn,
+} from './matchSchedule.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
@@ -120,6 +126,9 @@ function App() {
   const selectedDate = state.selectedDate || getDefaultMatchDateCn(matches);
   const visibleMatches = matches.filter((match) => match.date === selectedDate);
   const dateLabel = selectedDate ? formatChinaDateLabel(selectedDate) : '暂无赛程';
+  const inviteDate = selectedDate ? getNextMatchDateCn(matches, selectedDate) : '';
+  const inviteMatches = inviteDate ? matches.filter((match) => match.date === inviteDate) : [];
+  const inviteDateLabel = inviteDate ? formatChinaDateLabel(inviteDate) : '';
 
   useEffect(() => {
     selectedDateButtonRef.current?.scrollIntoView({
@@ -203,6 +212,8 @@ function App() {
       players,
       state,
       scoreOddsByMatch,
+      inviteDateLabel,
+      inviteMatches,
       currentGroupUrl: window.location.href,
     });
 

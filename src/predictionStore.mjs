@@ -118,6 +118,8 @@ export function exportPredictionsText({
   players,
   state,
   scoreOddsByMatch = {},
+  inviteDateLabel = '',
+  inviteMatches = [],
   currentGroupUrl = '',
 }) {
   const lines = [`${dateLabel}比分预测`];
@@ -153,7 +155,7 @@ export function exportPredictionsText({
   }
 
   if (currentGroupUrl) {
-    lines.push('', buildInviteLine({ dateLabel, matches, currentGroupUrl }));
+    lines.push('', buildInviteLine({ inviteDateLabel, inviteMatches, currentGroupUrl }));
   }
 
   return lines.join('\n').trimEnd();
@@ -182,14 +184,14 @@ function formatOdds(odds) {
   return Number.isInteger(odds) ? String(odds) : String(odds);
 }
 
-function buildInviteLine({ dateLabel, matches = [], currentGroupUrl }) {
-  const matchList = matches
+function buildInviteLine({ inviteDateLabel, inviteMatches = [], currentGroupUrl }) {
+  const matchList = inviteMatches
     .map((match) => `${match.home} vs ${match.away}`)
     .filter(Boolean)
     .join('、');
 
-  if (!matchList) return `[欢迎预测] ${currentGroupUrl}`;
-  return `[欢迎预测] ${dateLabel}比赛 ${matchList} ${currentGroupUrl}`;
+  if (!inviteDateLabel || !matchList) return `[欢迎预测] ${currentGroupUrl}`;
+  return `[欢迎预测] ${inviteDateLabel}比赛 ${matchList} ${currentGroupUrl}`;
 }
 
 function formatSignedAmount(value) {

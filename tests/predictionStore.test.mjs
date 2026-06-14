@@ -115,6 +115,11 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
         { score: '2-1', odds: 12 },
       ],
     },
+    inviteDateLabel: '6月14日',
+    inviteMatches: [
+      { id: 'm3', home: '加拿大', away: '波黑' },
+      { id: 'm4', home: '美国', away: '巴拉圭' },
+    ],
     currentGroupUrl: 'https://worldcup-predictor.example/?group=friends',
   });
 
@@ -136,7 +141,7 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
       '21:00 西班牙 vs 巴西',
       '阿哲：0-0',
       '',
-      '[欢迎预测] 6月13日比赛 德国 vs 日本、西班牙 vs 巴西 https://worldcup-predictor.example/?group=friends',
+      '[欢迎预测] 6月14日比赛 加拿大 vs 波黑、美国 vs 巴拉圭 https://worldcup-predictor.example/?group=friends',
     ].join('\n'),
   );
 });
@@ -172,27 +177,37 @@ test('exportPredictionsText labels completed matches with the final score in pre
   assert.doesNotMatch(text, /美国 vs 巴拉圭\[/);
 });
 
-test('exportPredictionsText appends selected date matches before the group URL', () => {
+test('exportPredictionsText appends invite date matches before the group URL', () => {
   const text = exportPredictionsText({
-    dateLabel: '6月14日',
+    dateLabel: '6月13日',
     matches: [
       {
         id: 'm1',
         time: '03:00',
+        home: '德国',
+        away: '日本',
+        status: 'post',
+        homeScore: 1,
+        awayScore: 0,
+      },
+    ],
+    players,
+    state: { predictions: {} },
+    inviteDateLabel: '6月14日',
+    inviteMatches: [
+      {
+        id: 'm2',
         home: '加拿大',
         away: '波黑',
         status: 'pre',
       },
       {
-        id: 'm2',
-        time: '09:00',
+        id: 'm3',
         home: '美国',
         away: '巴拉圭',
         status: 'pre',
       },
     ],
-    players,
-    state: { predictions: {} },
     currentGroupUrl: 'https://worldcup-predictor.example/?group=friends',
   });
 

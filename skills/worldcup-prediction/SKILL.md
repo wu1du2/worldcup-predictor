@@ -23,7 +23,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Export dialog must support one-tap clipboard copy and show an immediate copied/failed state.
 - Export text includes a results section before raw predictions. Result rows use `张三 ROI = 165%｜净收益 +3.3｜命中 1/2｜成本 2`: ROI is `(revenue - cost) / cost`, net profit is `revenue - cost`, cost is one unit per selected score, and the hit denominator is completed matches with any prediction, not selected scores. Sort hit players by ROI, then revenue, then name.
 - In the export prediction section, completed match headers should append the final score as `03:00 加拿大 vs 波黑[1-1]`; pre-match or incomplete-score rows should remain unmarked.
-- Export footer with a group URL should include the selected date and match list: `[欢迎预测] 6月14日比赛 加拿大 vs 波黑、美国 vs 巴拉圭 https://...`.
+- Export footer with a group URL should invite the next available match date after the selected export date, not repeat the selected date: `[欢迎预测] 6月14日比赛 加拿大 vs 波黑、美国 vs 巴拉圭 https://...`. If no later match date exists, keep only `[欢迎预测] https://...`.
 - Low-frequency actions live in compact header controls.
 - Buttons, score chips, and match rows use stable dimensions; text must not overlap or resize the layout.
 - Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`.

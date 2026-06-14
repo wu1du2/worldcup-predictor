@@ -6,6 +6,7 @@ import {
   formatChinaDateLabel,
   getDefaultMatchDateCn,
   getMatchScoreText,
+  getNextMatchDateCn,
   toMatchUpsertRows,
   normalizeEspnScoreboard,
 } from '../src/matchSchedule.mjs';
@@ -156,6 +157,19 @@ test('getDefaultMatchDateCn also accepts app match rows with date fields', () =>
     { date: '2026-06-13' },
     { date: '2026-06-14' },
   ], new Date('2026-06-13T01:00:00+08:00')), '2026-06-13');
+});
+
+test('getNextMatchDateCn picks the next available match date after the selected date', () => {
+  const matches = [
+    { date: '2026-06-13' },
+    { date: '2026-06-14' },
+    { date: '2026-06-14' },
+    { date: '2026-06-16' },
+  ];
+
+  assert.equal(getNextMatchDateCn(matches, '2026-06-13'), '2026-06-14');
+  assert.equal(getNextMatchDateCn(matches, '2026-06-14'), '2026-06-16');
+  assert.equal(getNextMatchDateCn(matches, '2026-06-16'), '');
 });
 
 test('formatChinaDateLabel and getMatchScoreText produce mobile display text', () => {

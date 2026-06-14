@@ -102,6 +102,11 @@ export function getDefaultMatchDateCn(matches, now = new Date()) {
   return dates.find((date) => date >= today) || dates[dates.length - 1];
 }
 
+export function getNextMatchDateCn(matches, selectedDate) {
+  const dates = [...new Set(matches.map((match) => match.match_date_cn || match.date).filter(Boolean))].sort();
+  return dates.find((date) => date > selectedDate) || '';
+}
+
 export function formatChinaDateLabel(matchDateCn) {
   const [, month, day] = matchDateCn.split('-');
   return `${Number(month)}月${Number(day)}日`;
