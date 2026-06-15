@@ -44,6 +44,11 @@ export function getCopyStatusText(status) {
   return '一键复制';
 }
 
+export function getRoiTitle({ roiPercent, seed }) {
+  const titles = getRoiTitleBand(roiPercent);
+  return titles[stableHash(seed) % titles.length];
+}
+
 export function submitPrediction(state, { playerId, matchId, scores }) {
   const nextPredictions = {
     ...state.predictions,
@@ -134,7 +139,11 @@ export function exportPredictionsText({
     lines.push('暂无完场预测');
   } else {
     for (const row of resultRows) {
-      lines.push(`${row.playerName} ROI ${row.roiPercent}%｜净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
+      const title = getRoiTitle({
+        roiPercent: row.roiPercent,
+        seed: `${dateLabel}|${row.playerName}|${row.roiPercent}`,
+      });
+      lines.push(`[${title}] ${row.playerName} ROI ${row.roiPercent}%｜净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
       for (const hit of row.hits) {
         lines.push(`${hit.matchLabel} ${hit.score}(${formatOdds(hit.odds)}) ✅`);
       }
@@ -204,6 +213,24 @@ function findScoreOdds(scoreOptions = [], score) {
 
 function formatOdds(odds) {
   return Number.isInteger(odds) ? String(odds) : String(odds);
+}
+
+function getRoiTitleBand(roiPercent) {
+  if (roiPercent >= 200) return ['赔率刺客', '庄家噩梦', '剧本阅读者', '赛果穿越者', '大场面先生'];
+  if (roiPercent >= 100) return ['懂球帝', '赛果预言家', '比分猎手', '神来一笔', '红单体质', '灵感在线'];
+  if (roiPercent >= 30) return ['稳健大师', '小赚怡情', '准星在线', '有点东西'];
+  if (roiPercent >= 0) return ['保本战士', '略懂皮毛', '谨慎派', '不亏就赢'];
+  if (roiPercent >= -30) return ['手感微凉', '惜败选手', '再来一场', '差口气'];
+  if (roiPercent >= -80) return ['快乐赞助商', '还在热身', '思路打开', '赛前很美', '玄学波动'];
+  return ['倒霉蛋', '天台观察员', '庄家好友', '玄学受害者'];
+}
+
+function stableHash(value) {
+  let hash = 0;
+  for (const char of String(value)) {
+    hash = ((hash << 5) - hash + char.charCodeAt(0)) >>> 0;
+  }
+  return hash;
 }
 
 function buildInviteLine({ inviteDateLabel, inviteMatches = [], currentGroupUrl }) {
