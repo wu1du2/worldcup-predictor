@@ -220,8 +220,8 @@ function getRoiTitleBand(roiPercent) {
   if (roiPercent >= 100) return ['懂球帝', '赛果预言家', '比分猎手', '神来一笔', '红单体质', '灵感在线'];
   if (roiPercent >= 30) return ['稳健大师', '小赚怡情', '准星在线', '有点东西'];
   if (roiPercent >= 0) return ['保本战士', '略懂皮毛', '谨慎派', '不亏就赢'];
-  if (roiPercent >= -30) return ['手感微凉', '惜败选手', '再来一场', '差口气'];
-  if (roiPercent >= -80) return ['快乐赞助商', '还在热身', '思路打开', '赛前很美', '玄学波动'];
+  if (roiPercent >= -30) return ['手感微凉', '惜败选手', '差口气', '险些上岸', '差点回本', '今晚不服'];
+  if (roiPercent >= -80) return ['快乐赞助商', '赛前很美', '玄学波动', '已经上头', '心态微崩'];
   return ['倒霉蛋', '天台观察员', '庄家好友', '玄学受害者'];
 }
 
