@@ -160,6 +160,29 @@ export function exportPredictionsText({
   return lines.join('\n').trimEnd();
 }
 
+export function exportAllTimeStatsText({
+  matches,
+  players,
+  state,
+  scoreOddsByMatch = {},
+}) {
+  const lines = ['【总榜统计】'];
+  const completedMatches = (matches || []).filter(isCompletedMatch);
+  const resultRows = buildPredictionResultRows({ matches, players, state, scoreOddsByMatch });
+
+  if (!completedMatches.length) {
+    lines.push('暂无完场比赛');
+  } else if (!resultRows.length) {
+    lines.push('暂无完场预测');
+  } else {
+    for (const row of resultRows) {
+      lines.push(`${row.playerName} ROI ${row.roiPercent}%｜净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
+    }
+  }
+
+  return lines.join('\n');
+}
+
 function isCompletedMatch(match) {
   return match.status === 'post'
     && Number.isInteger(match.homeScore)

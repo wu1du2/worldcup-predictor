@@ -99,10 +99,12 @@ try {
   await page.addInitScript(() => window.localStorage.clear());
   await page.goto(`${baseUrl}/?group=${groupCode}`, { waitUntil: 'networkidle' });
   await page.getByText('正在加载群数据...').waitFor({ state: 'detached' });
+  await page.getByRole('button', { name: '更多' }).click();
   await page.getByRole('button', { name: '后台报告' }).click();
 
   const dialog = page.locator('[data-backend-report-dialog]');
   await dialog.waitFor({ state: 'visible' });
+  await dialog.getByText('赔率更新').waitFor();
   const dialogText = await dialog.textContent();
 
   assert.match(dialogText, /后台报告/);

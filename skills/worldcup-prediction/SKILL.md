@@ -22,6 +22,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - New groups start with no members. The player picker shows only group-specific Supabase players plus a `+` button.
 - Export dialog must support one-tap clipboard copy and show an immediate copied/failed state.
 - Export text includes a compact `【今日战报】` section before `【预测情况】`, with no blank lines between blocks. Result rows use `张三 ROI 165%｜净收益 +3.3｜命中 1/2｜成本 2`: ROI is `(revenue - cost) / cost`, net profit is `revenue - cost`, cost is one unit per selected score, and the hit denominator is completed matches with any prediction, not selected scores. Include losing players who predicted completed matches, show hit details only for winners as `加拿大 vs 波黑 1-1(8) ✅`, and sort players by ROI, then revenue, then name.
+- The `...` header menu contains low-frequency tools: `总榜统计` and `后台报告`. `总榜统计` always aggregates only the current URL group by using currently loaded group players/predictions with all completed matches and the same ROI/cost/revenue rules as daily exports.
 - In the export prediction section, completed match headers should append the final score as `03:00 加拿大 vs 波黑[1-1]`; pre-match or incomplete-score rows should remain unmarked.
 - Export footer with a group URL should invite the next available match date after the selected export date, not repeat the selected date: `[欢迎预测] 6月14日比赛 加拿大 vs 波黑、美国 vs 巴拉圭 https://...`. If no later match date exists, keep only `[欢迎预测] https://...`.
 - Low-frequency actions live in compact header controls.
@@ -79,6 +80,7 @@ Stage 1 commands:
 - Stage 3 real schedule screenshot: `docs/artifacts/stage3/real-schedule-score-iphone13.png`.
 - Results export acceptance: `npm run acceptance:results` with a local Vite server verifies an iPhone 13 export dialog using mocked Supabase responses and writes `docs/artifacts/stage9/export-results-*`.
 - Backend report acceptance: `npm run acceptance:reports` with a local Vite server verifies the iPhone 13 `...` report dialog with mocked success/failed reports and writes `docs/artifacts/stage10/backend-report-*`.
+- Total stats acceptance: `npm run acceptance:stats` with a local Vite server verifies the iPhone 13 `...` -> `总榜统计` flow with mocked current-group data and writes `docs/artifacts/stage11/total-stats-*`.
 - Online other-score odds check: `docs/artifacts/online-other-scores/online-other-0616*` verifies the deployed Render page shows `胜其他` / `平其他` / `负其他` on a date with freshly imported odds.
 
 ## Current Pitfalls

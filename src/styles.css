@@ -393,6 +393,28 @@ h1 {
   line-height: 0.8;
 }
 
+.more-menu-dialog {
+  width: min(100%, 360px);
+}
+
+.more-menu-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.menu-action-button {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #cfd8d2;
+  border-radius: 8px;
+  background: #fbfcfa;
+  color: #17231f;
+  font-size: 16px;
+  font-weight: 900;
+  text-align: left;
+  padding: 0 14px;
+}
+
 .report-dialog {
   max-height: min(78vh, 660px);
   overflow: hidden;

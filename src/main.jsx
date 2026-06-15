@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 import {
   createInitialState,
+  exportAllTimeStatsText,
   exportPredictionsText,
   formatScoreOptionLabel,
   getCopyStatusText,
@@ -84,6 +85,7 @@ function App() {
   const [loadStatus, setLoadStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState('');
   const [reportDialog, setReportDialog] = useState({ open: false, status: 'idle', reports: [], error: '' });
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -238,7 +240,23 @@ function App() {
     }));
   }
 
+  function showAllTimeStats() {
+    const text = exportAllTimeStatsText({
+      matches,
+      players,
+      state,
+      scoreOddsByMatch,
+    });
+
+    setMoreMenuOpen(false);
+    setState((current) => ({
+      ...current,
+      exportText: text,
+    }));
+  }
+
   async function showBackendReports() {
+    setMoreMenuOpen(false);
     if (!client) {
       setReportDialog({ open: true, status: 'error', reports: [], error: 'Supabase 配置缺失' });
       return;
@@ -298,7 +316,7 @@ function App() {
           <button className="ghost-button" data-action="export" onClick={showExport}>
             导出文本
           </button>
-          <button className="icon-button topbar-menu-button" data-action="backend-report" aria-label="后台报告" onClick={showBackendReports}>
+          <button className="icon-button topbar-menu-button" data-action="more-menu" aria-label="更多" onClick={() => setMoreMenuOpen(true)}>
             ...
           </button>
         </div>
@@ -388,6 +406,14 @@ function App() {
         />
       ) : null}
 
+      {moreMenuOpen ? (
+        <MoreMenuDialog
+          onClose={() => setMoreMenuOpen(false)}
+          onShowAllTimeStats={showAllTimeStats}
+          onShowBackendReports={showBackendReports}
+        />
+      ) : null}
+
       {state.addingPlayer ? (
         <AddPlayerDialog
           name={state.newPlayerName || ''}
@@ -404,6 +430,29 @@ function App() {
         />
       ) : null}
     </main>
+  );
+}
+
+function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports }) {
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="更多">
+      <div className="dialog compact-dialog more-menu-dialog" data-more-menu-dialog>
+        <div className="dialog-header">
+          <h2>更多</h2>
+          <button className="icon-button" data-action="close-more-menu" aria-label="关闭" onClick={onClose}>
+            ×
+          </button>
+        </div>
+        <div className="more-menu-actions">
+          <button className="menu-action-button" data-action="all-time-stats" onClick={onShowAllTimeStats}>
+            总榜统计
+          </button>
+          <button className="menu-action-button" data-action="backend-report" onClick={onShowBackendReports}>
+            后台报告
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

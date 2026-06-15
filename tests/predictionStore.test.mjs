@@ -5,6 +5,7 @@ import {
   addCustomPlayer,
   buildPredictionResultRows,
   createInitialState,
+  exportAllTimeStatsText,
   exportPredictionsText,
   formatScoreOptionLabel,
   getCopyStatusText,
@@ -376,4 +377,69 @@ test('exportPredictionsText reports empty result states', () => {
     state: { predictions: { alice: { m1: ['1-0'] } } },
     scoreOddsByMatch: { m1: [{ score: '0-0', odds: 9.5 }] },
   }), /阿哲 ROI -100%｜净收益 -1｜命中 0\/1｜成本 1/);
+});
+
+test('exportAllTimeStatsText aggregates every completed match for the current group state', () => {
+  const text = exportAllTimeStatsText({
+    players: [
+      { id: 'zhang', name: '张三' },
+      { id: 'li', name: '李四' },
+      { id: 'empty', name: '没下场' },
+    ],
+    matches: [
+      {
+        id: 'm1',
+        home: '加拿大',
+        away: '波黑',
+        homeScore: 1,
+        awayScore: 1,
+        status: 'post',
+      },
+      {
+        id: 'm2',
+        home: '美国',
+        away: '巴拉圭',
+        homeScore: 2,
+        awayScore: 0,
+        status: 'post',
+      },
+      {
+        id: 'm3',
+        home: '德国',
+        away: '日本',
+        homeScore: null,
+        awayScore: null,
+        status: 'pre',
+      },
+    ],
+    state: {
+      predictions: {
+        zhang: {
+          m1: ['1-1', '2-1'],
+          m2: ['2-0'],
+          m3: ['1-0'],
+        },
+        li: {
+          m1: ['1-0'],
+          m2: ['1-1'],
+        },
+        otherGroupPlayer: {
+          m1: ['1-1'],
+        },
+      },
+    },
+    scoreOddsByMatch: {
+      m1: [{ score: '1-1', odds: 8 }],
+      m2: [{ score: '2-0', odds: 6 }],
+    },
+  });
+
+  assert.equal(
+    text,
+    [
+      '【总榜统计】',
+      '张三 ROI 367%｜净收益 +11｜命中 2/2｜成本 3',
+      '李四 ROI -100%｜净收益 -2｜命中 0/2｜成本 2',
+    ].join('\n'),
+  );
 });

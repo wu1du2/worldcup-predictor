@@ -11,6 +11,7 @@
     "acceptance:supabase": "node tests/stage2.supabase.acceptance.mjs",
     "acceptance:results": "node tests/stage9.results.acceptance.mjs",
     "acceptance:reports": "node tests/stage10.reports.acceptance.mjs",
+    "acceptance:stats": "node tests/stage11.total-stats.acceptance.mjs",
     "import:matches": "node scripts/importMatchesFromEspn.mjs",
     "import:matches:dry": "node scripts/importMatchesFromEspn.mjs --dry-run",
     "probe:odds": "node scripts/probeSportteryOdds.mjs",
