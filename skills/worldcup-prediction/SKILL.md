@@ -26,7 +26,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Export footer with a group URL should invite the next available match date after the selected export date, not repeat the selected date: `[欢迎预测] 6月14日比赛 加拿大 vs 波黑、美国 vs 巴拉圭 https://...`. If no later match date exists, keep only `[欢迎预测] https://...`.
 - Low-frequency actions live in compact header controls.
 - Buttons, score chips, and match rows use stable dimensions; text must not overlap or resize the layout.
-- Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`.
+- Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`. The score template should match the Sporttery correct-score market: 28 exact scores plus `胜其他` / `平其他` / `负其他`, each with odds when available.
 - Use “比分预测” in user-facing titles and export headers. Avoid “波胆预测” in visible copy.
 - Match cards show Chinese team names and the match score/status. Do not show venue text or per-match prediction counts in the card.
 - Date tabs include all imported group-stage dates, but the selected today/next match day should auto-scroll to the left edge so future dates are immediately visible.

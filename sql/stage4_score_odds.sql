@@ -11,7 +11,7 @@ create table if not exists public.score_odds (
   created_at timestamptz not null default now(),
 
   constraint score_odds_unique unique (source, source_match_key, score),
-  constraint score_odds_score_format check (score ~ '^[0-9]+-[0-9]+$'),
+  constraint score_odds_score_format check (score ~ '^([0-9]+-[0-9]+|[胜平负]其他)$'),
   constraint score_odds_positive check (odds > 1)
 );
 

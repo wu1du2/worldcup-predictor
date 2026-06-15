@@ -82,7 +82,7 @@ test('addCustomPlayer ignores blank names', () => {
 
 test('formatScoreOptionLabel displays odds without changing score values', () => {
   assert.equal(formatScoreOptionLabel({ score: '1-1', odds: 6.5 }), '1:1(6.5)');
-  assert.equal(formatScoreOptionLabel({ score: '其他' }), '其他');
+  assert.equal(formatScoreOptionLabel({ score: '胜其他', odds: 100 }), '胜其他(100)');
 });
 
 test('getCopyStatusText returns user-facing copy feedback', () => {

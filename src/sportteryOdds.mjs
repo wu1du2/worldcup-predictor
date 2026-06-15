@@ -60,7 +60,7 @@ export function validateScoreOddsRows(rows) {
       if (!row[field]) throw new Error(`Score odds row ${index} missing ${field}.`);
     }
 
-    if (!/^[0-9]+-[0-9]+$/.test(row.score)) {
+    if (!isValidScoreLabel(row.score)) {
       throw new Error(`Score odds row ${index} has invalid score ${row.score}.`);
     }
 
@@ -112,17 +112,22 @@ export function filterMatchesByKickoffDates(matches, dates) {
 
 function extractScores(text) {
   const scores = [];
-  const scorePattern = /([0-9]):([0-9])\s+([0-9]+(?:\.[0-9]+)?)/g;
+  const scorePattern = /(?:([0-9]):([0-9])|([胜平负])其[他它])\s+([0-9]+(?:\.[0-9]+)?)/g;
   let match;
 
   while ((match = scorePattern.exec(text))) {
+    const score = match[3] ? `${match[3]}其他` : `${match[1]}-${match[2]}`;
     scores.push({
-      score: `${match[1]}-${match[2]}`,
-      odds: Number(match[3]),
+      score,
+      odds: Number(match[4]),
     });
   }
 
   return scores;
+}
+
+function isValidScoreLabel(score) {
+  return /^[0-9]+-[0-9]+$/.test(score) || /^[胜平负]其他$/.test(score);
 }
 
 function toFullKickoffDate(kickoffLabel) {

@@ -161,13 +161,36 @@ test('mapScoreOddsByMatch joins odds to app matches by Chinese teams and China k
       score: '1-0',
       odds: 5.1,
     },
+    {
+      home: '加拿大',
+      away: '波黑',
+      kickoff_label: '06-13 03:00',
+      score: '胜其他',
+      odds: 100,
+    },
+    {
+      home: '加拿大',
+      away: '波黑',
+      kickoff_label: '06-13 03:00',
+      score: '平其他',
+      odds: 500,
+    },
+    {
+      home: '加拿大',
+      away: '波黑',
+      kickoff_label: '06-13 03:00',
+      score: '负其他',
+      odds: 400,
+    },
   ];
 
   assert.deepEqual(mapScoreOddsByMatch(matches, oddsRows), {
     'espn-1': [
       { score: '1-0', odds: 5.1 },
       { score: '2-1', odds: 5.3 },
-      { score: '其他' },
+      { score: '胜其他', odds: 100 },
+      { score: '平其他', odds: 500 },
+      { score: '负其他', odds: 400 },
     ],
   });
 });
@@ -181,6 +204,13 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
       kickoff_label: '06-13 03:00',
       score: '1-0',
       odds: 5.1,
+    },
+    {
+      home: '加拿大',
+      away: '波黑',
+      kickoff_label: '06-13 03:00',
+      score: '胜其他',
+      odds: 100,
     },
   ];
   const client = {
@@ -208,7 +238,7 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
   assert.deepEqual(odds, {
     m1: [
       { score: '1-0', odds: 5.1 },
-      { score: '其他' },
+      { score: '胜其他', odds: 100 },
     ],
   });
   assert.deepEqual(calls, [

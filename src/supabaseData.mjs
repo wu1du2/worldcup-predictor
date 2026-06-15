@@ -98,12 +98,9 @@ export function mapScoreOddsByMatch(matches, oddsRows) {
     const rows = rowsByMatchKey.get(key) || [];
     if (!rows.length) continue;
 
-    oddsByMatchId[match.id] = [
-      ...rows
-        .map((row) => ({ score: row.score, odds: Number(row.odds) }))
-        .sort(compareScoreOptions),
-      { score: '其他' },
-    ];
+    oddsByMatchId[match.id] = rows
+      .map((row) => ({ score: row.score, odds: Number(row.odds) }))
+      .sort(compareScoreOptions);
   }
 
   return oddsByMatchId;
@@ -204,10 +201,10 @@ function compareScoreOptions(a, b) {
 function getScoreOrder(score) {
   const preferred = [
     '1-0', '2-0', '2-1', '3-0', '3-1', '3-2',
-    '4-0', '4-1', '4-2', '5-0', '5-1', '5-2',
-    '0-0', '1-1', '2-2', '3-3',
+    '4-0', '4-1', '4-2', '5-0', '5-1', '5-2', '胜其他',
+    '0-0', '1-1', '2-2', '3-3', '平其他',
     '0-1', '0-2', '1-2', '0-3', '1-3', '2-3',
-    '0-4', '1-4', '2-4', '0-5', '1-5', '2-5',
+    '0-4', '1-4', '2-4', '0-5', '1-5', '2-5', '负其他',
   ];
   const index = preferred.indexOf(score);
   return index === -1 ? preferred.length : index;

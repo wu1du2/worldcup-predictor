@@ -34,12 +34,15 @@ test('parseSportteryScoreOddsHtml extracts match score odds from 500.com score p
         { score: '1-0', odds: 5.3 },
         { score: '2-0', odds: 6.5 },
         { score: '2-1', odds: 5.65 },
+        { score: '胜其他', odds: 100 },
         { score: '0-0', odds: 9.5 },
         { score: '1-1', odds: 5.3 },
         { score: '2-2', odds: 16.5 },
+        { score: '平其他', odds: 500 },
         { score: '0-1', odds: 10.5 },
         { score: '0-2', odds: 28 },
         { score: '1-2', odds: 14 },
+        { score: '负其他', odds: 400 },
       ],
     },
   ]);
@@ -49,7 +52,7 @@ test('toScoreOptionRows converts parsed odds to future score_options upsert rows
   const parsed = parseSportteryScoreOddsHtml(html);
   const rows = toScoreOptionRows(parsed, '2026-06-12T10:00:00.000Z');
 
-  assert.equal(rows.length, 9);
+  assert.equal(rows.length, 12);
   assert.deepEqual(rows[0], {
     source: '500',
     source_match_key: '周五003|加拿大|波黑|06-13 03:00',
@@ -66,8 +69,8 @@ test('toScoreOptionRows converts parsed odds to future score_options upsert rows
     home: '加拿大',
     away: '波黑',
     kickoff_label: '06-13 03:00',
-    score: '1-2',
-    odds: 14,
+    score: '负其他',
+    odds: 400,
     updated_at: '2026-06-12T10:00:00.000Z',
   });
 });
@@ -86,12 +89,15 @@ test('dedupeParsedMatches keeps one match per source key when daily pages overla
         { score: '1-0', odds: 5.3 },
         { score: '2-0', odds: 6.5 },
         { score: '2-1', odds: 5.65 },
+        { score: '胜其他', odds: 100 },
         { score: '0-0', odds: 9.5 },
         { score: '1-1', odds: 5.3 },
         { score: '2-2', odds: 16.5 },
+        { score: '平其他', odds: 500 },
         { score: '0-1', odds: 10.5 },
         { score: '0-2', odds: 28 },
         { score: '1-2', odds: 14 },
+        { score: '负其他', odds: 400 },
       ],
     },
   ]);
@@ -112,6 +118,9 @@ test('validateScoreOddsRows accepts complete unique rows', () => {
   const rows = toScoreOptionRows(parseSportteryScoreOddsHtml(html), '2026-06-12T10:00:00.000Z');
 
   assert.equal(validateScoreOddsRows(rows), rows);
+  assert.ok(rows.some((row) => row.score === '胜其他'));
+  assert.ok(rows.some((row) => row.score === '平其他'));
+  assert.ok(rows.some((row) => row.score === '负其他'));
 });
 
 test('validateParsedOddsMatches rejects empty and thin parsed match batches', () => {
