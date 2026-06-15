@@ -68,16 +68,17 @@ Stage 1 commands:
 - Supabase two-group acceptance: `npm run acceptance:supabase`.
 - Match import dry run: `npm run import:matches:dry`.
 - Match import write: `npm run import:matches`.
-- GitHub Actions imports matches daily at 18:17 UTC (02:17 UTC+8) and can be manually triggered from `Import World Cup Matches`.
+- GitHub Actions imports matches hourly at minute 17 UTC and can be manually triggered from `Import World Cup Matches`.
 - GitHub Actions requires repository secrets `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
 - Correct-score odds probe: `npm run probe:odds` fetches 500.com Sporttery score odds, decodes GB18030 HTML, parses to `docs/artifacts/odds-probe/sporttery-score-odds.json`, and does not write Supabase.
-- Correct-score odds import: after `sql/stage4_score_odds.sql` is applied, run `npm run import:odds:dry` to validate live parsing, then `npm run import:odds` to upsert `score_odds`. The GitHub Actions workflow `Import Sporttery Odds` runs every five minutes.
+- Correct-score odds import: after `sql/stage4_score_odds.sql` is applied, run `npm run import:odds:dry` to validate live parsing, then `npm run import:odds` to upsert `score_odds`. The GitHub Actions workflow `Import Sporttery Odds` runs hourly at minute 43 UTC.
 - Backend import reports: after `sql/stage10_import_reports.sql` is applied, match and odds importers write success/failed rows to `import_reports`. The right-header `...` button reads this table as a compact backend report.
 - Render env vars required: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - For iPhone layout QA, prefer Playwright built-in device descriptors (`devices['iPhone SE']`, `devices['iPhone 13']`, `devices['iPhone 14 Pro Max']`) over hand-written viewport guesses.
 - Stage 3 real schedule screenshot: `docs/artifacts/stage3/real-schedule-score-iphone13.png`.
 - Results export acceptance: `npm run acceptance:results` with a local Vite server verifies an iPhone 13 export dialog using mocked Supabase responses and writes `docs/artifacts/stage9/export-results-*`.
 - Backend report acceptance: `npm run acceptance:reports` with a local Vite server verifies the iPhone 13 `...` report dialog with mocked success/failed reports and writes `docs/artifacts/stage10/backend-report-*`.
+- Online other-score odds check: `docs/artifacts/online-other-scores/online-other-0616*` verifies the deployed Render page shows `胜其他` / `平其他` / `负其他` on a date with freshly imported odds.
 
 ## Current Pitfalls
 

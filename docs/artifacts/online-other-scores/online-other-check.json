@@ -1,0 +1,135 @@
+{
+  "heading": "6月15日比分预测",
+  "dateButtons": [
+    {
+      "date": "2026-06-12",
+      "text": "6月12日2场"
+    },
+    {
+      "date": "2026-06-13",
+      "text": "6月13日2场"
+    },
+    {
+      "date": "2026-06-14",
+      "text": "6月14日4场"
+    },
+    {
+      "date": "2026-06-15",
+      "text": "6月15日4场"
+    },
+    {
+      "date": "2026-06-16",
+      "text": "6月16日4场"
+    },
+    {
+      "date": "2026-06-17",
+      "text": "6月17日4场"
+    },
+    {
+      "date": "2026-06-18",
+      "text": "6月18日4场"
+    },
+    {
+      "date": "2026-06-19",
+      "text": "6月19日4场"
+    },
+    {
+      "date": "2026-06-20",
+      "text": "6月20日4场"
+    },
+    {
+      "date": "2026-06-21",
+      "text": "6月21日4场"
+    },
+    {
+      "date": "2026-06-22",
+      "text": "6月22日4场"
+    },
+    {
+      "date": "2026-06-23",
+      "text": "6月23日4场"
+    },
+    {
+      "date": "2026-06-24",
+      "text": "6月24日4场"
+    },
+    {
+      "date": "2026-06-25",
+      "text": "6月25日6场"
+    },
+    {
+      "date": "2026-06-26",
+      "text": "6月26日6场"
+    },
+    {
+      "date": "2026-06-27",
+      "text": "6月27日6场"
+    },
+    {
+      "date": "2026-06-28",
+      "text": "6月28日6场"
+    }
+  ],
+  "scoreCount": 112,
+  "otherTexts": [],
+  "firstScores": [
+    "1:0(17)",
+    "2:0(8)",
+    "2:1(18)",
+    "3:0(4.9)",
+    "3:1(12)",
+    "3:2(85)",
+    "4:0(4.8)",
+    "4:1(13)",
+    "4:2(65)",
+    "5:0(6.95)",
+    "5:1(20)",
+    "5:2(80)",
+    "0:0(60)",
+    "1:1(35)",
+    "2:2(80)",
+    "3:3(350)",
+    "0:1(90)",
+    "0:2(200)",
+    "1:2(100)",
+    "0:3(700)",
+    "1:3(500)",
+    "2:3(400)",
+    "0:4(1000)",
+    "1:4(1000)",
+    "2:4(1000)",
+    "0:5(1000)",
+    "1:5(1000)",
+    "2:5(1000)",
+    "1:0(8)",
+    "2:0(11)",
+    "2:1(4.8)",
+    "3:0(23)",
+    "3:1(20)",
+    "3:2(27)",
+    "4:0(60)",
+    "4:1(45)",
+    "4:2(80)",
+    "5:0(200)",
+    "5:1(200)",
+    "5:2(300)"
+  ],
+  "responses": [
+    {
+      "url": "https://worldcup-predictor-qepw.onrender.com/assets/index-SoirVVxG.css",
+      "status": 200
+    },
+    {
+      "url": "https://worldcup-predictor-qepw.onrender.com/assets/index-BazeY7nX.js",
+      "status": 200
+    },
+    {
+      "url": "https://kiubdgdqjpxewhbszrqs.supabase.co/rest/v1/matches?select=id%2Cmatch_code%2Ckickoff_at_utc%2Cmatch_date_cn%2Ctime_cn%2Chome%2Caway%2Chome_cn%2Caway_cn%2Chome_score%2Caway_score%2Cstatus%2Cstatus_detail%2Cvenue%2Cstage%2Chome_team%3Ateams%21matches_home_team_id_fkey%28name_en%2Cname_cn%29%2Caway_team%3Ateams%21matches_away_team_id_fkey%28name_en%2Cname_cn%29&active=eq.true&order=kickoff_at_utc.asc",
+      "status": 200
+    },
+    {
+      "url": "https://kiubdgdqjpxewhbszrqs.supabase.co/rest/v1/score_odds?select=home%2Caway%2Ckickoff_label%2Cscore%2Codds&order=source_match_key.asc",
+      "status": 200
+    }
+  ]
+}

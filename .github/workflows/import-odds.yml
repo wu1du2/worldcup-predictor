@@ -3,7 +3,7 @@ name: Import Sporttery Odds
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '43 * * * *'
 
 jobs:
   import-odds:
