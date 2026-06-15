@@ -91,7 +91,7 @@ export function buildPredictionResultRows({ matches, players, state, scoreOddsBy
       });
     }
 
-    if (!hits.length || cost === 0) continue;
+    if (cost === 0) continue;
 
     rows.push({
       playerId: player.id,
@@ -126,24 +126,23 @@ export function exportPredictionsText({
   const completedMatches = (matches || []).filter(isCompletedMatch);
   const resultRows = buildPredictionResultRows({ matches, players, state, scoreOddsByMatch });
 
-  lines.push('', '[结果展示]', '今日懂球帝');
+  lines.push('【今日战报】');
 
   if (!completedMatches.length) {
     lines.push('暂无完场比赛');
   } else if (!resultRows.length) {
-    lines.push('暂无命中');
+    lines.push('暂无完场预测');
   } else {
     for (const row of resultRows) {
-      lines.push(`${row.playerName} ROI = ${row.roiPercent}%｜净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
+      lines.push(`${row.playerName} ROI ${row.roiPercent}%｜净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
       for (const hit of row.hits) {
-        lines.push(`${hit.matchLabel} [${hit.score}(${formatOdds(hit.odds)})]`);
+        lines.push(`${hit.matchLabel} ${hit.score}(${formatOdds(hit.odds)}) ✅`);
       }
     }
   }
 
-  lines.push('', '[预测情况]');
+  lines.push('【预测情况】');
   for (const [index, match] of matches.entries()) {
-    if (index > 0) lines.push('');
     lines.push(formatPredictionMatchHeader(match));
 
     for (const player of players) {
@@ -155,7 +154,7 @@ export function exportPredictionsText({
   }
 
   if (currentGroupUrl) {
-    lines.push('', buildInviteLine({ inviteDateLabel, inviteMatches, currentGroupUrl }));
+    lines.push(buildInviteLine({ inviteDateLabel, inviteMatches, currentGroupUrl }));
   }
 
   return lines.join('\n').trimEnd();

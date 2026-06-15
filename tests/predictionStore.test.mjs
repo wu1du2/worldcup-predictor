@@ -127,20 +127,16 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
     text,
     [
       '6月13日比分预测',
-      '',
-      '[结果展示]',
-      '今日懂球帝',
-      '阿哲 ROI = 200%｜净收益 +4｜命中 1/1｜成本 2',
-      '德国 vs 日本 [1-0(6)]',
-      '',
-      '[预测情况]',
+      '【今日战报】',
+      '阿哲 ROI 200%｜净收益 +4｜命中 1/1｜成本 2',
+      '德国 vs 日本 1-0(6) ✅',
+      '北北 ROI -100%｜净收益 -1｜命中 0/1｜成本 1',
+      '【预测情况】',
       '03:00 德国 vs 日本[1-0]',
       '阿哲：1-0, 2-1',
       '北北：1-1',
-      '',
       '21:00 西班牙 vs 巴西',
       '阿哲：0-0',
-      '',
       '[欢迎预测] 6月14日比赛 加拿大 vs 波黑、美国 vs 巴拉圭 https://worldcup-predictor.example/?group=friends',
     ].join('\n'),
   );
@@ -173,7 +169,7 @@ test('exportPredictionsText labels completed matches with the final score in pre
     state: { predictions: {} },
   });
 
-  assert.match(text, /\[预测情况\]\n03:00 加拿大 vs 波黑\[1-1\]\n\n09:00 美国 vs 巴拉圭/);
+  assert.match(text, /【预测情况】\n03:00 加拿大 vs 波黑\[1-1\]\n09:00 美国 vs 巴拉圭/);
   assert.doesNotMatch(text, /美国 vs 巴拉圭\[/);
 });
 
@@ -257,10 +253,10 @@ test('exportPredictionsText reports net profit, hit rate, and cost in result row
     },
   });
 
-  assert.match(text, /张三 ROI = 165%｜净收益 \+3\.3｜命中 1\/2｜成本 2/);
+  assert.match(text, /张三 ROI 165%｜净收益 \+3\.3｜命中 1\/2｜成本 2/);
 });
 
-test('buildPredictionResultRows counts only completed matches and sorts by ROI then revenue then name', () => {
+test('buildPredictionResultRows includes losing players and sorts by ROI then revenue then name', () => {
   const resultRows = buildPredictionResultRows({
     matches: [
       {
@@ -347,6 +343,16 @@ test('buildPredictionResultRows counts only completed matches and sorts by ROI t
         { matchLabel: '美国 vs 巴拉圭', score: '2-0', odds: 6 },
       ],
     },
+    {
+      playerId: 'wang',
+      playerName: '王五',
+      cost: 1,
+      revenue: 0,
+      netProfit: -1,
+      settledMatchCount: 1,
+      roiPercent: -100,
+      hits: [],
+    },
   ]);
 });
 
@@ -369,5 +375,5 @@ test('exportPredictionsText reports empty result states', () => {
     matches: [{ id: 'm1', time: '03:00', home: '德国', away: '日本', status: 'post', homeScore: 0, awayScore: 0 }],
     state: { predictions: { alice: { m1: ['1-0'] } } },
     scoreOddsByMatch: { m1: [{ score: '0-0', odds: 9.5 }] },
-  }), /暂无命中/);
+  }), /阿哲 ROI -100%｜净收益 -1｜命中 0\/1｜成本 1/);
 });
