@@ -10,6 +10,10 @@ import {
   validateScoreOddsRows,
 } from '../src/sportteryOdds.mjs';
 import { getGithubRunUrl, writeImportReport } from '../src/importReports.mjs';
+import {
+  buildOddsImportSnapshotRow,
+  writeOddsImportSnapshot,
+} from '../src/oddsImportSnapshots.mjs';
 
 const artifactDir = new URL('../docs/artifacts/odds-import/', import.meta.url);
 const dryRun = process.argv.includes('--dry-run');
@@ -48,6 +52,19 @@ try {
     }
 
     client = createClient(supabaseUrl, supabaseKey);
+    await writeOddsImportSnapshot({
+      client,
+      row: buildOddsImportSnapshotRow({
+        source: '500',
+        sourceDate: date,
+        sourceUrl: url,
+        rawHtml: html,
+        matches,
+        rows,
+        createdAt: startedAt,
+      }),
+    });
+
     const { error } = await client
       .from('score_odds')
       .upsert(rows, { onConflict: 'source,source_match_key,score' });
