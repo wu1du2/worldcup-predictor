@@ -10,6 +10,7 @@ test('project is configured as a Vite React app', async () => {
   assert.equal(packageJson.scripts.build, 'vite build');
   assert.ok(packageJson.dependencies.react);
   assert.ok(packageJson.dependencies['react-dom']);
+  assert.match(indexHtml, /<title>世界杯比分预测<\/title>/);
   assert.match(indexHtml, /<div id="root"><\/div>/);
   assert.match(indexHtml, /src="\/src\/main.jsx"/);
 });
