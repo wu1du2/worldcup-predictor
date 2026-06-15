@@ -15,8 +15,18 @@ export function createSupabaseBrowserClient() {
 
 export function getGroupCodeFromSearch(search) {
   const params = new URLSearchParams(search);
+  if (!params.has('group')) return null;
   const code = params.get('group')?.trim();
   return code || 'default';
+}
+
+export function generateGroupCode(random = Math.random) {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let code = '';
+  for (let index = 0; index < 6; index += 1) {
+    code += alphabet[Math.floor(random() * alphabet.length)];
+  }
+  return code;
 }
 
 export function mergePlayers(dbPlayers) {

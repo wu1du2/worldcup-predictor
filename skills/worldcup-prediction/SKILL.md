@@ -19,6 +19,7 @@ After each completed task, update this skill when new project-specific lessons, 
 
 - Mobile first: the first screen must show the date, player picker, match board, and clear primary action without hunting.
 - Main path: choose player -> choose one or more correct scores per match -> submit -> export text.
+- Visiting the app without a `group` query parameter shows a one-button homepage. `创建群链接` generates a six-character lowercase alphanumeric group code, navigates to `?group=<code>`, and shows a one-time hint telling the user to use `导出文本` to save/share the group URL. Do not validate non-empty `group` values on the client.
 - New groups start with no members. The player picker shows only group-specific Supabase players plus a `+` button.
 - Export dialog must support one-tap clipboard copy and show an immediate copied/failed state.
 - Export text includes a compact `【今日战报】` section before `【预测情况】`, with no blank lines between blocks. Result rows use `张三 ROI 165%｜净收益 +3.3｜命中 1/2｜成本 2`: ROI is `(revenue - cost) / cost`, net profit is `revenue - cost`, cost is one unit per selected score, and the hit denominator is completed matches with any prediction, not selected scores. Include losing players who predicted completed matches, show hit details only for winners as `加拿大 vs 波黑 1-1(8) ✅`, and sort players by ROI, then revenue, then name.
@@ -81,6 +82,7 @@ Stage 1 commands:
 - Results export acceptance: `npm run acceptance:results` with a local Vite server verifies an iPhone 13 export dialog using mocked Supabase responses and writes `docs/artifacts/stage9/export-results-*`.
 - Backend report acceptance: `npm run acceptance:reports` with a local Vite server verifies the iPhone 13 `...` report dialog with mocked success/failed reports and writes `docs/artifacts/stage10/backend-report-*`.
 - Total stats acceptance: `npm run acceptance:stats` with a local Vite server verifies the iPhone 13 `...` -> `总榜统计` flow with mocked current-group data and writes `docs/artifacts/stage11/total-stats-*`.
+- Homepage create-group acceptance: `npm run acceptance:home` with a local Vite server verifies the no-group homepage, generated group navigation, and one-time share hint, writing `docs/artifacts/stage12/*`.
 - Online other-score odds check: `docs/artifacts/online-other-scores/online-other-0616*` verifies the deployed Render page shows `胜其他` / `平其他` / `负其他` on a date with freshly imported odds.
 
 ## Current Pitfalls

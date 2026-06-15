@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  generateGroupCode,
   getGroupCodeFromSearch,
   loadImportReports,
   loadScoreOdds,
@@ -14,7 +15,14 @@ import {
 test('getGroupCodeFromSearch reads group query param and falls back to default', () => {
   assert.equal(getGroupCodeFromSearch('?group=wx-football'), 'wx-football');
   assert.equal(getGroupCodeFromSearch('?group=%E7%90%83%E5%8F%8B'), '球友');
-  assert.equal(getGroupCodeFromSearch(''), 'default');
+  assert.equal(getGroupCodeFromSearch('?group='), 'default');
+  assert.equal(getGroupCodeFromSearch(''), null);
+});
+
+test('generateGroupCode returns a six character lowercase letter and number code', () => {
+  assert.match(generateGroupCode(() => 0), /^[a-z0-9]{6}$/);
+  assert.equal(generateGroupCode(() => 0), 'aaaaaa');
+  assert.equal(generateGroupCode(() => 0.999), '999999');
 });
 
 test('mergePlayers returns only group-specific database players', () => {

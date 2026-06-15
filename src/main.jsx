@@ -12,6 +12,7 @@ import {
 import {
   createGroupPlayer,
   createSupabaseBrowserClient,
+  generateGroupCode,
   getGroupCodeFromSearch,
   loadImportReports,
   loadGroupState,
@@ -86,6 +87,7 @@ function App() {
   const [errorMessage, setErrorMessage] = useState('');
   const [reportDialog, setReportDialog] = useState({ open: false, status: 'idle', reports: [], error: '' });
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [createdHintOpen, setCreatedHintOpen] = useState(false);
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -127,8 +129,17 @@ function App() {
   }
 
   useEffect(() => {
+    if (!groupCode) return;
     refreshGroupState();
   }, [client, groupCode]);
+
+  useEffect(() => {
+    if (!groupCode) return;
+    const hintGroup = window.sessionStorage.getItem('created-group-hint');
+    if (hintGroup !== groupCode) return;
+    window.sessionStorage.removeItem('created-group-hint');
+    setCreatedHintOpen(true);
+  }, [groupCode]);
 
   function updateState(updater) {
     setState((current) => {
@@ -146,6 +157,10 @@ function App() {
   const inviteDate = selectedDate ? getNextMatchDateCn(matches, selectedDate) : '';
   const inviteMatches = inviteDate ? matches.filter((match) => match.date === inviteDate) : [];
   const inviteDateLabel = inviteDate ? formatChinaDateLabel(inviteDate) : '';
+
+  if (!groupCode) {
+    return <HomePage />;
+  }
 
   useEffect(() => {
     selectedDateButtonRef.current?.scrollIntoView({
@@ -423,6 +438,14 @@ function App() {
         />
       ) : null}
 
+      {createdHintOpen ? (
+        <InfoDialog
+          title="群链接已创建"
+          message="点击“导出文本”可以保存本群链接，之后把这个链接发到微信群即可。"
+          onClose={() => setCreatedHintOpen(false)}
+        />
+      ) : null}
+
       {reportDialog.open ? (
         <BackendReportDialog
           dialog={reportDialog}
@@ -430,6 +453,41 @@ function App() {
         />
       ) : null}
     </main>
+  );
+}
+
+function HomePage() {
+  function createGroupLink() {
+    const groupCode = generateGroupCode();
+    window.sessionStorage.setItem('created-group-hint', groupCode);
+    window.location.assign(`${window.location.pathname}?group=${groupCode}`);
+  }
+
+  return (
+    <main className="home-shell" aria-label="创建群链接">
+      <button className="primary-button home-create-button" data-action="create-group-link" onClick={createGroupLink}>
+        创建群链接
+      </button>
+    </main>
+  );
+}
+
+function InfoDialog({ title, message, onClose }) {
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="dialog compact-dialog info-dialog">
+        <div className="dialog-header">
+          <h2>{title}</h2>
+          <button className="icon-button" data-action="close-info" aria-label="关闭" onClick={onClose}>
+            ×
+          </button>
+        </div>
+        <p>{message}</p>
+        <button className="primary-button full-button" data-action="confirm-info" onClick={onClose}>
+          知道了
+        </button>
+      </div>
+    </div>
   );
 }
 

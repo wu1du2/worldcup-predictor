@@ -30,6 +30,21 @@ textarea {
   padding: 16px 14px 88px;
 }
 
+.home-shell {
+  width: min(100%, 460px);
+  min-height: 100vh;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.home-create-button {
+  width: min(100%, 260px);
+  height: 54px;
+  font-size: 18px;
+}
+
 .topbar {
   display: flex;
   align-items: flex-start;
@@ -395,6 +410,14 @@ h1 {
 
 .more-menu-dialog {
   width: min(100%, 360px);
+}
+
+.info-dialog p {
+  margin: 0;
+  color: #26352f;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.55;
 }
 
 .more-menu-actions {
