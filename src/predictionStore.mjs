@@ -143,9 +143,10 @@ export function exportPredictionsText({
         roiPercent: row.roiPercent,
         seed: `${dateLabel}|${row.playerName}|${row.roiPercent}`,
       });
-      lines.push(`[${title}] ${row.playerName} ROI ${row.roiPercent}%｜净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
+      lines.push(`[${title}] ${row.playerName}｜${row.roiPercent}%`);
+      lines.push(`净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
       for (const hit of row.hits) {
-        lines.push(`${hit.matchLabel} ${hit.score}(${formatOdds(hit.odds)}) ✅`);
+        lines.push(`  ✅ ${hit.matchLabel} ${hit.score}(${formatOdds(hit.odds)})`);
       }
     }
   }

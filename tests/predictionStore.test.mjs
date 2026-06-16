@@ -149,9 +149,11 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
     [
       '6月13日比分预测',
       '【今日战报】',
-      '[赛果穿越者] 阿哲 ROI 200%｜净收益 +4｜命中 1/1｜成本 2',
-      '德国 vs 日本 1-0(6) ✅',
-      '[天台观察员] 北北 ROI -100%｜净收益 -1｜命中 0/1｜成本 1',
+      '[赛果穿越者] 阿哲｜200%',
+      '净收益 +4｜命中 1/1｜成本 2',
+      '  ✅ 德国 vs 日本 1-0(6)',
+      '[天台观察员] 北北｜-100%',
+      '净收益 -1｜命中 0/1｜成本 1',
       '【预测情况】',
       '03:00 德国 vs 日本[1-0]',
       '阿哲：1-0, 2-1',
@@ -274,7 +276,7 @@ test('exportPredictionsText reports net profit, hit rate, and cost in result row
     },
   });
 
-  assert.match(text, /\[[^\]]+\] 张三 ROI 165%｜净收益 \+3\.3｜命中 1\/2｜成本 2/);
+  assert.match(text, /\[[^\]]+\] 张三｜165%\n净收益 \+3\.3｜命中 1\/2｜成本 2/);
 });
 
 test('buildPredictionResultRows includes losing players and sorts by ROI then revenue then name', () => {
@@ -396,7 +398,7 @@ test('exportPredictionsText reports empty result states', () => {
     matches: [{ id: 'm1', time: '03:00', home: '德国', away: '日本', status: 'post', homeScore: 0, awayScore: 0 }],
     state: { predictions: { alice: { m1: ['1-0'] } } },
     scoreOddsByMatch: { m1: [{ score: '0-0', odds: 9.5 }] },
-  }), /\[[^\]]+\] 阿哲 ROI -100%｜净收益 -1｜命中 0\/1｜成本 1/);
+  }), /\[[^\]]+\] 阿哲｜-100%\n净收益 -1｜命中 0\/1｜成本 1/);
 });
 
 test('exportAllTimeStatsText aggregates every completed match for the current group state', () => {
