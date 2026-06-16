@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: '17 * * * *'
 
+concurrency:
+  group: import-matches
+  cancel-in-progress: false
+
 jobs:
   import-matches:
     runs-on: ubuntu-latest

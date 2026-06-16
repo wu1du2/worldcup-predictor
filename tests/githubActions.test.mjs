@@ -7,6 +7,7 @@ test('match import workflow supports off-peak hourly schedule and manual runs wi
 
   assert.match(workflow, /workflow_dispatch:/);
   assert.match(workflow, /cron: '17 \* \* \* \*'/);
+  assert.match(workflow, /concurrency:\n  group: import-matches\n  cancel-in-progress: false/);
   assert.match(workflow, /SUPABASE_URL: \$\{\{ secrets\.SUPABASE_URL \}\}/);
   assert.match(workflow, /SUPABASE_SERVICE_ROLE_KEY: \$\{\{ secrets\.SUPABASE_SERVICE_ROLE_KEY \}\}/);
   assert.match(workflow, /npm run import:matches/);
@@ -19,6 +20,7 @@ test('odds import workflow supports off-peak hourly schedule, manual runs, and f
 
   assert.match(workflow, /workflow_dispatch:/);
   assert.match(workflow, /cron: '43 \* \* \* \*'/);
+  assert.match(workflow, /concurrency:\n  group: import-odds\n  cancel-in-progress: false/);
   assert.match(workflow, /SUPABASE_URL: \$\{\{ secrets\.SUPABASE_URL \}\}/);
   assert.match(workflow, /SUPABASE_SERVICE_ROLE_KEY: \$\{\{ secrets\.SUPABASE_SERVICE_ROLE_KEY \}\}/);
   assert.match(workflow, /npm run import:odds/);

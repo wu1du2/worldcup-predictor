@@ -73,6 +73,7 @@ Stage 1 commands:
 - Match import write: `npm run import:matches`.
 - GitHub Actions imports matches hourly at minute 17 UTC and can be manually triggered from `Import World Cup Matches`.
 - GitHub Actions requires repository secrets `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+- GitHub scheduled workflows are not reliable enough for near-live updates. For 5-minute refresh, use cron-job.org to call GitHub `workflow_dispatch` for `import-matches.yml` and `import-odds.yml`; keep the hourly GitHub schedules as a fallback. Import workflows use `concurrency` groups so external triggers do not pile up overlapping runs.
 - Correct-score odds probe: `npm run probe:odds` fetches 500.com Sporttery score odds, decodes GB18030 HTML, parses to `docs/artifacts/odds-probe/sporttery-score-odds.json`, and does not write Supabase.
 - Correct-score odds import: after `sql/stage4_score_odds.sql` is applied, run `npm run import:odds:dry` to validate live parsing, then `npm run import:odds` to upsert `score_odds`. The GitHub Actions workflow `Import Sporttery Odds` runs hourly at minute 43 UTC.
 - Backend import reports: after `sql/stage10_import_reports.sql` is applied, match and odds importers write success/failed rows to `import_reports`. The right-header `...` button reads this table as a compact backend report.

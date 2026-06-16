@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: '43 * * * *'
 
+concurrency:
+  group: import-odds
+  cancel-in-progress: false
+
 jobs:
   import-odds:
     runs-on: ubuntu-latest
