@@ -49,6 +49,11 @@ export function getRoiTitle({ roiPercent, seed }) {
   return titles[stableHash(seed) % titles.length];
 }
 
+export function getRoiEmoji({ roiPercent, seed }) {
+  const emojis = getRoiEmojiBand(roiPercent);
+  return emojis[stableHash(seed) % emojis.length];
+}
+
 export function submitPrediction(state, { playerId, matchId, scores }) {
   const nextPredictions = {
     ...state.predictions,
@@ -141,9 +146,13 @@ export function exportPredictionsText({
     for (const row of resultRows) {
       const title = getRoiTitle({
         roiPercent: row.roiPercent,
-        seed: `${dateLabel}|${row.playerName}|${row.roiPercent}`,
+        seed: `${dateLabel}|${row.playerName}|${row.roiPercent}|title`,
       });
-      lines.push(`[${title}] ${row.playerName}｜${row.roiPercent}%`);
+      const emoji = getRoiEmoji({
+        roiPercent: row.roiPercent,
+        seed: `${dateLabel}|${row.playerName}|${row.roiPercent}|emoji`,
+      });
+      lines.push(`${emoji}[${title}] ${row.playerName}｜${row.roiPercent}%`);
       lines.push(`净收益 ${formatSignedAmount(row.netProfit)}｜命中 ${row.hits.length}/${row.settledMatchCount}｜成本 ${row.cost}`);
       for (const hit of row.hits) {
         lines.push(`  ✅ ${hit.matchLabel} ${hit.score}(${formatOdds(hit.odds)})`);
@@ -224,6 +233,16 @@ function getRoiTitleBand(roiPercent) {
   if (roiPercent >= -30) return ['手感微凉', '惜败选手', '差口气', '险些上岸', '差点回本', '今晚不服'];
   if (roiPercent >= -80) return ['快乐赞助商', '赛前很美', '玄学波动', '已经上头', '心态微崩'];
   return ['倒霉蛋', '天台观察员', '庄家好友', '玄学受害者'];
+}
+
+function getRoiEmojiBand(roiPercent) {
+  if (roiPercent >= 200) return ['🚀', '🔥', '👑'];
+  if (roiPercent >= 100) return ['🎯', '📈', '🏹'];
+  if (roiPercent >= 30) return ['🟢', '✨', '💪'];
+  if (roiPercent >= 0) return ['➕', '🟡', '🛟'];
+  if (roiPercent >= -30) return ['😬', '🥲', '😮‍💨', '🛟', '🤏', '😤'];
+  if (roiPercent >= -80) return ['💸', '🌧️', '🧨', '🤯', '📉', '😵‍💫'];
+  return ['❌', '🧊', '🫠', '💀', '😵‍💫', '🧨'];
 }
 
 function stableHash(value) {

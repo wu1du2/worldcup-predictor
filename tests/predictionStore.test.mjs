@@ -8,6 +8,7 @@ import {
   exportAllTimeStatsText,
   exportPredictionsText,
   formatScoreOptionLabel,
+  getRoiEmoji,
   getRoiTitle,
   getCopyStatusText,
   submitPrediction,
@@ -112,6 +113,25 @@ test('getRoiTitle chooses stable titles from the configured ROI bands', () => {
   }
 });
 
+test('getRoiEmoji chooses stable emoji from the configured ROI bands', () => {
+  const cases = [
+    { roi: 250, allowed: ['🚀', '🔥', '👑'] },
+    { roi: 150, allowed: ['🎯', '📈', '🏹'] },
+    { roi: 50, allowed: ['🟢', '✨', '💪'] },
+    { roi: 10, allowed: ['➕', '🟡', '🛟'] },
+    { roi: -10, allowed: ['😬', '🥲', '😮‍💨', '🛟', '🤏', '😤'] },
+    { roi: -50, allowed: ['💸', '🌧️', '🧨', '🤯', '📉', '😵‍💫'] },
+    { roi: -100, allowed: ['❌', '🧊', '🫠', '💀', '😵‍💫', '🧨'] },
+  ];
+
+  for (const item of cases) {
+    const seed = `6月13日|张三|${item.roi}|emoji`;
+    const emoji = getRoiEmoji({ roiPercent: item.roi, seed });
+    assert.ok(item.allowed.includes(emoji), `${emoji} should be in ${item.allowed.join(',')}`);
+    assert.equal(emoji, getRoiEmoji({ roiPercent: item.roi, seed }));
+  }
+});
+
 test('exportPredictionsText renders results, raw predictions, and group URL', () => {
   const state = {
     predictions: {
@@ -149,10 +169,10 @@ test('exportPredictionsText renders results, raw predictions, and group URL', ()
     [
       '6月13日比分预测',
       '【今日战报】',
-      '[赛果穿越者] 阿哲｜200%',
+      '👑[剧本阅读者] 阿哲｜200%',
       '净收益 +4｜命中 1/1｜成本 2',
       '  ✅ 德国 vs 日本 1-0(6)',
-      '[天台观察员] 北北｜-100%',
+      '🧊[天台观察员] 北北｜-100%',
       '净收益 -1｜命中 0/1｜成本 1',
       '【预测情况】',
       '03:00 德国 vs 日本[1-0]',
