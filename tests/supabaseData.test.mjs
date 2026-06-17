@@ -203,6 +203,46 @@ test('mapScoreOddsByMatch joins odds to app matches by Chinese teams and China k
   });
 });
 
+test('mapScoreOddsByMatch normalizes Sporttery team aliases before joining odds', () => {
+  const matches = [
+    {
+      id: 'espn-1',
+      date: '2026-06-18',
+      time: '01:00',
+      home: '葡萄牙',
+      away: '刚果民主共和国',
+    },
+    {
+      id: 'espn-2',
+      date: '2026-06-18',
+      time: '10:00',
+      home: '乌兹别克斯坦',
+      away: '哥伦比亚',
+    },
+  ];
+  const oddsRows = [
+    {
+      home: '葡萄牙',
+      away: '刚果(金)',
+      kickoff_label: '06-18 01:00',
+      score: '1-0',
+      odds: 6.25,
+    },
+    {
+      home: '乌兹别克',
+      away: '哥伦比亚',
+      kickoff_label: '06-18 10:00',
+      score: '0-1',
+      odds: 11,
+    },
+  ];
+
+  assert.deepEqual(mapScoreOddsByMatch(matches, oddsRows), {
+    'espn-1': [{ score: '1-0', odds: 6.25 }],
+    'espn-2': [{ score: '0-1', odds: 11 }],
+  });
+});
+
 test('loadScoreOdds reads score_odds and returns match-keyed options', async () => {
   const calls = [];
   const rows = [

@@ -4,6 +4,7 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import {
   buildSportteryScoreUrl,
   dedupeParsedMatches,
+  dedupeScoreOptionRows,
   parseSportteryScoreOddsHtml,
   toScoreOptionRows,
   validateParsedOddsMatches,
@@ -37,7 +38,7 @@ try {
   await writeFile(new URL(`500-score-${date}.html`, artifactDir), html);
 
   matches = validateParsedOddsMatches(dedupeParsedMatches(parseSportteryScoreOddsHtml(html)));
-  rows = validateScoreOddsRows(toScoreOptionRows(matches));
+  rows = validateScoreOddsRows(dedupeScoreOptionRows(toScoreOptionRows(matches)));
   await writeFile(new URL('sporttery-score-odds-import.json', artifactDir), `${JSON.stringify({ date, sourceUrl: url, matches, rows }, null, 2)}\n`);
 
   console.log(`Fetched Sporttery score odds from ${url}`);

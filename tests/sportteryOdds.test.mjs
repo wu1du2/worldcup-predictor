@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   buildSportteryScoreUrl,
   dedupeParsedMatches,
+  dedupeScoreOptionRows,
   filterMatchesByKickoffDates,
   parseSportteryScoreOddsHtml,
   toScoreOptionRows,
@@ -101,6 +102,37 @@ test('dedupeParsedMatches keeps one match per source key when daily pages overla
       ],
     },
   ]);
+});
+
+test('dedupeParsedMatches also keeps one odds value per score inside a noisy source block', () => {
+  const parsed = parseSportteryScoreOddsHtml(`
+    <tr>
+      <td>周三024</td><td>世界杯</td><td>06-18 10:00</td><td>乌兹别克 VS 哥伦比亚</td>
+      <td>1:0 19.00 0:1 5.50 1:0 8.00 0:1 10.50 胜其它 55.00 胜其它 34.00</td>
+    </tr>
+  `);
+
+  assert.deepEqual(dedupeParsedMatches(parsed), [
+    {
+      issue: '周三024',
+      competition: '世界杯',
+      kickoffLabel: '06-18 10:00',
+      home: '乌兹别克',
+      away: '哥伦比亚',
+      scores: [
+        { score: '1-0', odds: 8 },
+        { score: '0-1', odds: 10.5 },
+        { score: '胜其他', odds: 34 },
+      ],
+    },
+  ]);
+});
+
+test('dedupeScoreOptionRows removes repeated score rows from duplicated source fragments', () => {
+  const rows = toScoreOptionRows(parseSportteryScoreOddsHtml(html), '2026-06-12T10:00:00.000Z');
+  const duplicateRows = [...rows, rows[0], rows[1], rows.at(-1)];
+
+  assert.equal(validateScoreOddsRows(dedupeScoreOptionRows(duplicateRows)).length, rows.length);
 });
 
 test('filterMatchesByKickoffDates keeps only requested China dates', () => {

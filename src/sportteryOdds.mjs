@@ -76,6 +76,17 @@ export function validateScoreOddsRows(rows) {
   return rows;
 }
 
+export function dedupeScoreOptionRows(rows) {
+  const byKey = new Map();
+
+  for (const row of rows) {
+    const key = `${row.source}|${row.source_match_key}|${row.score}`;
+    byKey.set(key, row);
+  }
+
+  return [...byKey.values()];
+}
+
 export function validateParsedOddsMatches(matches) {
   if (!Array.isArray(matches) || matches.length === 0) {
     throw new Error('No score odds matches parsed.');
@@ -98,7 +109,10 @@ export function dedupeParsedMatches(matches) {
 
   for (const match of matches) {
     const key = `${match.issue}|${match.home}|${match.away}|${match.kickoffLabel}`;
-    if (!byKey.has(key)) byKey.set(key, match);
+    byKey.set(key, {
+      ...match,
+      scores: dedupeScores(match.scores),
+    });
   }
 
   return [...byKey.values()];
@@ -124,6 +138,16 @@ function extractScores(text) {
   }
 
   return scores;
+}
+
+function dedupeScores(scores) {
+  const byScore = new Map();
+
+  for (const score of scores) {
+    byScore.set(score.score, score);
+  }
+
+  return [...byScore.values()];
 }
 
 function isValidScoreLabel(score) {

@@ -98,6 +98,8 @@ Stage 1 commands:
 - ESPN's public World Cup scoreboard endpoint can be slow or intermittently time out. Import scripts should use retry with timeout and never make frontend rendering depend on live ESPN fetches.
 - 500.com Sporttery pages are GB18030 encoded. Decode with `new TextDecoder('gb18030')`, not UTF-8, or Chinese teams and odds text will be unreliable.
 - 500.com date URLs can return overlapping rolling sales windows. Odds importers must dedupe by source match key and then filter by UTC+8 kickoff date before writing/reviewing rows.
+- 500.com score pages can repeat the same score odds inside one parsed match block. Deduplicate score rows by `source + source_match_key + score` before validation/upsert, and keep parsed snapshots deduped so audit logs stay readable.
+- Sporttery Chinese names can differ from schedule names, e.g. `刚果(金)` vs `刚果民主共和国`, `乌兹别克` vs `乌兹别克斯坦`. Frontend odds matching should normalize these aliases before joining `score_odds` to matches.
 - Frontend odds display reads `score_odds` with the browser anon key. If service role sees rows but the page shows fallback scores without odds, check the `score_odds_public_read` RLS select policy.
 - Import report writes are best-effort and must not make an otherwise successful import fail. If the report dialog errors while import logs look healthy, first check that `sql/stage10_import_reports.sql` was applied and the public read policy exists.
 - Old/incomplete `matches` rows may remain in Supabase from earlier phases. Data loading must filter out rows missing `match_code`, UTC+8 date, kickoff time, home, or away before rendering.
