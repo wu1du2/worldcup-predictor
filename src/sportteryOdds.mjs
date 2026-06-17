@@ -5,6 +5,9 @@ export function buildSportteryScoreUrl(date) {
 }
 
 export function parseSportteryScoreOddsHtml(html) {
+  const structuredMatches = parseStructuredSportteryRows(html);
+  if (structuredMatches.length) return structuredMatches;
+
   const text = html
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
@@ -33,6 +36,44 @@ export function parseSportteryScoreOddsHtml(html) {
   }
 
   return matches;
+}
+
+function parseStructuredSportteryRows(html) {
+  const segments = html.split(/<tr\b(?=[^>]*class="[^"]*\bbet-tb-tr\b[^"]*")/i).slice(1);
+  const matches = [];
+
+  for (const segment of segments) {
+    const openingTag = segment.match(/^[^>]*>/)?.[0] || '';
+    const attrs = parseAttributes(openingTag);
+    if (attrs.datasimpleleague !== '世界杯') continue;
+
+    const kickoffLabel = `${attrs.datamatchdate?.slice(5)} ${attrs.datamatchtime}`;
+    const scores = extractScores(segment);
+    if (!attrs.datamatchnum || !attrs.datahomesxname || !attrs.dataawaysxname || !kickoffLabel || !scores.length) continue;
+
+    matches.push({
+      issue: attrs.datamatchnum,
+      competition: attrs.datasimpleleague,
+      kickoffLabel,
+      home: attrs.datahomesxname,
+      away: attrs.dataawaysxname,
+      scores,
+    });
+  }
+
+  return matches;
+}
+
+function parseAttributes(tag) {
+  const attrs = {};
+  const attrPattern = /([a-zA-Z0-9_-]+)="([^"]*)"/g;
+  let match;
+
+  while ((match = attrPattern.exec(tag))) {
+    attrs[match[1].replace(/-/g, '').toLowerCase()] = decodeHtmlText(match[2]);
+  }
+
+  return attrs;
 }
 
 export function toScoreOptionRows(matches, updatedAt = new Date().toISOString()) {
@@ -125,11 +166,15 @@ export function filterMatchesByKickoffDates(matches, dates) {
 }
 
 function extractScores(text) {
+  const buttonScores = extractButtonScores(text);
+  if (buttonScores.length) return buttonScores;
+
   const scores = [];
+  const cleanText = htmlToText(text);
   const scorePattern = /(?:([0-9]):([0-9])|([胜平负])其[他它])\s+([0-9]+(?:\.[0-9]+)?)/g;
   let match;
 
-  while ((match = scorePattern.exec(text))) {
+  while ((match = scorePattern.exec(cleanText))) {
     const score = match[3] ? `${match[3]}其他` : `${match[1]}-${match[2]}`;
     scores.push({
       score,
@@ -138,6 +183,45 @@ function extractScores(text) {
   }
 
   return scores;
+}
+
+function extractButtonScores(html) {
+  const scores = [];
+  const buttonPattern = /<p\b(?=[^>]*\bdata-type="bf")(?=[^>]*\bdata-value="([^"]+)")(?=[^>]*\bdata-sp="([^"]+)")[^>]*>/g;
+  let match;
+
+  while ((match = buttonPattern.exec(html))) {
+    const rawScore = decodeHtmlText(match[1]);
+    const scoreMatch = rawScore.match(/^([0-9]):([0-9])$/);
+    const otherMatch = rawScore.match(/^([胜平负])其[他它]$/);
+    const score = otherMatch ? `${otherMatch[1]}其他` : `${scoreMatch?.[1]}-${scoreMatch?.[2]}`;
+    if (!scoreMatch && !otherMatch) continue;
+    scores.push({
+      score,
+      odds: Number(match[2]),
+    });
+  }
+
+  return scores;
+}
+
+function htmlToText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function decodeHtmlText(text) {
+  return text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"');
 }
 
 function dedupeScores(scores) {

@@ -23,6 +23,27 @@ const html = `
 </tr>
 `;
 
+const structuredHtml = `
+<tr class="bet-tb-tr" data-homesxname="乌兹别克" data-awaysxname="哥伦比亚" data-matchdate="2026-06-18" data-matchtime="10:00" data-simpleleague="世界杯" data-matchnum="周三024">
+  <td>周三024</td><td>世界杯</td><td>06-18 10:00</td><td>乌兹别克 VS 哥伦比亚</td>
+</tr>
+<tr class="bet-more-wrap hide">
+  <td><p class="sbetbtn" data-type="bf" data-value="1:0" data-sp="19.00">1:0<i>19.00</i></p><p class="sbetbtn" data-type="bf" data-value="0:1" data-sp="5.50">0:1<i>5.50</i></p></td>
+</tr>
+<tr class="bet-tb-tr" data-homesxname="赫尔辛基" data-awaysxname="国际图尔" data-matchdate="2026-06-17" data-matchtime="23:00" data-simpleleague="芬兰超级联赛" data-matchnum="周三201">
+  <td>周三201</td><td>芬兰超级联赛</td><td>06-17 23:00</td><td>赫尔辛基 VS 国际图尔</td>
+</tr>
+<tr class="bet-more-wrap hide">
+  <td><p class="sbetbtn" data-type="bf" data-value="1:0" data-sp="8.00">1:0<i>8.00</i></p><p class="sbetbtn" data-type="bf" data-value="0:1" data-sp="10.50">0:1<i>10.50</i></p></td>
+</tr>
+<tr class="bet-tb-tr" data-homesxname="捷克" data-awaysxname="南非" data-matchdate="2026-06-19" data-matchtime="00:00" data-simpleleague="世界杯" data-matchnum="周四025">
+  <td>周四025</td><td>世界杯</td><td>06-19 00:00</td><td>捷克 VS 南非</td>
+</tr>
+<tr class="bet-more-wrap hide">
+  <td><p class="sbetbtn" data-type="bf" data-value="2:1" data-sp="6.75">2:1<i>6.75</i></p><p class="sbetbtn" data-type="bf" data-value="胜其它" data-sp="90.00">胜其它<i>90.00</i></p></td>
+</tr>
+`;
+
 test('parseSportteryScoreOddsHtml extracts match score odds from 500.com score page text', () => {
   assert.deepEqual(parseSportteryScoreOddsHtml(html), [
     {
@@ -44,6 +65,33 @@ test('parseSportteryScoreOddsHtml extracts match score odds from 500.com score p
         { score: '0-2', odds: 28 },
         { score: '1-2', odds: 14 },
         { score: '负其他', odds: 400 },
+      ],
+    },
+  ]);
+});
+
+test('parseSportteryScoreOddsHtml keeps each structured row scoped to its own match', () => {
+  assert.deepEqual(parseSportteryScoreOddsHtml(structuredHtml), [
+    {
+      issue: '周三024',
+      competition: '世界杯',
+      kickoffLabel: '06-18 10:00',
+      home: '乌兹别克',
+      away: '哥伦比亚',
+      scores: [
+        { score: '1-0', odds: 19 },
+        { score: '0-1', odds: 5.5 },
+      ],
+    },
+    {
+      issue: '周四025',
+      competition: '世界杯',
+      kickoffLabel: '06-19 00:00',
+      home: '捷克',
+      away: '南非',
+      scores: [
+        { score: '2-1', odds: 6.75 },
+        { score: '胜其他', odds: 90 },
       ],
     },
   ]);
