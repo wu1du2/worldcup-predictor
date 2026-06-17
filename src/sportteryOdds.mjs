@@ -77,16 +77,21 @@ function parseAttributes(tag) {
 }
 
 export function toScoreOptionRows(matches, updatedAt = new Date().toISOString()) {
-  return matches.flatMap((match) => match.scores.map((scoreOption) => ({
-    source: '500',
-    source_match_key: `${match.issue}|${match.home}|${match.away}|${match.kickoffLabel}`,
-    home: match.home,
-    away: match.away,
-    kickoff_label: match.kickoffLabel,
-    score: scoreOption.score,
-    odds: scoreOption.odds,
-    updated_at: updatedAt,
-  })));
+  return matches.flatMap((match) => {
+    const home = normalizeSportteryTeamName(match.home);
+    const away = normalizeSportteryTeamName(match.away);
+
+    return match.scores.map((scoreOption) => ({
+      source: '500',
+      source_match_key: `${match.issue}|${home}|${away}|${match.kickoffLabel}`,
+      home,
+      away,
+      kickoff_label: match.kickoffLabel,
+      score: scoreOption.score,
+      odds: scoreOption.odds,
+      updated_at: updatedAt,
+    }));
+  });
 }
 
 export function validateScoreOddsRows(rows) {
@@ -240,4 +245,13 @@ function isValidScoreLabel(score) {
 
 function toFullKickoffDate(kickoffLabel) {
   return `2026-${kickoffLabel.slice(0, 5)}`;
+}
+
+function normalizeSportteryTeamName(name) {
+  const aliases = {
+    '刚果(金)': '刚果民主共和国',
+    乌兹别克: '乌兹别克斯坦',
+  };
+
+  return aliases[name] || name;
 }

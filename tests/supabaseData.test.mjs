@@ -203,7 +203,7 @@ test('mapScoreOddsByMatch joins odds to app matches by Chinese teams and China k
   });
 });
 
-test('mapScoreOddsByMatch normalizes Sporttery team aliases before joining odds', () => {
+test('mapScoreOddsByMatch expects imported odds to use internal Chinese team names', () => {
   const matches = [
     {
       id: 'espn-1',
@@ -223,13 +223,13 @@ test('mapScoreOddsByMatch normalizes Sporttery team aliases before joining odds'
   const oddsRows = [
     {
       home: '葡萄牙',
-      away: '刚果(金)',
+      away: '刚果民主共和国',
       kickoff_label: '06-18 01:00',
       score: '1-0',
       odds: 6.25,
     },
     {
-      home: '乌兹别克',
+      home: '乌兹别克斯坦',
       away: '哥伦比亚',
       kickoff_label: '06-18 10:00',
       score: '0-1',

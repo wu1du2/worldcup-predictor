@@ -201,16 +201,7 @@ async function findOrCreateGroup(client, groupCode) {
 }
 
 function buildOddsMatchKey(home, away, kickoffLabel) {
-  return `${normalizeSportteryTeamName(home)}|${normalizeSportteryTeamName(away)}|${kickoffLabel}`;
-}
-
-function normalizeSportteryTeamName(name) {
-  const aliases = {
-    '刚果(金)': '刚果民主共和国',
-    乌兹别克: '乌兹别克斯坦',
-  };
-
-  return aliases[name] || name;
+  return `${home}|${away}|${kickoffLabel}`;
 }
 
 function compareScoreOptions(a, b) {

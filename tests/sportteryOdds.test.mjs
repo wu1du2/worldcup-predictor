@@ -124,6 +124,44 @@ test('toScoreOptionRows converts parsed odds to future score_options upsert rows
   });
 });
 
+test('toScoreOptionRows normalizes external team aliases to internal Chinese names before upsert', () => {
+  const rows = toScoreOptionRows([
+    {
+      issue: '周三021',
+      competition: '世界杯',
+      kickoffLabel: '06-18 01:00',
+      home: '葡萄牙',
+      away: '刚果(金)',
+      scores: [{ score: '1-0', odds: 6.25 }],
+    },
+    {
+      issue: '周三024',
+      competition: '世界杯',
+      kickoffLabel: '06-18 10:00',
+      home: '乌兹别克',
+      away: '哥伦比亚',
+      scores: [{ score: '0-1', odds: 5.75 }],
+    },
+  ], '2026-06-17T10:00:00.000Z');
+
+  assert.deepEqual(rows.map((row) => ({
+    source_match_key: row.source_match_key,
+    home: row.home,
+    away: row.away,
+  })), [
+    {
+      source_match_key: '周三021|葡萄牙|刚果民主共和国|06-18 01:00',
+      home: '葡萄牙',
+      away: '刚果民主共和国',
+    },
+    {
+      source_match_key: '周三024|乌兹别克斯坦|哥伦比亚|06-18 10:00',
+      home: '乌兹别克斯坦',
+      away: '哥伦比亚',
+    },
+  ]);
+});
+
 test('dedupeParsedMatches keeps one match per source key when daily pages overlap', () => {
   const parsed = parseSportteryScoreOddsHtml(html);
 
