@@ -56,13 +56,8 @@ export async function loadMatches({ client }) {
 }
 
 export async function loadScoreOdds({ client, matches }) {
-  const { data, error } = await client
-    .from('score_odds')
-    .select('home,away,kickoff_label,score,odds')
-    .order('source_match_key', { ascending: true });
-
-  if (error) throw error;
-  return mapScoreOddsByMatch(matches, data || []);
+  const rows = await loadAllScoreOddsRows(client);
+  return mapScoreOddsByMatch(matches, rows);
 }
 
 export async function loadImportReports({ client, limit = 8 }) {
@@ -90,6 +85,25 @@ function toAppImportReport(row) {
     runUrl: row.run_url || '',
     createdAt: row.created_at,
   };
+}
+
+async function loadAllScoreOddsRows(client) {
+  const pageSize = 1000;
+  const rows = [];
+
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await client
+      .from('score_odds')
+      .select('home,away,kickoff_label,score,odds')
+      .order('source_match_key', { ascending: true })
+      .range(from, from + pageSize - 1);
+
+    if (error) throw error;
+    rows.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+  }
+
+  return rows;
 }
 
 export function mapScoreOddsByMatch(matches, oddsRows) {

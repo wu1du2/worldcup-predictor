@@ -270,7 +270,12 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
           return {
             order(columnName, options) {
               calls.push(['order', columnName, options]);
-              return Promise.resolve({ data: rows, error: null });
+              return {
+                range(from, to) {
+                  calls.push(['range', from, to]);
+                  return Promise.resolve({ data: rows, error: null });
+                },
+              };
             },
           };
         },
@@ -293,6 +298,61 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
     ['from', 'score_odds'],
     ['select', 'home,away,kickoff_label,score,odds'],
     ['order', 'source_match_key', { ascending: true }],
+    ['range', 0, 999],
+  ]);
+});
+
+test('loadScoreOdds paginates beyond Supabase default row limits', async () => {
+  const firstPage = Array.from({ length: 1000 }, (_, index) => ({
+    home: '占位',
+    away: '球队',
+    kickoff_label: '06-12 00:00',
+    score: `${index % 6}-${index % 5}`,
+    odds: 10,
+  }));
+  const secondPage = [
+    {
+      home: '西班牙',
+      away: '沙特阿拉伯',
+      kickoff_label: '06-22 00:00',
+      score: '1-0',
+      odds: 9.7,
+    },
+  ];
+  const ranges = [];
+  const client = {
+    from() {
+      return {
+        select() {
+          return {
+            order() {
+              return {
+                range(from, to) {
+                  ranges.push([from, to]);
+                  return Promise.resolve({
+                    data: from === 0 ? firstPage : secondPage,
+                    error: null,
+                  });
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const odds = await loadScoreOdds({
+    client,
+    matches: [{ id: 'm1', date: '2026-06-22', time: '00:00', home: '西班牙', away: '沙特阿拉伯' }],
+  });
+
+  assert.deepEqual(odds, {
+    m1: [{ score: '1-0', odds: 9.7 }],
+  });
+  assert.deepEqual(ranges, [
+    [0, 999],
+    [1000, 1999],
   ]);
 });
 
