@@ -78,6 +78,7 @@ Stage 1 commands:
 - Correct-score odds import: after `sql/stage4_score_odds.sql` is applied, run `npm run import:odds:dry` to validate live parsing, then `npm run import:odds` to upsert `score_odds`. The GitHub Actions workflow `Import Sporttery Odds` runs hourly at minute 43 UTC.
 - Backend import reports: after `sql/stage10_import_reports.sql` is applied, match and odds importers write success/failed rows to `import_reports`. The right-header `...` button reads this table as a compact backend report.
 - Odds raw audit logs: after `sql/stage12_odds_import_snapshots.sql` is applied, `npm run import:odds` writes one best-effort `odds_import_snapshots` row per fetch with raw GB18030-decoded HTML and parsed JSON. Snapshot failures must warn but not block `score_odds` upsert.
+- Odds trend phase 1: after `sql/stage13_score_odds_trends.sql` is applied, `npm run backfill:odds-trends` computes first-to-latest trends for the fixed England vs Croatia sample (`06-18 04:00`, 403 snapshots) and writes 31 rows to `score_odds_trends`. Verified anchor values: `1-0` 5.5 -> 6.3 = +14.545%, `2-1` 7 -> 5.6 = -20%, `4-2` 75 -> 60 = -20%, `3-3` 100 -> 40 = -60%.
 - Render env vars required: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - For iPhone layout QA, prefer Playwright built-in device descriptors (`devices['iPhone SE']`, `devices['iPhone 13']`, `devices['iPhone 14 Pro Max']`) over hand-written viewport guesses.
 - Stage 3 real schedule screenshot: `docs/artifacts/stage3/real-schedule-score-iphone13.png`.
