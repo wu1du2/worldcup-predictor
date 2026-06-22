@@ -203,6 +203,54 @@ test('mapScoreOddsByMatch joins odds to app matches by Chinese teams and China k
   });
 });
 
+test('mapScoreOddsByMatch merges first-to-latest trend data into score options', () => {
+  const matches = [
+    {
+      id: 'espn-1',
+      date: '2026-06-18',
+      time: '04:00',
+      home: '英格兰',
+      away: '克罗地亚',
+    },
+  ];
+  const oddsRows = [
+    {
+      home: '英格兰',
+      away: '克罗地亚',
+      kickoff_label: '06-18 04:00',
+      score: '4-2',
+      odds: 60,
+    },
+  ];
+  const trendRows = [
+    {
+      home: '英格兰',
+      away: '克罗地亚',
+      kickoff_label: '06-18 04:00',
+      score: '4-2',
+      first_odds: 75,
+      latest_odds: 60,
+      change_pct: -20,
+      snapshots_count: 403,
+    },
+  ];
+
+  assert.deepEqual(mapScoreOddsByMatch(matches, oddsRows, trendRows), {
+    'espn-1': [
+      {
+        score: '4-2',
+        odds: 60,
+        trend: {
+          firstOdds: 75,
+          latestOdds: 60,
+          changePct: -20,
+          snapshotsCount: 403,
+        },
+      },
+    ],
+  });
+});
+
 test('mapScoreOddsByMatch expects imported odds to use internal Chinese team names', () => {
   const matches = [
     {
@@ -264,6 +312,7 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
   const client = {
     from(table) {
       calls.push(['from', table]);
+      const tableRows = table === 'score_odds' ? rows : [];
       return {
         select(columns) {
           calls.push(['select', columns]);
@@ -273,7 +322,7 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
               return {
                 range(from, to) {
                   calls.push(['range', from, to]);
-                  return Promise.resolve({ data: rows, error: null });
+                  return Promise.resolve({ data: tableRows, error: null });
                 },
               };
             },
@@ -299,6 +348,10 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
     ['select', 'home,away,kickoff_label,score,odds'],
     ['order', 'source_match_key', { ascending: true }],
     ['range', 0, 999],
+    ['from', 'score_odds_trends'],
+    ['select', 'home,away,kickoff_label,score,first_odds,latest_odds,change_pct,snapshots_count'],
+    ['order', 'source_match_key', { ascending: true }],
+    ['range', 0, 999],
   ]);
 });
 
@@ -321,7 +374,7 @@ test('loadScoreOdds paginates beyond Supabase default row limits', async () => {
   ];
   const ranges = [];
   const client = {
-    from() {
+    from(table) {
       return {
         select() {
           return {
@@ -329,6 +382,9 @@ test('loadScoreOdds paginates beyond Supabase default row limits', async () => {
               return {
                 range(from, to) {
                   ranges.push([from, to]);
+                  if (table !== 'score_odds') {
+                    return Promise.resolve({ data: [], error: null });
+                  }
                   return Promise.resolve({
                     data: from === 0 ? firstPage : secondPage,
                     error: null,
@@ -350,10 +406,8 @@ test('loadScoreOdds paginates beyond Supabase default row limits', async () => {
   assert.deepEqual(odds, {
     m1: [{ score: '1-0', odds: 9.7 }],
   });
-  assert.deepEqual(ranges, [
-    [0, 999],
-    [1000, 1999],
-  ]);
+  assert.equal(ranges.filter(([from, to]) => from === 0 && to === 999).length, 2);
+  assert.equal(ranges.filter(([from, to]) => from === 1000 && to === 1999).length, 1);
 });
 
 test('loadImportReports reads recent backend reports ordered by creation time', async () => {

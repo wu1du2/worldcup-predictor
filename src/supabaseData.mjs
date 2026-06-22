@@ -56,8 +56,11 @@ export async function loadMatches({ client }) {
 }
 
 export async function loadScoreOdds({ client, matches }) {
-  const rows = await loadAllScoreOddsRows(client);
-  return mapScoreOddsByMatch(matches, rows);
+  const [rows, trendRows] = await Promise.all([
+    loadAllScoreOddsRows(client),
+    loadAllScoreOddsTrendRows(client),
+  ]);
+  return mapScoreOddsByMatch(matches, rows, trendRows);
 }
 
 export async function loadImportReports({ client, limit = 8 }) {
@@ -106,12 +109,43 @@ async function loadAllScoreOddsRows(client) {
   return rows;
 }
 
-export function mapScoreOddsByMatch(matches, oddsRows) {
+async function loadAllScoreOddsTrendRows(client) {
+  const pageSize = 1000;
+  const rows = [];
+
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await client
+      .from('score_odds_trends')
+      .select('home,away,kickoff_label,score,first_odds,latest_odds,change_pct,snapshots_count')
+      .order('source_match_key', { ascending: true })
+      .range(from, from + pageSize - 1);
+
+    if (error) throw error;
+    rows.push(...(data || []));
+    if (!data || data.length < pageSize) break;
+  }
+
+  return rows;
+}
+
+export function mapScoreOddsByMatch(matches, oddsRows, trendRows = []) {
   const rowsByMatchKey = new Map();
+  const trendsByScoreKey = new Map();
 
   for (const row of oddsRows || []) {
     const key = buildOddsMatchKey(row.home, row.away, row.kickoff_label);
     rowsByMatchKey.set(key, [...(rowsByMatchKey.get(key) || []), row]);
+  }
+
+  for (const row of trendRows || []) {
+    if (!row.home || !row.away || !row.kickoff_label || !row.score) continue;
+    const matchKey = buildOddsMatchKey(row.home, row.away, row.kickoff_label);
+    trendsByScoreKey.set(`${matchKey}|${row.score}`, {
+      firstOdds: Number(row.first_odds),
+      latestOdds: Number(row.latest_odds),
+      changePct: Number(row.change_pct),
+      snapshotsCount: row.snapshots_count,
+    });
   }
 
   const oddsByMatchId = {};
@@ -123,7 +157,15 @@ export function mapScoreOddsByMatch(matches, oddsRows) {
     if (!rows.length) continue;
 
     oddsByMatchId[match.id] = rows
-      .map((row) => ({ score: row.score, odds: Number(row.odds) }))
+      .map((row) => {
+        const option = {
+          score: row.score,
+          odds: Number(row.odds),
+        };
+        const trend = trendsByScoreKey.get(`${key}|${row.score}`);
+        if (trend) option.trend = trend;
+        return option;
+      })
       .sort(compareScoreOptions);
   }
 

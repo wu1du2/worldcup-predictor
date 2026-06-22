@@ -8,6 +8,8 @@ import {
   exportAllTimeStatsText,
   exportPredictionsText,
   formatScoreOptionLabel,
+  formatScoreTrendLabel,
+  getScoreTrendDirection,
   getRoiEmoji,
   getRoiTitle,
   getCopyStatusText,
@@ -86,6 +88,20 @@ test('addCustomPlayer ignores blank names', () => {
 test('formatScoreOptionLabel displays odds without changing score values', () => {
   assert.equal(formatScoreOptionLabel({ score: '1-1', odds: 6.5 }), '1:1(6.5)');
   assert.equal(formatScoreOptionLabel({ score: '胜其他', odds: 100 }), '胜其他(100)');
+});
+
+test('formatScoreTrendLabel renders first-to-latest odds movement', () => {
+  assert.equal(formatScoreTrendLabel({ trend: { changePct: 14.545 } }), '+14.5%');
+  assert.equal(formatScoreTrendLabel({ trend: { changePct: -20 } }), '-20%');
+  assert.equal(formatScoreTrendLabel({ trend: { changePct: 0.01 } }), '0%');
+  assert.equal(formatScoreTrendLabel({}), '');
+});
+
+test('getScoreTrendDirection classifies odds movement for UI color', () => {
+  assert.equal(getScoreTrendDirection({ trend: { changePct: 14.5 } }), 'up');
+  assert.equal(getScoreTrendDirection({ trend: { changePct: -20 } }), 'down');
+  assert.equal(getScoreTrendDirection({ trend: { changePct: 0.01 } }), 'flat');
+  assert.equal(getScoreTrendDirection({}), 'flat');
 });
 
 test('getCopyStatusText returns user-facing copy feedback', () => {

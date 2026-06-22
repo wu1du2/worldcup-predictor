@@ -6,7 +6,9 @@ import {
   exportAllTimeStatsText,
   exportPredictionsText,
   formatScoreOptionLabel,
+  formatScoreTrendLabel,
   getCopyStatusText,
+  getScoreTrendDirection,
   toggleScorePick,
 } from './predictionStore.mjs';
 import {
@@ -532,13 +534,18 @@ function MatchCard({ match, picks, selectedPlayerId, scoreOptions, onToggle }) {
         {scoreOptions.map((option) => (
           <button
             key={option.score}
-            className={`score-chip ${picks.includes(option.score) ? 'selected' : ''}`}
+            className={`score-chip ${picks.includes(option.score) ? 'selected' : ''} ${formatScoreTrendLabel(option) ? 'with-trend' : ''}`}
             data-match-id={match.id}
             data-score={option.score}
             disabled={!selectedPlayerId}
             onClick={() => onToggle(match.id, option.score)}
           >
-            {formatScoreOptionLabel(option)}
+            <span className="score-main-label">{formatScoreOptionLabel(option)}</span>
+            {formatScoreTrendLabel(option) ? (
+              <span className={`score-trend trend-${getScoreTrendDirection(option)}`}>
+                {formatScoreTrendLabel(option)}
+              </span>
+            ) : null}
           </button>
         ))}
       </div>

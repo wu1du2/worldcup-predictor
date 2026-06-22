@@ -38,6 +38,20 @@ export function formatScoreOptionLabel(option) {
   return `${displayScore}(${option.odds})`;
 }
 
+export function formatScoreTrendLabel(option) {
+  const changePct = option.trend?.changePct;
+  if (!Number.isFinite(changePct)) return '';
+  const rounded = Math.round(changePct * 10) / 10;
+  if (Object.is(rounded, -0) || rounded === 0) return '0%';
+  return `${rounded > 0 ? '+' : ''}${rounded}%`;
+}
+
+export function getScoreTrendDirection(option) {
+  const changePct = option.trend?.changePct;
+  if (!Number.isFinite(changePct) || Math.abs(changePct) < 0.05) return 'flat';
+  return changePct > 0 ? 'up' : 'down';
+}
+
 export function getCopyStatusText(status) {
   if (status === 'copied') return '已复制';
   if (status === 'failed') return '复制失败';
