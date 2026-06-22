@@ -55,6 +55,24 @@ test('mapPredictionsByPlayer converts database rows to app prediction state', ()
   });
 });
 
+test('mapPredictionsByPlayer ignores malformed score arrays from database rows', () => {
+  const rows = [
+    { player_id: 'player-a', match_id: 'm01', scores: '1-0' },
+    { player_id: 'player-a', match_id: 'm02', scores: ['0-0', 5, null] },
+    { player_id: 'player-b', match_id: 'm01', scores: null },
+  ];
+
+  assert.deepEqual(mapPredictionsByPlayer(rows), {
+    'player-a': {
+      m01: [],
+      m02: ['0-0'],
+    },
+    'player-b': {
+      m01: [],
+    },
+  });
+});
+
 test('loadMatches reads active matches sorted by kickoff and maps them for the app', async () => {
   const calls = [];
   const rows = [

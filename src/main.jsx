@@ -10,6 +10,7 @@ import {
   getCopyStatusText,
   getScoreTrendDirection,
   isCorrectScoreOption,
+  normalizePredictionState,
   toggleScorePick,
 } from './predictionStore.mjs';
 import {
@@ -43,7 +44,7 @@ function loadState() {
   if (!saved) return createInitialState();
 
   try {
-    return { ...createInitialState(), ...JSON.parse(saved) };
+    return normalizePredictionState(JSON.parse(saved));
   } catch {
     return createInitialState();
   }
@@ -144,8 +145,11 @@ function App() {
 
   function selectedScores(matchId, currentState = state) {
     const playerId = currentState.selectedPlayerId;
-    if (!playerId) return currentState.draftPicks[matchId] || [];
-    return currentState.draftPicks[matchId] || currentState.predictions[playerId]?.[matchId] || [];
+    const draftScores = currentState.draftPicks?.[matchId];
+    if (!playerId) return Array.isArray(draftScores) ? draftScores : [];
+    const savedScores = currentState.predictions?.[playerId]?.[matchId];
+    if (Array.isArray(draftScores)) return draftScores;
+    return Array.isArray(savedScores) ? savedScores : [];
   }
 
   function selectPlayer(playerId) {

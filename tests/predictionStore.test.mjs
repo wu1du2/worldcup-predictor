@@ -11,6 +11,7 @@ import {
   formatScoreTrendLabel,
   getScoreTrendDirection,
   isCorrectScoreOption,
+  normalizePredictionState,
   getRoiEmoji,
   getRoiTitle,
   getCopyStatusText,
@@ -84,6 +85,33 @@ test('addCustomPlayer ignores blank names', () => {
   const state = createInitialState();
 
   assert.deepEqual(addCustomPlayer(state, '   '), state);
+});
+
+test('normalizePredictionState repairs stale local state shapes', () => {
+  assert.deepEqual(normalizePredictionState({
+    selectedPlayerId: 123,
+    customPlayers: null,
+    draftPicks: null,
+    predictions: {
+      playerA: {
+        m1: '1-0',
+        m2: ['2-1'],
+      },
+      playerB: null,
+    },
+    selectedDate: '2026-06-23',
+  }), {
+    selectedPlayerId: '',
+    customPlayers: [],
+    draftPicks: {},
+    predictions: {
+      playerA: {
+        m1: [],
+        m2: ['2-1'],
+      },
+    },
+    selectedDate: '2026-06-23',
+  });
 });
 
 test('formatScoreOptionLabel displays odds without changing score values', () => {

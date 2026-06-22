@@ -39,10 +39,14 @@ export function mapPredictionsByPlayer(rows) {
 
   for (const row of rows) {
     predictions[row.player_id] ||= {};
-    predictions[row.player_id][row.match_id] = row.scores || [];
+    predictions[row.player_id][row.match_id] = normalizeScores(row.scores);
   }
 
   return predictions;
+}
+
+function normalizeScores(scores) {
+  return Array.isArray(scores) ? scores.filter((score) => typeof score === 'string') : [];
 }
 
 export async function loadMatches({ client }) {

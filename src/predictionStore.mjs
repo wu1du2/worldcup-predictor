@@ -9,6 +9,21 @@ export function createInitialState() {
   };
 }
 
+export function normalizePredictionState(rawState) {
+  const state = {
+    ...createInitialState(),
+    ...(isPlainObject(rawState) ? rawState : {}),
+  };
+
+  return {
+    ...state,
+    selectedPlayerId: typeof state.selectedPlayerId === 'string' ? state.selectedPlayerId : '',
+    customPlayers: Array.isArray(state.customPlayers) ? state.customPlayers : [],
+    draftPicks: normalizeScoreMap(state.draftPicks),
+    predictions: normalizePredictionsMap(state.predictions),
+  };
+}
+
 export function addCustomPlayer(state, rawName) {
   const name = rawName.trim();
   if (!name) return state;
@@ -27,11 +42,12 @@ export function addCustomPlayer(state, rawName) {
 }
 
 export function toggleScorePick(scores, score) {
-  if (scores.includes(score)) {
-    return scores.filter((item) => item !== score);
+  const currentScores = Array.isArray(scores) ? scores : [];
+  if (currentScores.includes(score)) {
+    return currentScores.filter((item) => item !== score);
   }
 
-  return [...scores, score];
+  return [...currentScores, score];
 }
 
 export function formatScoreOptionLabel(option) {
@@ -322,4 +338,35 @@ function slugifyName(name) {
   return Array.from(name)
     .map((char) => char.charCodeAt(0).toString(16))
     .join('-');
+}
+
+function normalizePredictionsMap(predictions) {
+  if (!isPlainObject(predictions)) return {};
+
+  const normalized = {};
+  for (const [playerId, playerMatches] of Object.entries(predictions)) {
+    const matches = normalizeScoreMap(playerMatches);
+    if (Object.keys(matches).length > 0) {
+      normalized[playerId] = matches;
+    }
+  }
+  return normalized;
+}
+
+function normalizeScoreMap(scoreMap) {
+  if (!isPlainObject(scoreMap)) return {};
+
+  const normalized = {};
+  for (const [matchId, scores] of Object.entries(scoreMap)) {
+    normalized[matchId] = normalizeScores(scores);
+  }
+  return normalized;
+}
+
+function normalizeScores(scores) {
+  return Array.isArray(scores) ? scores.filter((score) => typeof score === 'string') : [];
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 }

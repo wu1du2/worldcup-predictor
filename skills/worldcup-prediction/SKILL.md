@@ -109,3 +109,4 @@ Stage 1 commands:
 - Import report writes are best-effort and must not make an otherwise successful import fail. If the report dialog errors while import logs look healthy, first check that `sql/stage10_import_reports.sql` was applied and the public read policy exists.
 - Old/incomplete `matches` rows may remain in Supabase from earlier phases. Data loading must filter out rows missing `match_code`, UTC+8 date, kickoff time, home, or away before rendering.
 - Shared schedule helpers may receive raw importer rows (`match_date_cn`) or app rows (`date`). Tests should cover both shapes to prevent UI crashes.
+- Browser `localStorage` can contain stale or malformed prediction state from older deployments. Always normalize loaded state and defensively treat score lists as arrays before calling array methods such as `includes`, especially when switching players/dates.
