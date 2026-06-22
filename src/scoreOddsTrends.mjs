@@ -1,7 +1,34 @@
+export function buildAllScoreOddsTrendRows({ snapshots }) {
+  if (!Array.isArray(snapshots)) throw new Error('Trend snapshots must be an array.');
+
+  const matchKeysById = new Map();
+
+  for (const snapshot of snapshots) {
+    for (const match of getSnapshotMatches(snapshot)) {
+      if (!match.issue || !match.kickoffLabel || !match.home || !match.away) continue;
+      const id = `${match.issue}|${match.home}|${match.away}|${match.kickoffLabel}`;
+      matchKeysById.set(id, {
+        source: match.source || '500',
+        issue: match.issue,
+        kickoffLabel: match.kickoffLabel,
+        home: match.home,
+        away: match.away,
+      });
+    }
+  }
+
+  return [...matchKeysById.values()]
+    .flatMap((matchKey) => buildScoreOddsTrendRows({ snapshots, matchKey }))
+    .sort((a, b) => (
+      a.source_match_key.localeCompare(b.source_match_key)
+      || a.score.localeCompare(b.score)
+    ));
+}
+
 export function buildScoreOddsTrendRows({ snapshots, matchKey }) {
   if (!Array.isArray(snapshots)) throw new Error('Trend snapshots must be an array.');
-  if (!matchKey?.kickoffLabel || !matchKey?.home || !matchKey?.away) {
-    throw new Error('Trend matchKey requires kickoffLabel, home, and away.');
+  if (!matchKey?.issue || !matchKey?.kickoffLabel || !matchKey?.home || !matchKey?.away) {
+    throw new Error('Trend matchKey requires issue, kickoffLabel, home, and away.');
   }
 
   const byScore = new Map();
@@ -49,10 +76,15 @@ export function buildScoreOddsTrendRows({ snapshots, matchKey }) {
 }
 
 function findSnapshotMatch(snapshot, matchKey) {
-  const matches = snapshot.parsed_json?.matches || snapshot.parsedJson?.matches || [];
-  return matches.find((match) => (
-    match.kickoffLabel === matchKey.kickoffLabel
+  return getSnapshotMatches(snapshot).find((match) => (
+    match.issue === matchKey.issue
+    && match.kickoffLabel === matchKey.kickoffLabel
     && match.home === matchKey.home
     && match.away === matchKey.away
   ));
+}
+
+function getSnapshotMatches(snapshot) {
+  const matches = snapshot.parsed_json?.matches || snapshot.parsedJson?.matches || [];
+  return Array.isArray(matches) ? matches : [];
 }

@@ -1,3 +1,5 @@
+import { exactSportteryScores } from './scoreTemplate.mjs';
+
 export function createInitialState() {
   return {
     selectedPlayerId: '',
@@ -50,6 +52,22 @@ export function getScoreTrendDirection(option) {
   const changePct = option.trend?.changePct;
   if (!Number.isFinite(changePct) || Math.abs(changePct) < 0.05) return 'flat';
   return changePct > 0 ? 'up' : 'down';
+}
+
+export function isCorrectScoreOption(match, option) {
+  const homeScore = match.homeScore ?? match.home_score;
+  const awayScore = match.awayScore ?? match.away_score;
+  if (match.status !== 'post' || !Number.isInteger(homeScore) || !Number.isInteger(awayScore)) {
+    return false;
+  }
+
+  const actualScore = `${homeScore}-${awayScore}`;
+  if (option.score === actualScore) return true;
+  if (exactSportteryScores.has(actualScore)) return false;
+
+  if (homeScore > awayScore) return option.score === '胜其他';
+  if (homeScore === awayScore) return option.score === '平其他';
+  return option.score === '负其他';
 }
 
 export function getCopyStatusText(status) {

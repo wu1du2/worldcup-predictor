@@ -1,16 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import { readFile } from 'node:fs/promises';
 
-import { buildScoreOddsTrendRows } from '../src/scoreOddsTrends.mjs';
+import { buildAllScoreOddsTrendRows, buildScoreOddsTrendRows } from '../src/scoreOddsTrends.mjs';
 
 const dryRun = process.argv.includes('--dry-run');
-const matchKey = {
-  source: '500',
-  issue: processArg('issue') || '周三022',
-  kickoffLabel: processArg('kickoff') || '06-18 04:00',
-  home: processArg('home') || '英格兰',
-  away: processArg('away') || '克罗地亚',
-};
+const matchKey = buildMatchKeyFromArgs();
 
 await loadLocalEnv();
 
@@ -23,23 +17,30 @@ if (!supabaseUrl || !supabaseKey) {
 
 const client = createClient(supabaseUrl, supabaseKey);
 const snapshots = await loadAllSnapshots(client);
-const rows = buildScoreOddsTrendRows({ snapshots, matchKey });
+const rows = matchKey
+  ? buildScoreOddsTrendRows({ snapshots, matchKey })
+  : buildAllScoreOddsTrendRows({ snapshots });
 
 if (!rows.length) {
-  throw new Error(`No trend rows found for ${matchKey.kickoffLabel} ${matchKey.home} vs ${matchKey.away}.`);
+  throw new Error(matchKey
+    ? `No trend rows found for ${matchKey.kickoffLabel} ${matchKey.home} vs ${matchKey.away}.`
+    : 'No trend rows found in odds snapshots.');
 }
 
-console.log(`Built ${rows.length} score odds trend rows for ${matchKey.home} vs ${matchKey.away}.`);
-console.log(JSON.stringify(rows.filter((row) => ['4-2', '2-1', '1-0', '3-3'].includes(row.score)), null, 2));
+const matchCount = new Set(rows.map((row) => row.source_match_key)).size;
+console.log(`Built ${rows.length} score odds trend rows for ${matchCount} matches.`);
+console.log(JSON.stringify(rows.slice(0, 12), null, 2));
 
 if (dryRun) {
   console.log('Dry run: not writing Supabase.');
 } else {
-  const { error } = await client
-    .from('score_odds_trends')
-    .upsert(rows, { onConflict: 'source,source_match_key,score' });
+  for (const chunk of chunkRows(rows, 500)) {
+    const { error } = await client
+      .from('score_odds_trends')
+      .upsert(chunk, { onConflict: 'source,source_match_key,score' });
 
-  if (error) throw error;
+    if (error) throw error;
+  }
   console.log(`Upserted ${rows.length} score odds trend rows into Supabase.`);
 }
 
@@ -47,23 +48,63 @@ async function loadAllSnapshots(client) {
   const pageSize = 1000;
   const rows = [];
 
-  for (let from = 0; ; from += pageSize) {
-    const { data, error } = await client
-      .from('odds_import_snapshots')
-      .select('created_at,parsed_json')
-      .order('created_at', { ascending: true })
-      .range(from, from + pageSize - 1);
+  for (const sourceDate of buildSourceDateRange()) {
+    for (let from = 0; ; from += pageSize) {
+      const { data, error } = await client
+        .from('odds_import_snapshots')
+        .select('created_at,parsed_json')
+        .eq('source', '500')
+        .eq('source_date', sourceDate)
+        .order('created_at', { ascending: true })
+        .range(from, from + pageSize - 1);
 
-    if (error) throw error;
-    rows.push(...(data || []));
-    if (!data || data.length < pageSize) break;
+      if (error) throw error;
+      rows.push(...(data || []));
+      if (!data || data.length < pageSize) break;
+    }
   }
 
-  return rows;
+  return rows.sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
 }
 
 function processArg(name) {
   return process.argv.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
+}
+
+function buildMatchKeyFromArgs() {
+  const issue = processArg('issue');
+  const kickoffLabel = processArg('kickoff');
+  const home = processArg('home');
+  const away = processArg('away');
+
+  if (!issue && !kickoffLabel && !home && !away) return null;
+  return {
+    source: '500',
+    issue,
+    kickoffLabel,
+    home,
+    away,
+  };
+}
+
+function chunkRows(rows, size) {
+  const chunks = [];
+  for (let index = 0; index < rows.length; index += size) {
+    chunks.push(rows.slice(index, index + size));
+  }
+  return chunks;
+}
+
+function buildSourceDateRange() {
+  const start = new Date('2026-06-01T00:00:00Z');
+  const end = new Date('2026-07-20T00:00:00Z');
+  const dates = [];
+
+  for (let cursor = start; cursor <= end; cursor = new Date(cursor.getTime() + 86400000)) {
+    dates.push(cursor.toISOString().slice(0, 10));
+  }
+
+  return dates;
 }
 
 async function loadLocalEnv() {

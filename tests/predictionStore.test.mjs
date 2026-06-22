@@ -10,6 +10,7 @@ import {
   formatScoreOptionLabel,
   formatScoreTrendLabel,
   getScoreTrendDirection,
+  isCorrectScoreOption,
   getRoiEmoji,
   getRoiTitle,
   getCopyStatusText,
@@ -102,6 +103,21 @@ test('getScoreTrendDirection classifies odds movement for UI color', () => {
   assert.equal(getScoreTrendDirection({ trend: { changePct: -20 } }), 'down');
   assert.equal(getScoreTrendDirection({ trend: { changePct: 0.01 } }), 'flat');
   assert.equal(getScoreTrendDirection({}), 'flat');
+});
+
+test('isCorrectScoreOption recognizes exact completed scores', () => {
+  const match = { status: 'post', homeScore: 2, awayScore: 1 };
+  assert.equal(isCorrectScoreOption(match, { score: '2-1' }), true);
+  assert.equal(isCorrectScoreOption(match, { score: '1-0' }), false);
+  assert.equal(isCorrectScoreOption({ status: 'pre', homeScore: 2, awayScore: 1 }, { score: '2-1' }), false);
+});
+
+test('isCorrectScoreOption recognizes Sporttery other-score buckets', () => {
+  assert.equal(isCorrectScoreOption({ status: 'post', homeScore: 6, awayScore: 2 }, { score: '胜其他' }), true);
+  assert.equal(isCorrectScoreOption({ status: 'post', homeScore: 6, awayScore: 2 }, { score: '负其他' }), false);
+  assert.equal(isCorrectScoreOption({ status: 'post', homeScore: 4, awayScore: 4 }, { score: '平其他' }), true);
+  assert.equal(isCorrectScoreOption({ status: 'post', homeScore: 2, awayScore: 6 }, { score: '负其他' }), true);
+  assert.equal(isCorrectScoreOption({ status: 'post', homeScore: 5, awayScore: 2 }, { score: '胜其他' }), false);
 });
 
 test('getCopyStatusText returns user-facing copy feedback', () => {

@@ -9,6 +9,7 @@ import {
   formatScoreTrendLabel,
   getCopyStatusText,
   getScoreTrendDirection,
+  isCorrectScoreOption,
   toggleScorePick,
 } from './predictionStore.mjs';
 import {
@@ -30,43 +31,12 @@ import {
   getMatchScoreText,
   getNextMatchDateCn,
 } from './matchSchedule.mjs';
+import { sportteryScoreTemplate } from './scoreTemplate.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
 
-const fallbackScoreOptions = [
-  { score: '1-0' },
-  { score: '2-0' },
-  { score: '2-1' },
-  { score: '3-0' },
-  { score: '3-1' },
-  { score: '3-2' },
-  { score: '4-0' },
-  { score: '4-1' },
-  { score: '4-2' },
-  { score: '5-0' },
-  { score: '5-1' },
-  { score: '5-2' },
-  { score: '胜其他' },
-  { score: '0-0' },
-  { score: '1-1' },
-  { score: '2-2' },
-  { score: '3-3' },
-  { score: '平其他' },
-  { score: '0-1' },
-  { score: '0-2' },
-  { score: '1-2' },
-  { score: '0-3' },
-  { score: '1-3' },
-  { score: '2-3' },
-  { score: '0-4' },
-  { score: '1-4' },
-  { score: '2-4' },
-  { score: '0-5' },
-  { score: '1-5' },
-  { score: '2-5' },
-  { score: '负其他' },
-];
+const fallbackScoreOptions = sportteryScoreTemplate.map((score) => ({ score }));
 
 function loadState() {
   const saved = window.localStorage.getItem(storageKey);
@@ -534,7 +504,7 @@ function MatchCard({ match, picks, selectedPlayerId, scoreOptions, onToggle }) {
         {scoreOptions.map((option) => (
           <button
             key={option.score}
-            className={`score-chip ${picks.includes(option.score) ? 'selected' : ''} ${formatScoreTrendLabel(option) ? 'with-trend' : ''}`}
+            className={`score-chip ${picks.includes(option.score) ? 'selected' : ''} ${formatScoreTrendLabel(option) ? 'with-trend' : ''} ${isCorrectScoreOption(match, option) ? 'correct-result' : ''}`}
             data-match-id={match.id}
             data-score={option.score}
             disabled={!selectedPlayerId}

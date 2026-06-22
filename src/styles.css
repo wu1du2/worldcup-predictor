@@ -332,6 +332,18 @@ h1 {
   color: #0f4d40;
 }
 
+.score-chip.correct-result {
+  border-color: #14915f;
+  box-shadow: inset 0 0 0 1px #14915f;
+  background: #effaf3;
+}
+
+.score-chip.selected.correct-result {
+  border-color: #0d7a4d;
+  box-shadow: inset 0 0 0 2px #0d7a4d;
+  background: #d9f4e3;
+}
+
 .score-chip:disabled {
   opacity: 0.45;
 }

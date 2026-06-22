@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildScoreOddsTrendRows } from '../src/scoreOddsTrends.mjs';
+import { buildAllScoreOddsTrendRows, buildScoreOddsTrendRows } from '../src/scoreOddsTrends.mjs';
 
 test('buildScoreOddsTrendRows computes first-to-latest odds changes for one match', () => {
   const rows = buildScoreOddsTrendRows({
@@ -18,6 +18,7 @@ test('buildScoreOddsTrendRows computes first-to-latest odds changes for one matc
         parsed_json: {
           matches: [
             {
+              issue: '周三022',
               kickoffLabel: '06-18 04:00',
               home: '英格兰',
               away: '克罗地亚',
@@ -34,6 +35,7 @@ test('buildScoreOddsTrendRows computes first-to-latest odds changes for one matc
         parsed_json: {
           matches: [
             {
+              issue: '周三022',
               kickoffLabel: '06-18 04:00',
               home: '英格兰',
               away: '克罗地亚',
@@ -79,5 +81,61 @@ test('buildScoreOddsTrendRows computes first-to-latest odds changes for one matc
     },
   ]);
   assert.equal(Math.round(rows[0].change_pct * 10) / 10, -20);
+  assert.equal(Math.round(rows[1].change_pct * 10) / 10, -20);
+});
+
+test('buildAllScoreOddsTrendRows computes trends for every match found in snapshots', () => {
+  const rows = buildAllScoreOddsTrendRows({
+    snapshots: [
+      {
+        created_at: '2026-06-15T03:45:02.807Z',
+        parsed_json: {
+          matches: [
+            {
+              issue: '周三022',
+              kickoffLabel: '06-18 04:00',
+              home: '英格兰',
+              away: '克罗地亚',
+              scores: [{ score: '1-0', odds: 5.5 }],
+            },
+            {
+              issue: '周三023',
+              kickoffLabel: '06-18 07:00',
+              home: '法国',
+              away: '德国',
+              scores: [{ score: '胜其他', odds: 100 }],
+            },
+          ],
+        },
+      },
+      {
+        created_at: '2026-06-17T19:55:39.141Z',
+        parsed_json: {
+          matches: [
+            {
+              issue: '周三022',
+              kickoffLabel: '06-18 04:00',
+              home: '英格兰',
+              away: '克罗地亚',
+              scores: [{ score: '1-0', odds: 6.3 }],
+            },
+            {
+              issue: '周三023',
+              kickoffLabel: '06-18 07:00',
+              home: '法国',
+              away: '德国',
+              scores: [{ score: '胜其他', odds: 80 }],
+            },
+          ],
+        },
+      },
+    ],
+  });
+
+  assert.deepEqual(rows.map((row) => [row.source_match_key, row.score, row.first_odds, row.latest_odds]), [
+    ['周三022|英格兰|克罗地亚|06-18 04:00', '1-0', 5.5, 6.3],
+    ['周三023|法国|德国|06-18 07:00', '胜其他', 100, 80],
+  ]);
+  assert.equal(Math.round(rows[0].change_pct * 10) / 10, 14.5);
   assert.equal(Math.round(rows[1].change_pct * 10) / 10, -20);
 });
