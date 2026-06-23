@@ -184,6 +184,19 @@ h1 {
   color: #ffffff;
 }
 
+.player-chip.ai-player-chip {
+  border: 1px solid #2f6fed;
+  background: #eaf2ff;
+  color: #174ea6;
+  box-shadow: inset 0 0 0 1px rgba(47, 111, 237, 0.12);
+}
+
+.player-chip.ai-player-chip.selected {
+  border-color: #1f5edc;
+  background: #1f5edc;
+  color: #ffffff;
+}
+
 .add-player-chip {
   border: 1px dashed #9aaba2;
   background: #ffffff;
@@ -332,6 +345,13 @@ h1 {
   color: #0f4d40;
 }
 
+.score-chip.ai-selected {
+  border-color: #2f6fed;
+  background: #e9f1ff;
+  color: #174ea6;
+  box-shadow: inset 0 0 0 1px rgba(47, 111, 237, 0.18);
+}
+
 .score-chip.correct-result {
   border-color: #c48512;
   box-shadow: inset 0 0 0 1px #c48512;
@@ -344,6 +364,51 @@ h1 {
 
 .score-chip:disabled {
   opacity: 0.45;
+}
+
+.ai-reason-panel {
+  margin-top: 10px;
+  border-top: 1px solid #d8e5fb;
+  padding-top: 9px;
+}
+
+.ai-reason-toggle {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid #d8e5fb;
+  border-radius: 8px;
+  background: #f6f9ff;
+  color: #214d93;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  text-align: left;
+}
+
+.ai-reason-toggle span {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-reason-toggle strong {
+  color: #1f5edc;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.ai-reason-panel p {
+  margin: 8px 2px 0;
+  color: #395371;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .submit-bar {

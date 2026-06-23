@@ -44,6 +44,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Group isolation is URL-driven: `?group=wx-a` and `?group=wx-b` must not share players or predictions.
 - Players live in Supabase under the current group; adding one selects it immediately after the write succeeds.
 - `AI推荐` is a special Supabase-backed player created per group, shown first in the player list, and stored in the same `players` / `predictions` tables as human users.
+- `AI推荐` must feel like a special user: blue player chip, blue selected score chips, and per-match reason UI shown only when AI is selected. Reason summary is capped at 50 Chinese characters and expandable detail is capped at 400 characters.
 - Match dates and displayed kickoff times are always UTC+8 (`Asia/Shanghai`). Date tabs and export labels use the UTC+8 match date.
 - The match importer upserts by `match_code` and overwrites schedule/status/score fields from the source. Keep legacy compatibility fields (`match_date`, `kickoff_at`, `home_team`, `away_team`) in sync while the old table shape exists.
 - Team Chinese names live in the `teams` table as the translation authority. Importers upsert teams from `data/team-name-mapping.csv`, write `home_team_id` and `away_team_id` to matches, and keep `home_cn` / `away_cn` only as snapshots.

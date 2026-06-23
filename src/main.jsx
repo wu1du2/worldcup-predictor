@@ -26,6 +26,11 @@ import {
 } from './supabaseData.mjs';
 import { formatReportStatusText } from './importReports.mjs';
 import {
+  getAiReasonPreview,
+  getAiRecommendationForMatch,
+  isAiPlayer,
+} from './aiRecommendation.mjs';
+import {
   buildDateTabs,
   formatChinaDateLabel,
   getDefaultMatchDateCn,
@@ -61,6 +66,7 @@ function App() {
   const [reportDialog, setReportDialog] = useState({ open: false, status: 'idle', reports: [], error: '' });
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [createdHintOpen, setCreatedHintOpen] = useState(false);
+  const [expandedAiReasons, setExpandedAiReasons] = useState({});
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -123,6 +129,7 @@ function App() {
   }
 
   const selectedPlayer = players.find((player) => player.id === state.selectedPlayerId);
+  const selectedPlayerIsAi = isAiPlayer(selectedPlayer);
   const dateTabs = buildDateTabs(matches);
   const selectedDate = state.selectedDate || getDefaultMatchDateCn(matches);
   const visibleMatches = matches.filter((match) => match.date === selectedDate);
@@ -157,6 +164,13 @@ function App() {
       ...current,
       selectedPlayerId: playerId,
       draftPicks: {},
+    }));
+  }
+
+  function toggleAiReason(matchId) {
+    setExpandedAiReasons((current) => ({
+      ...current,
+      [matchId]: !current[matchId],
     }));
   }
 
@@ -339,7 +353,7 @@ function App() {
           {players.map((player) => (
             <button
               key={player.id}
-              className={`player-chip ${player.id === state.selectedPlayerId ? 'selected' : ''}`}
+              className={`player-chip ${isAiPlayer(player) ? 'ai-player-chip' : ''} ${player.id === state.selectedPlayerId ? 'selected' : ''}`}
               data-player-id={player.id}
               onClick={() => selectPlayer(player.id)}
             >
@@ -370,6 +384,10 @@ function App() {
             match={match}
             picks={selectedScores(match.id)}
             selectedPlayerId={state.selectedPlayerId}
+            isAiSelected={selectedPlayerIsAi}
+            aiRecommendation={selectedPlayerIsAi ? getAiRecommendationForMatch(match.id) : null}
+            aiReasonExpanded={Boolean(expandedAiReasons[match.id])}
+            onToggleAiReason={toggleAiReason}
             scoreOptions={scoreOddsByMatch[match.id] || fallbackScoreOptions}
             onToggle={toggleMatchScore}
           />
@@ -490,7 +508,19 @@ function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports }) {
   );
 }
 
-function MatchCard({ match, picks, selectedPlayerId, scoreOptions, onToggle }) {
+function MatchCard({
+  match,
+  picks,
+  selectedPlayerId,
+  isAiSelected,
+  aiRecommendation,
+  aiReasonExpanded,
+  onToggleAiReason,
+  scoreOptions,
+  onToggle,
+}) {
+  const aiReason = aiRecommendation?.reason ? getAiReasonPreview(aiRecommendation.reason) : null;
+
   return (
     <article className="match-card">
       <div className="match-header">
@@ -508,7 +538,7 @@ function MatchCard({ match, picks, selectedPlayerId, scoreOptions, onToggle }) {
         {scoreOptions.map((option) => (
           <button
             key={option.score}
-            className={`score-chip ${picks.includes(option.score) ? 'selected' : ''} ${formatScoreTrendLabel(option) ? 'with-trend' : ''} ${isCorrectScoreOption(match, option) ? 'correct-result' : ''}`}
+            className={`score-chip ${picks.includes(option.score) ? 'selected' : ''} ${isAiSelected && picks.includes(option.score) ? 'ai-selected' : ''} ${formatScoreTrendLabel(option) ? 'with-trend' : ''} ${isCorrectScoreOption(match, option) ? 'correct-result' : ''}`}
             data-match-id={match.id}
             data-score={option.score}
             disabled={!selectedPlayerId}
@@ -523,6 +553,17 @@ function MatchCard({ match, picks, selectedPlayerId, scoreOptions, onToggle }) {
           </button>
         ))}
       </div>
+      {isAiSelected && aiReason ? (
+        <div className="ai-reason-panel">
+          <button className="ai-reason-toggle" type="button" onClick={() => onToggleAiReason(match.id)}>
+            <span>{aiReason.summary}</span>
+            <strong>{aiReasonExpanded ? '收起' : '展开'}</strong>
+          </button>
+          {aiReasonExpanded ? (
+            <p>{aiReason.detail}</p>
+          ) : null}
+        </div>
+      ) : null}
     </article>
   );
 }
