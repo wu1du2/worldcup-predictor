@@ -333,15 +333,13 @@ h1 {
 }
 
 .score-chip.correct-result {
-  border-color: #14915f;
-  box-shadow: inset 0 0 0 1px #14915f;
-  background: #effaf3;
+  border-color: #c48512;
+  box-shadow: inset 0 0 0 1px #c48512;
 }
 
 .score-chip.selected.correct-result {
-  border-color: #0d7a4d;
-  box-shadow: inset 0 0 0 2px #0d7a4d;
-  background: #d9f4e3;
+  border-color: #b8730b;
+  box-shadow: inset 0 0 0 2px #b8730b;
 }
 
 .score-chip:disabled {
