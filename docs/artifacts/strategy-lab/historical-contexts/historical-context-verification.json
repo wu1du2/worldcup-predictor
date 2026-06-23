@@ -1,0 +1,2255 @@
+{
+  "generatedAt": "2026-06-23T14:00:22.166Z",
+  "targetMatches": 42,
+  "required": {
+    "complete": 42,
+    "percent": 100
+  },
+  "effort": {
+    "coveredSlots": 46,
+    "totalSlots": 252,
+    "percent": 18.25,
+    "missingBySlot": {
+      "media": 41,
+      "team_news": 41,
+      "form_and_tactics": 41,
+      "external_market": 0,
+      "weather_and_venue": 41,
+      "official": 42
+    }
+  },
+  "legality": {
+    "passed": 42,
+    "percent": 100
+  },
+  "canBacktest": 42,
+  "problemMatches": [],
+  "results": [
+    {
+      "dirName": "2026-06-13_加拿大_vs_波黑",
+      "match": {
+        "id": "espn-760416",
+        "date": "2026-06-13",
+        "time": "03:00",
+        "home": "加拿大",
+        "away": "波黑"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-13_美国_vs_巴拉圭",
+      "match": {
+        "id": "espn-760417",
+        "date": "2026-06-13",
+        "time": "09:00",
+        "home": "美国",
+        "away": "巴拉圭"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-14_卡塔尔_vs_瑞士",
+      "match": {
+        "id": "espn-760420",
+        "date": "2026-06-14",
+        "time": "03:00",
+        "home": "卡塔尔",
+        "away": "瑞士"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-14_巴西_vs_摩洛哥",
+      "match": {
+        "id": "espn-760419",
+        "date": "2026-06-14",
+        "time": "06:00",
+        "home": "巴西",
+        "away": "摩洛哥"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-14_海地_vs_苏格兰",
+      "match": {
+        "id": "espn-760418",
+        "date": "2026-06-14",
+        "time": "09:00",
+        "home": "海地",
+        "away": "苏格兰"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-14_澳大利亚_vs_土耳其",
+      "match": {
+        "id": "espn-760421",
+        "date": "2026-06-14",
+        "time": "12:00",
+        "home": "澳大利亚",
+        "away": "土耳其"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-15_德国_vs_库拉索",
+      "match": {
+        "id": "espn-760422",
+        "date": "2026-06-15",
+        "time": "01:00",
+        "home": "德国",
+        "away": "库拉索"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-15_瑞典_vs_突尼斯",
+      "match": {
+        "id": "espn-760424",
+        "date": "2026-06-15",
+        "time": "10:00",
+        "home": "瑞典",
+        "away": "突尼斯"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-15_科特迪瓦_vs_厄瓜多尔",
+      "match": {
+        "id": "espn-760423",
+        "date": "2026-06-15",
+        "time": "07:00",
+        "home": "科特迪瓦",
+        "away": "厄瓜多尔"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-15_荷兰_vs_日本",
+      "match": {
+        "id": "espn-760425",
+        "date": "2026-06-15",
+        "time": "04:00",
+        "home": "荷兰",
+        "away": "日本"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-16_伊朗_vs_新西兰",
+      "match": {
+        "id": "espn-760427",
+        "date": "2026-06-16",
+        "time": "09:00",
+        "home": "伊朗",
+        "away": "新西兰"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-16_比利时_vs_埃及",
+      "match": {
+        "id": "espn-760426",
+        "date": "2026-06-16",
+        "time": "03:00",
+        "home": "比利时",
+        "away": "埃及"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-16_沙特阿拉伯_vs_乌拉圭",
+      "match": {
+        "id": "espn-760429",
+        "date": "2026-06-16",
+        "time": "06:00",
+        "home": "沙特阿拉伯",
+        "away": "乌拉圭"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-16_西班牙_vs_佛得角",
+      "match": {
+        "id": "espn-760428",
+        "date": "2026-06-16",
+        "time": "00:00",
+        "home": "西班牙",
+        "away": "佛得角"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-17_伊拉克_vs_挪威",
+      "match": {
+        "id": "espn-760430",
+        "date": "2026-06-17",
+        "time": "06:00",
+        "home": "伊拉克",
+        "away": "挪威"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-17_奥地利_vs_约旦",
+      "match": {
+        "id": "espn-760431",
+        "date": "2026-06-17",
+        "time": "12:00",
+        "home": "奥地利",
+        "away": "约旦"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-17_法国_vs_塞内加尔",
+      "match": {
+        "id": "espn-760432",
+        "date": "2026-06-17",
+        "time": "03:00",
+        "home": "法国",
+        "away": "塞内加尔"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-17_阿根廷_vs_阿尔及利亚",
+      "match": {
+        "id": "espn-760433",
+        "date": "2026-06-17",
+        "time": "09:00",
+        "home": "阿根廷",
+        "away": "阿尔及利亚"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-18_乌兹别克斯坦_vs_哥伦比亚",
+      "match": {
+        "id": "espn-760436",
+        "date": "2026-06-18",
+        "time": "10:00",
+        "home": "乌兹别克斯坦",
+        "away": "哥伦比亚"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-18_加纳_vs_巴拿马",
+      "match": {
+        "id": "espn-760434",
+        "date": "2026-06-18",
+        "time": "07:00",
+        "home": "加纳",
+        "away": "巴拿马"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-18_英格兰_vs_克罗地亚",
+      "match": {
+        "id": "espn-760437",
+        "date": "2026-06-18",
+        "time": "04:00",
+        "home": "英格兰",
+        "away": "克罗地亚"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 5,
+        "total": 6,
+        "percent": 83.33,
+        "details": [
+          {
+            "key": "media",
+            "present": true
+          },
+          {
+            "key": "team_news",
+            "present": true
+          },
+          {
+            "key": "form_and_tactics",
+            "present": true
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": true
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "enriched",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-18_葡萄牙_vs_刚果民主共和国",
+      "match": {
+        "id": "espn-760435",
+        "date": "2026-06-18",
+        "time": "01:00",
+        "home": "葡萄牙",
+        "away": "刚果民主共和国"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-19_加拿大_vs_卡塔尔",
+      "match": {
+        "id": "espn-760440",
+        "date": "2026-06-19",
+        "time": "06:00",
+        "home": "加拿大",
+        "away": "卡塔尔"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-19_捷克_vs_南非",
+      "match": {
+        "id": "espn-760438",
+        "date": "2026-06-19",
+        "time": "00:00",
+        "home": "捷克",
+        "away": "南非"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-19_瑞士_vs_波黑",
+      "match": {
+        "id": "espn-760439",
+        "date": "2026-06-19",
+        "time": "03:00",
+        "home": "瑞士",
+        "away": "波黑"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-19_墨西哥_vs_韩国",
+      "match": {
+        "id": "espn-760441",
+        "date": "2026-06-19",
+        "time": "09:00",
+        "home": "墨西哥",
+        "away": "韩国"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-20_土耳其_vs_巴拉圭",
+      "match": {
+        "id": "espn-760443",
+        "date": "2026-06-20",
+        "time": "11:00",
+        "home": "土耳其",
+        "away": "巴拉圭"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-20_巴西_vs_海地",
+      "match": {
+        "id": "espn-760444",
+        "date": "2026-06-20",
+        "time": "08:30",
+        "home": "巴西",
+        "away": "海地"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-20_美国_vs_澳大利亚",
+      "match": {
+        "id": "espn-760442",
+        "date": "2026-06-20",
+        "time": "03:00",
+        "home": "美国",
+        "away": "澳大利亚"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-20_苏格兰_vs_摩洛哥",
+      "match": {
+        "id": "espn-760445",
+        "date": "2026-06-20",
+        "time": "06:00",
+        "home": "苏格兰",
+        "away": "摩洛哥"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-21_厄瓜多尔_vs_库拉索",
+      "match": {
+        "id": "espn-760446",
+        "date": "2026-06-21",
+        "time": "08:00",
+        "home": "厄瓜多尔",
+        "away": "库拉索"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-21_德国_vs_科特迪瓦",
+      "match": {
+        "id": "espn-760448",
+        "date": "2026-06-21",
+        "time": "04:00",
+        "home": "德国",
+        "away": "科特迪瓦"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-21_突尼斯_vs_日本",
+      "match": {
+        "id": "espn-760449",
+        "date": "2026-06-21",
+        "time": "12:00",
+        "home": "突尼斯",
+        "away": "日本"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-21_荷兰_vs_瑞典",
+      "match": {
+        "id": "espn-760447",
+        "date": "2026-06-21",
+        "time": "01:00",
+        "home": "荷兰",
+        "away": "瑞典"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-22_乌拉圭_vs_佛得角",
+      "match": {
+        "id": "espn-760450",
+        "date": "2026-06-22",
+        "time": "06:00",
+        "home": "乌拉圭",
+        "away": "佛得角"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-22_新西兰_vs_埃及",
+      "match": {
+        "id": "espn-760452",
+        "date": "2026-06-22",
+        "time": "09:00",
+        "home": "新西兰",
+        "away": "埃及"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-22_比利时_vs_伊朗",
+      "match": {
+        "id": "espn-760451",
+        "date": "2026-06-22",
+        "time": "03:00",
+        "home": "比利时",
+        "away": "伊朗"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-22_西班牙_vs_沙特阿拉伯",
+      "match": {
+        "id": "espn-760453",
+        "date": "2026-06-22",
+        "time": "00:00",
+        "home": "西班牙",
+        "away": "沙特阿拉伯"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-23_挪威_vs_塞内加尔",
+      "match": {
+        "id": "espn-760454",
+        "date": "2026-06-23",
+        "time": "08:00",
+        "home": "挪威",
+        "away": "塞内加尔"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-23_法国_vs_伊拉克",
+      "match": {
+        "id": "espn-760457",
+        "date": "2026-06-23",
+        "time": "05:00",
+        "home": "法国",
+        "away": "伊拉克"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-23_约旦_vs_阿尔及利亚",
+      "match": {
+        "id": "espn-760455",
+        "date": "2026-06-23",
+        "time": "11:00",
+        "home": "约旦",
+        "away": "阿尔及利亚"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    },
+    {
+      "dirName": "2026-06-23_阿根廷_vs_奥地利",
+      "match": {
+        "id": "espn-760456",
+        "date": "2026-06-23",
+        "time": "01:00",
+        "home": "阿根廷",
+        "away": "奥地利"
+      },
+      "required": {
+        "ok": true,
+        "missing": [],
+        "missingMarketScores": [],
+        "requiredMarketScoresOk": true
+      },
+      "effort": {
+        "covered": 1,
+        "total": 6,
+        "percent": 16.67,
+        "details": [
+          {
+            "key": "media",
+            "present": false
+          },
+          {
+            "key": "team_news",
+            "present": false
+          },
+          {
+            "key": "form_and_tactics",
+            "present": false
+          },
+          {
+            "key": "external_market",
+            "present": true
+          },
+          {
+            "key": "weather_and_venue",
+            "present": false
+          },
+          {
+            "key": "official",
+            "present": false
+          }
+        ]
+      },
+      "legality": {
+        "ok": true,
+        "violations": []
+      },
+      "contextQuality": "market_only",
+      "canBacktest": true
+    }
+  ]
+}

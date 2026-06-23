@@ -1,0 +1,146 @@
+{
+  "type": "market",
+  "match": "加拿大 vs 波黑",
+  "trusted_source_ids": [],
+  "internal_source_ids": [
+    "local_supabase_market"
+  ],
+  "correct_score_inputs": {
+    "source": "Local Supabase score_odds and score_odds_trends",
+    "baseline_scores": [
+      {
+        "score": "1-0",
+        "odds": 5.1
+      },
+      {
+        "score": "0-0",
+        "odds": 9.5
+      },
+      {
+        "score": "1-1",
+        "odds": 5.3
+      },
+      {
+        "score": "0-1",
+        "odds": 11
+      }
+    ],
+    "all_scores": [
+      {
+        "score": "1-0",
+        "odds": 5.1
+      },
+      {
+        "score": "2-0",
+        "odds": 6.5
+      },
+      {
+        "score": "2-1",
+        "odds": 5.3
+      },
+      {
+        "score": "3-0",
+        "odds": 15.5
+      },
+      {
+        "score": "3-1",
+        "odds": 15
+      },
+      {
+        "score": "3-2",
+        "odds": 35
+      },
+      {
+        "score": "4-0",
+        "odds": 40
+      },
+      {
+        "score": "4-1",
+        "odds": 46
+      },
+      {
+        "score": "4-2",
+        "odds": 90
+      },
+      {
+        "score": "5-0",
+        "odds": 120
+      },
+      {
+        "score": "5-1",
+        "odds": 125
+      },
+      {
+        "score": "5-2",
+        "odds": 250
+      },
+      {
+        "score": "0-0",
+        "odds": 9.5
+      },
+      {
+        "score": "1-1",
+        "odds": 5.3
+      },
+      {
+        "score": "2-2",
+        "odds": 17.5
+      },
+      {
+        "score": "3-3",
+        "odds": 80
+      },
+      {
+        "score": "0-1",
+        "odds": 11
+      },
+      {
+        "score": "0-2",
+        "odds": 28
+      },
+      {
+        "score": "1-2",
+        "odds": 14
+      },
+      {
+        "score": "0-3",
+        "odds": 95
+      },
+      {
+        "score": "1-3",
+        "odds": 55
+      },
+      {
+        "score": "2-3",
+        "odds": 70
+      },
+      {
+        "score": "0-4",
+        "odds": 400
+      },
+      {
+        "score": "1-4",
+        "odds": 300
+      },
+      {
+        "score": "2-4",
+        "odds": 350
+      },
+      {
+        "score": "0-5",
+        "odds": 600
+      },
+      {
+        "score": "1-5",
+        "odds": 500
+      },
+      {
+        "score": "2-5",
+        "odds": 600
+      }
+    ]
+  },
+  "prediction_signal": [
+    "Market-only historical reconstruction. External pre-match sources have not been collected for this match yet."
+  ]
+}

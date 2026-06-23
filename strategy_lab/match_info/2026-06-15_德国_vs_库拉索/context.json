@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "context_mode": "historical_reconstruction",
+  "context_quality": "market_only",
+  "generatedAt": "2026-06-23T13:59:16.412Z",
+  "match": {
+    "id": "espn-760422",
+    "date": "2026-06-15",
+    "time": "01:00",
+    "kickoffAt": "2026-06-14T17:00:00+00:00",
+    "kickoff_utc8": "2026-06-15T01:00:00+08:00",
+    "home": "德国",
+    "away": "库拉索",
+    "stage": "Group Stage"
+  },
+  "sourceGate": {
+    "rule": "published_at or updated_at must be earlier than kickoff_utc8 to enter this context",
+    "accepted_source_ids": [],
+    "excluded_source_ids": [
+      "local_supabase_market"
+    ]
+  },
+  "market": {
+    "scoreOptions": [
+      {
+        "score": "1-0",
+        "odds": 17
+      },
+      {
+        "score": "2-0",
+        "odds": 8
+      },
+      {
+        "score": "2-1",
+        "odds": 18
+      },
+      {
+        "score": "3-0",
+        "odds": 4.9
+      },
+      {
+        "score": "3-1",
+        "odds": 12
+      },
+      {
+        "score": "3-2",
+        "odds": 85
+      },
+      {
+        "score": "4-0",
+        "odds": 4.8
+      },
+      {
+        "score": "4-1",
+        "odds": 13
+      },
+      {
+        "score": "4-2",
+        "odds": 65
+      },
+      {
+        "score": "5-0",
+        "odds": 6.95
+      },
+      {
+        "score": "5-1",
+        "odds": 20
+      },
+      {
+        "score": "5-2",
+        "odds": 80
+      },
+      {
+        "score": "0-0",
+        "odds": 60
+      },
+      {
+        "score": "1-1",
+        "odds": 35
+      },
+      {
+        "score": "2-2",
+        "odds": 80
+      },
+      {
+        "score": "3-3",
+        "odds": 350
+      },
+      {
+        "score": "0-1",
+        "odds": 90
+      },
+      {
+        "score": "0-2",
+        "odds": 200
+      },
+      {
+        "score": "1-2",
+        "odds": 100
+      },
+      {
+        "score": "0-3",
+        "odds": 700
+      },
+      {
+        "score": "1-3",
+        "odds": 500
+      },
+      {
+        "score": "2-3",
+        "odds": 400
+      },
+      {
+        "score": "0-4",
+        "odds": 1000
+      },
+      {
+        "score": "1-4",
+        "odds": 1000
+      },
+      {
+        "score": "2-4",
+        "odds": 1000
+      },
+      {
+        "score": "0-5",
+        "odds": 1000
+      },
+      {
+        "score": "1-5",
+        "odds": 1000
+      },
+      {
+        "score": "2-5",
+        "odds": 1000
+      }
+    ]
+  },
+  "publicContext": {
+    "processedFiles": [
+      "processed/market.json",
+      "processed/team_news.json",
+      "processed/form_and_tactics.json",
+      "processed/weather_and_venue.json"
+    ],
+    "media": [],
+    "teamNews": [],
+    "formAndTactics": [],
+    "marketRead": [
+      "Local Sporttery correct-score odds are available. No trusted external pre-match analysis has been collected for this match yet."
+    ],
+    "weatherAndVenue": []
+  }
+}

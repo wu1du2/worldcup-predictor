@@ -1,0 +1,8 @@
+{
+  "type": "weather_and_venue",
+  "match": "挪威 vs 塞内加尔",
+  "trusted_source_ids": [],
+  "status": "not_collected",
+  "facts": [],
+  "prediction_signal": []
+}

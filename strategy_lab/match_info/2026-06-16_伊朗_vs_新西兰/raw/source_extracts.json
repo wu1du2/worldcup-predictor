@@ -1,0 +1,18 @@
+{
+  "match": "伊朗 vs 新西兰",
+  "kickoff_utc8": "2026-06-16T09:00:00+08:00",
+  "generated_at": "2026-06-23T13:59:16.457Z",
+  "context_mode": "historical_reconstruction",
+  "extracts": [
+    {
+      "source_id": "local_supabase_market",
+      "type": "market",
+      "title": "Local Supabase Sporttery correct-score odds",
+      "enters_context": true,
+      "facts": [
+        "Loaded 31 correct-score odds rows from local Supabase tables.",
+        "Main strategy required scores available: 1-0, 0-0, 1-1, 0-1."
+      ]
+    }
+  ]
+}

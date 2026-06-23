@@ -21,6 +21,8 @@
     "backtest:strategies": "node scripts/backtestStrategies.mjs",
     "strategy:lab": "node scripts/runStrategyLab.mjs",
     "ai:sync-prediction": "node scripts/syncAiPrediction.mjs",
+    "historical:contexts": "node scripts/buildHistoricalContexts.mjs",
+    "historical:verify": "node scripts/verifyHistoricalContexts.mjs",
     "backfill:odds-trends": "node scripts/backfillScoreOddsTrends.mjs",
     "backfill:odds-trends:dry": "node scripts/backfillScoreOddsTrends.mjs --dry-run"
   },

@@ -1,0 +1,18 @@
+{
+  "match": "法国 vs 伊拉克",
+  "kickoff_utc8": "2026-06-23T05:00:00+08:00",
+  "generated_at": "2026-06-23T13:59:16.537Z",
+  "trusted_sources": [],
+  "audit_only_sources": [
+    {
+      "id": "local_supabase_market",
+      "title": "Local Supabase Sporttery correct-score odds",
+      "publisher": "worldcup-predictor",
+      "url": null,
+      "published_at": null,
+      "enters_context": false,
+      "evidence_quality": "internal_market_data",
+      "reason": "Internal market data is used for odds context; it is not an external article source and carries no final-score text."
+    }
+  ]
+}

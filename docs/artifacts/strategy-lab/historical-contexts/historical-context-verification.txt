@@ -1,0 +1,14 @@
+历史 context 批量验收
+目标比赛：42
+必需信息完成：42/42 = 100%
+尽力信息覆盖：46/252 = 18.25%
+合法性通过：42/42 = 100%
+可进入回测：42/42
+
+尽力信息缺口：
+- media: 缺 41 场
+- team_news: 缺 41 场
+- form_and_tactics: 缺 41 场
+- external_market: 缺 0 场
+- weather_and_venue: 缺 41 场
+- official: 缺 42 场

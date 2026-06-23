@@ -1,0 +1,119 @@
+{
+  "match": "卡塔尔 vs 瑞士",
+  "kickoff_utc8": "2026-06-14T03:00:00+08:00",
+  "source": "Supabase score_odds and score_odds_trends imported from Sporttery/500.com",
+  "score_options": [
+    {
+      "score": "1-0",
+      "odds": 27
+    },
+    {
+      "score": "2-0",
+      "odds": 95
+    },
+    {
+      "score": "2-1",
+      "odds": 32
+    },
+    {
+      "score": "3-0",
+      "odds": 350
+    },
+    {
+      "score": "3-1",
+      "odds": 175
+    },
+    {
+      "score": "3-2",
+      "odds": 150
+    },
+    {
+      "score": "4-0",
+      "odds": 800
+    },
+    {
+      "score": "4-1",
+      "odds": 600
+    },
+    {
+      "score": "4-2",
+      "odds": 500
+    },
+    {
+      "score": "5-0",
+      "odds": 800
+    },
+    {
+      "score": "5-1",
+      "odds": 800
+    },
+    {
+      "score": "5-2",
+      "odds": 800
+    },
+    {
+      "score": "0-0",
+      "odds": 16
+    },
+    {
+      "score": "1-1",
+      "odds": 11
+    },
+    {
+      "score": "2-2",
+      "odds": 28
+    },
+    {
+      "score": "3-3",
+      "odds": 125
+    },
+    {
+      "score": "0-1",
+      "odds": 6.3
+    },
+    {
+      "score": "0-2",
+      "odds": 4.2
+    },
+    {
+      "score": "1-2",
+      "odds": 7.5
+    },
+    {
+      "score": "0-3",
+      "odds": 6.1
+    },
+    {
+      "score": "1-3",
+      "odds": 10
+    },
+    {
+      "score": "2-3",
+      "odds": 35
+    },
+    {
+      "score": "0-4",
+      "odds": 11.5
+    },
+    {
+      "score": "1-4",
+      "odds": 21
+    },
+    {
+      "score": "2-4",
+      "odds": 65
+    },
+    {
+      "score": "0-5",
+      "odds": 22
+    },
+    {
+      "score": "1-5",
+      "odds": 40
+    },
+    {
+      "score": "2-5",
+      "odds": 110
+    }
+  ]
+}

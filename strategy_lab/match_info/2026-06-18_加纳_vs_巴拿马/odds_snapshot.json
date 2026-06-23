@@ -1,0 +1,317 @@
+{
+  "match": "加纳 vs 巴拿马",
+  "kickoff_utc8": "2026-06-18T07:00:00+08:00",
+  "source": "Supabase score_odds and score_odds_trends imported from Sporttery/500.com",
+  "score_options": [
+    {
+      "score": "1-0",
+      "odds": 6.3,
+      "trend": {
+        "firstOdds": 5.5,
+        "latestOdds": 6.3,
+        "changePct": 14.54545454545455,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "2-0",
+      "odds": 8.75,
+      "trend": {
+        "firstOdds": 8,
+        "latestOdds": 8.75,
+        "changePct": 9.375,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "2-1",
+      "odds": 6.75,
+      "trend": {
+        "firstOdds": 7.5,
+        "latestOdds": 6.75,
+        "changePct": -9.999999999999998,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "3-0",
+      "odds": 25,
+      "trend": {
+        "firstOdds": 16,
+        "latestOdds": 25,
+        "changePct": 56.25,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "3-1",
+      "odds": 18,
+      "trend": {
+        "firstOdds": 16,
+        "latestOdds": 18,
+        "changePct": 12.5,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "3-2",
+      "odds": 30,
+      "trend": {
+        "firstOdds": 30,
+        "latestOdds": 30,
+        "changePct": 0,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "4-0",
+      "odds": 65,
+      "trend": {
+        "firstOdds": 45,
+        "latestOdds": 65,
+        "changePct": 44.44444444444444,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "4-1",
+      "odds": 55,
+      "trend": {
+        "firstOdds": 45,
+        "latestOdds": 55,
+        "changePct": 22.222222222222232,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "4-2",
+      "odds": 80,
+      "trend": {
+        "firstOdds": 100,
+        "latestOdds": 80,
+        "changePct": -19.999999999999996,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "5-0",
+      "odds": 175,
+      "trend": {
+        "firstOdds": 150,
+        "latestOdds": 175,
+        "changePct": 16.666666666666675,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "5-1",
+      "odds": 175,
+      "trend": {
+        "firstOdds": 175,
+        "latestOdds": 175,
+        "changePct": 0,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "5-2",
+      "odds": 200,
+      "trend": {
+        "firstOdds": 300,
+        "latestOdds": 200,
+        "changePct": -33.333333333333336,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "胜其他",
+      "odds": 105,
+      "trend": {
+        "firstOdds": 100,
+        "latestOdds": 105,
+        "changePct": 5.000000000000004,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "0-0",
+      "odds": 8.25,
+      "trend": {
+        "firstOdds": 8,
+        "latestOdds": 8.25,
+        "changePct": 3.125,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "1-1",
+      "odds": 4.85,
+      "trend": {
+        "firstOdds": 5.5,
+        "latestOdds": 4.85,
+        "changePct": -11.818181818181827,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "2-2",
+      "odds": 14,
+      "trend": {
+        "firstOdds": 16,
+        "latestOdds": 14,
+        "changePct": -12.5,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "3-3",
+      "odds": 50,
+      "trend": {
+        "firstOdds": 100,
+        "latestOdds": 50,
+        "changePct": -50,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "平其他",
+      "odds": 300,
+      "trend": {
+        "firstOdds": 600,
+        "latestOdds": 300,
+        "changePct": -50,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "0-1",
+      "odds": 8.8,
+      "trend": {
+        "firstOdds": 9,
+        "latestOdds": 8.8,
+        "changePct": -2.2222222222222143,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "0-2",
+      "odds": 17,
+      "trend": {
+        "firstOdds": 18,
+        "latestOdds": 17,
+        "changePct": -5.555555555555558,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "1-2",
+      "odds": 11,
+      "trend": {
+        "firstOdds": 11,
+        "latestOdds": 11,
+        "changePct": 0,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "0-3",
+      "odds": 50,
+      "trend": {
+        "firstOdds": 55,
+        "latestOdds": 50,
+        "changePct": -9.090909090909093,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "1-3",
+      "odds": 35,
+      "trend": {
+        "firstOdds": 35,
+        "latestOdds": 35,
+        "changePct": 0,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "2-3",
+      "odds": 50,
+      "trend": {
+        "firstOdds": 50,
+        "latestOdds": 50,
+        "changePct": 0,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "0-4",
+      "odds": 150,
+      "trend": {
+        "firstOdds": 200,
+        "latestOdds": 150,
+        "changePct": -25,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "1-4",
+      "odds": 100,
+      "trend": {
+        "firstOdds": 150,
+        "latestOdds": 100,
+        "changePct": -33.333333333333336,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "2-4",
+      "odds": 175,
+      "trend": {
+        "firstOdds": 200,
+        "latestOdds": 175,
+        "changePct": -12.5,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "0-5",
+      "odds": 500,
+      "trend": {
+        "firstOdds": 600,
+        "latestOdds": 500,
+        "changePct": -16.666666666666664,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "1-5",
+      "odds": 450,
+      "trend": {
+        "firstOdds": 500,
+        "latestOdds": 450,
+        "changePct": -9.999999999999998,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "2-5",
+      "odds": 500,
+      "trend": {
+        "firstOdds": 700,
+        "latestOdds": 500,
+        "changePct": -28.57142857142857,
+        "snapshotsCount": 440
+      }
+    },
+    {
+      "score": "负其他",
+      "odds": 250,
+      "trend": {
+        "firstOdds": 300,
+        "latestOdds": 250,
+        "changePct": -16.666666666666664,
+        "snapshotsCount": 440
+      }
+    }
+  ]
+}

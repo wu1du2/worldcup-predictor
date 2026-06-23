@@ -1,0 +1,8 @@
+{
+  "type": "weather_and_venue",
+  "match": "厄瓜多尔 vs 库拉索",
+  "trusted_source_ids": [],
+  "status": "not_collected",
+  "facts": [],
+  "prediction_signal": []
+}

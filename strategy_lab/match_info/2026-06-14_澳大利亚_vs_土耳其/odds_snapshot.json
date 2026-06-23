@@ -1,0 +1,119 @@
+{
+  "match": "澳大利亚 vs 土耳其",
+  "kickoff_utc8": "2026-06-14T12:00:00+08:00",
+  "source": "Supabase score_odds and score_odds_trends imported from Sporttery/500.com",
+  "score_options": [
+    {
+      "score": "1-0",
+      "odds": 11.5
+    },
+    {
+      "score": "2-0",
+      "odds": 28
+    },
+    {
+      "score": "2-1",
+      "odds": 14
+    },
+    {
+      "score": "3-0",
+      "odds": 90
+    },
+    {
+      "score": "3-1",
+      "odds": 52
+    },
+    {
+      "score": "3-2",
+      "odds": 63
+    },
+    {
+      "score": "4-0",
+      "odds": 300
+    },
+    {
+      "score": "4-1",
+      "odds": 250
+    },
+    {
+      "score": "4-2",
+      "odds": 300
+    },
+    {
+      "score": "5-0",
+      "odds": 900
+    },
+    {
+      "score": "5-1",
+      "odds": 700
+    },
+    {
+      "score": "5-2",
+      "odds": 800
+    },
+    {
+      "score": "0-0",
+      "odds": 9.5
+    },
+    {
+      "score": "1-1",
+      "odds": 6.2
+    },
+    {
+      "score": "2-2",
+      "odds": 16
+    },
+    {
+      "score": "3-3",
+      "odds": 100
+    },
+    {
+      "score": "0-1",
+      "odds": 6
+    },
+    {
+      "score": "0-2",
+      "odds": 6.5
+    },
+    {
+      "score": "1-2",
+      "odds": 6.45
+    },
+    {
+      "score": "0-3",
+      "odds": 11.5
+    },
+    {
+      "score": "1-3",
+      "odds": 12
+    },
+    {
+      "score": "2-3",
+      "odds": 29
+    },
+    {
+      "score": "0-4",
+      "odds": 27
+    },
+    {
+      "score": "1-4",
+      "odds": 30
+    },
+    {
+      "score": "2-4",
+      "odds": 75
+    },
+    {
+      "score": "0-5",
+      "odds": 75
+    },
+    {
+      "score": "1-5",
+      "odds": 90
+    },
+    {
+      "score": "2-5",
+      "odds": 200
+    }
+  ]
+}
