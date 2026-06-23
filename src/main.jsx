@@ -576,17 +576,11 @@ function AiReasonDialog({ dialog, onClose }) {
   });
 
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="AI推荐理由">
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="推荐理由">
       <div className="dialog ai-reason-dialog" data-ai-reason-dialog>
         <div className="dialog-header ai-reason-dialog-header">
-          <div>
-            <p className="eyebrow">AI推荐理由</p>
-            <h2>
-              {dialog.match.home} <span>vs</span> {dialog.match.away}
-            </h2>
-          </div>
-          <button className="ai-reason-close-button" type="button" onClick={onClose}>
-            返回
+          <button className="ai-reason-close-button" type="button" aria-label="返回" onClick={onClose}>
+            ‹
           </button>
         </div>
         <div className="ai-reason-dialog-body">

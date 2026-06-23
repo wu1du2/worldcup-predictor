@@ -238,6 +238,11 @@ h1 {
   margin-bottom: 12px;
 }
 
+.match-header > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .match-header h2 {
   margin: 0;
   font-size: 18px;
@@ -367,7 +372,7 @@ h1 {
 }
 
 .ai-reason-inline {
-  width: min(100%, 300px);
+  width: 100%;
   min-height: 48px;
   margin-top: 6px;
   border: 1px solid #d8e5fb;
@@ -497,28 +502,21 @@ h1 {
 }
 
 .ai-reason-dialog-header {
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.ai-reason-dialog-header h2 {
-  line-height: 1.25;
-}
-
-.ai-reason-dialog-header h2 span {
-  color: #7a837d;
-  font-size: 14px;
+  justify-content: flex-end;
+  margin-bottom: 8px;
 }
 
 .ai-reason-close-button {
-  min-width: 72px;
+  width: 44px;
+  min-width: 44px;
   height: 44px;
   flex: 0 0 auto;
   border-radius: 8px;
   background: #1f5edc;
   color: #ffffff;
-  font-size: 15px;
+  font-size: 30px;
   font-weight: 900;
+  line-height: 1;
 }
 
 .ai-reason-dialog-body {
