@@ -25,10 +25,7 @@ import {
   saveGroupPredictions,
 } from './supabaseData.mjs';
 import { formatReportStatusText } from './importReports.mjs';
-import {
-  getAiRecommendedScores,
-  isAiPlayer,
-} from './aiRecommendation.mjs';
+import { isAiPlayer } from './aiRecommendation.mjs';
 import {
   buildDateTabs,
   formatChinaDateLabel,
@@ -127,6 +124,8 @@ function App() {
   }
 
   const selectablePlayers = players.filter((player) => !isAiPlayer(player));
+  const aiPlayer = players.find((player) => isAiPlayer(player));
+  const aiPredictions = aiPlayer ? state.predictions?.[aiPlayer.id] || {} : {};
   const selectedPlayer = selectablePlayers.find((player) => player.id === state.selectedPlayerId);
   const dateTabs = buildDateTabs(matches);
   const selectedDate = state.selectedDate || getDefaultMatchDateCn(matches);
@@ -375,7 +374,7 @@ function App() {
             match={match}
             picks={selectedScores(match.id)}
             selectedPlayerId={state.selectedPlayerId}
-            recommendedScores={getAiRecommendedScores(match.id)}
+            recommendedScores={aiPredictions[match.id] || []}
             scoreOptions={scoreOddsByMatch[match.id] || fallbackScoreOptions}
             onToggle={toggleMatchScore}
           />
