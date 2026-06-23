@@ -1,3 +1,5 @@
+import { normalizeSportteryTeamName } from './sportteryTeams.mjs';
+
 export function buildAllScoreOddsTrendRows({ snapshots }) {
   if (!Array.isArray(snapshots)) throw new Error('Trend snapshots must be an array.');
 
@@ -6,13 +8,15 @@ export function buildAllScoreOddsTrendRows({ snapshots }) {
   for (const snapshot of snapshots) {
     for (const match of getSnapshotMatches(snapshot)) {
       if (!match.issue || !match.kickoffLabel || !match.home || !match.away) continue;
-      const id = `${match.issue}|${match.home}|${match.away}|${match.kickoffLabel}`;
+      const home = normalizeSportteryTeamName(match.home);
+      const away = normalizeSportteryTeamName(match.away);
+      const id = `${match.issue}|${home}|${away}|${match.kickoffLabel}`;
       matchKeysById.set(id, {
         source: match.source || '500',
         issue: match.issue,
         kickoffLabel: match.kickoffLabel,
-        home: match.home,
-        away: match.away,
+        home,
+        away,
       });
     }
   }
@@ -79,8 +83,8 @@ function findSnapshotMatch(snapshot, matchKey) {
   return getSnapshotMatches(snapshot).find((match) => (
     match.issue === matchKey.issue
     && match.kickoffLabel === matchKey.kickoffLabel
-    && match.home === matchKey.home
-    && match.away === matchKey.away
+    && normalizeSportteryTeamName(match.home) === matchKey.home
+    && normalizeSportteryTeamName(match.away) === matchKey.away
   ));
 }
 

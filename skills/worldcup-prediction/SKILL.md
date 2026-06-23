@@ -48,6 +48,10 @@ After each completed task, update this skill when new project-specific lessons, 
 - Team Chinese names live in the `teams` table as the translation authority. Importers upsert teams from `data/team-name-mapping.csv`, write `home_team_id` and `away_team_id` to matches, and keep `home_cn` / `away_cn` only as snapshots.
 - Frontend match loading should use Supabase embedded joins (`home_team:teams!matches_home_team_id_fkey`, `away_team:teams!matches_away_team_id_fkey`) and prefer joined `teams.name_cn` over snapshot fields.
 
+## Future Ideas
+
+- Strategy Lab / AI Player: build an offline strategy-test architecture that freezes pre-match context snapshots before kickoff, prevents result leakage, supports pure strategy functions like `strategy(matchContext) => picks`, and later lets an AI player collect public pre-match data, produce daily predictions, and settle ROI alongside human players.
+
 ## Verification SOP
 
 Each phase must produce:
@@ -103,7 +107,7 @@ Stage 1 commands:
 - 500.com date URLs can return overlapping rolling sales windows. Odds importers must dedupe by source match key and then filter by UTC+8 kickoff date before writing/reviewing rows.
 - 500.com score pages can repeat the same score odds inside one parsed match block. Deduplicate score rows by `source + source_match_key + score` before validation/upsert, and keep parsed snapshots deduped so audit logs stay readable.
 - Do not parse 500.com odds by stripping all tags and using the next `世界杯` text as the match boundary. The page can interleave non-World-Cup lottery matches between World Cup rows, which will contaminate the previous World Cup match. Parse each `tr.bet-tb-tr` segment structurally from `data-*` attributes plus its adjacent `bet-more-wrap`.
-- Sporttery Chinese names can differ from schedule names, e.g. `刚果(金)` vs `刚果民主共和国`, `乌兹别克` vs `乌兹别克斯坦`. Normalize these aliases in the odds importer before writing `score_odds`; frontend odds matching should only join on internal standard Chinese names.
+- Sporttery Chinese names can differ from schedule names, e.g. `刚果(金)` vs `刚果民主共和国`, `乌兹别克` vs `乌兹别克斯坦`. Normalize these aliases through the shared `normalizeSportteryTeamName` helper in both odds import and odds trend backfill; frontend odds matching should only join on internal standard Chinese names.
 - Frontend odds display reads `score_odds` with the browser anon key. If service role sees rows but the page shows fallback scores without odds, check the `score_odds_public_read` RLS select policy.
 - Supabase browser selects can silently cap large tables at 1000 rows. `score_odds` already exceeds this; frontend odds loading must paginate with `.range(...)` or later dates will fall back to no-odds score chips even though rows exist.
 - Import report writes are best-effort and must not make an otherwise successful import fail. If the report dialog errors while import logs look healthy, first check that `sql/stage10_import_reports.sql` was applied and the public read policy exists.

@@ -139,3 +139,58 @@ test('buildAllScoreOddsTrendRows computes trends for every match found in snapsh
   assert.equal(Math.round(rows[0].change_pct * 10) / 10, 14.5);
   assert.equal(Math.round(rows[1].change_pct * 10) / 10, -20);
 });
+
+test('buildAllScoreOddsTrendRows normalizes Sporttery team aliases from snapshots', () => {
+  const rows = buildAllScoreOddsTrendRows({
+    snapshots: [
+      {
+        created_at: '2026-06-23T03:05:24.520Z',
+        parsed_json: {
+          matches: [
+            {
+              issue: '周二045',
+              kickoffLabel: '06-24 01:00',
+              home: '葡萄牙',
+              away: '乌兹别克',
+              scores: [{ score: '2-0', odds: 4.75 }],
+            },
+            {
+              issue: '周二048',
+              kickoffLabel: '06-24 10:00',
+              home: '哥伦比亚',
+              away: '刚果(金)',
+              scores: [{ score: '1-0', odds: 6.5 }],
+            },
+          ],
+        },
+      },
+      {
+        created_at: '2026-06-23T11:55:33.768Z',
+        parsed_json: {
+          matches: [
+            {
+              issue: '周二045',
+              kickoffLabel: '06-24 01:00',
+              home: '葡萄牙',
+              away: '乌兹别克',
+              scores: [{ score: '2-0', odds: 4.75 }],
+            },
+            {
+              issue: '周二048',
+              kickoffLabel: '06-24 10:00',
+              home: '哥伦比亚',
+              away: '刚果(金)',
+              scores: [{ score: '1-0', odds: 7.8 }],
+            },
+          ],
+        },
+      },
+    ],
+  });
+
+  assert.deepEqual(rows.map((row) => [row.source_match_key, row.home, row.away, row.score]), [
+    ['周二045|葡萄牙|乌兹别克斯坦|06-24 01:00', '葡萄牙', '乌兹别克斯坦', '2-0'],
+    ['周二048|哥伦比亚|刚果民主共和国|06-24 10:00', '哥伦比亚', '刚果民主共和国', '1-0'],
+  ]);
+  assert.equal(Math.round(rows[1].change_pct * 10) / 10, 20);
+});

@@ -1,3 +1,5 @@
+import { normalizeSportteryTeamName } from './sportteryTeams.mjs';
+
 const sportteryScoreBaseUrl = 'https://trade.500.com/jczq/index.php?g=2&playid=271';
 
 export function buildSportteryScoreUrl(date) {
@@ -245,13 +247,4 @@ function isValidScoreLabel(score) {
 
 function toFullKickoffDate(kickoffLabel) {
   return `2026-${kickoffLabel.slice(0, 5)}`;
-}
-
-function normalizeSportteryTeamName(name) {
-  const aliases = {
-    '刚果(金)': '刚果民主共和国',
-    乌兹别克: '乌兹别克斯坦',
-  };
-
-  return aliases[name] || name;
 }
