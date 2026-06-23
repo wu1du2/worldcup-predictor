@@ -529,24 +529,24 @@ function MatchCard({
           <h2>
             {match.home} <span>vs</span> {match.away}
           </h2>
-          {isAiSelected && aiReason ? (
-            <button
-              className="ai-reason-inline"
-              type="button"
-              onClick={() => onOpenAiReason({ match, recommendation: aiRecommendation })}
-            >
-              <span className="ai-reason-inline-copy">
-                {aiReason.roiText ? <span className="ai-roi-badge">{aiReason.roiText}</span> : null}
-                <span className="ai-reason-summary">{aiReason.summary}</span>
-              </span>
-              <strong>查看</strong>
-            </button>
-          ) : null}
         </div>
         <div className="match-side">
           <div className="score-pill">{getMatchScoreText(match)}</div>
         </div>
       </div>
+      {isAiSelected && aiReason ? (
+        <button
+          className="ai-reason-inline"
+          type="button"
+          onClick={() => onOpenAiReason({ match, recommendation: aiRecommendation })}
+        >
+          <span className="ai-reason-inline-copy">
+            {aiReason.roiText ? <span className="ai-roi-badge">{aiReason.roiText}</span> : null}
+            <span className="ai-reason-summary">{aiReason.summary}</span>
+          </span>
+          <strong>查看</strong>
+        </button>
+      ) : null}
       <div className="score-grid">
         {scoreOptions.map((option) => (
           <button
@@ -578,11 +578,9 @@ function AiReasonDialog({ dialog, onClose }) {
   return (
     <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="推荐理由">
       <div className="dialog ai-reason-dialog" data-ai-reason-dialog>
-        <div className="dialog-header ai-reason-dialog-header">
-          <button className="ai-reason-close-button" type="button" aria-label="返回" onClick={onClose}>
-            ‹
-          </button>
-        </div>
+        <button className="ai-reason-close-button" type="button" aria-label="返回" onClick={onClose}>
+          ‹
+        </button>
         <div className="ai-reason-dialog-body">
           {preview.roiText ? <span className="ai-roi-badge">{preview.roiText}</span> : null}
           <p>{preview.detail}</p>
