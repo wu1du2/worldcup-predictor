@@ -535,7 +535,10 @@ function MatchCard({
               type="button"
               onClick={() => onOpenAiReason({ match, recommendation: aiRecommendation })}
             >
-              <span>{aiReason.summary}</span>
+              <span className="ai-reason-inline-copy">
+                {aiReason.roiText ? <span className="ai-roi-badge">{aiReason.roiText}</span> : null}
+                <span className="ai-reason-summary">{aiReason.summary}</span>
+              </span>
               <strong>查看</strong>
             </button>
           ) : null}
@@ -587,7 +590,7 @@ function AiReasonDialog({ dialog, onClose }) {
           </button>
         </div>
         <div className="ai-reason-dialog-body">
-          <strong>{preview.summary}</strong>
+          {preview.roiText ? <span className="ai-roi-badge">{preview.roiText}</span> : null}
           <p>{preview.detail}</p>
         </div>
       </div>

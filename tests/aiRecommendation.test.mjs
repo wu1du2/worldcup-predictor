@@ -25,9 +25,12 @@ test('getAiReasonPreview keeps summary and detail within UI limits', () => {
   const reason = '英格兰是明确热门，但克罗地亚经验强，市场也偏向谨慎开局，因此保留低比分篮子。'.repeat(20);
   const preview = getAiReasonPreview(reason, { roiLabel: '+1.25%' });
 
+  assert.equal(preview.roiText, '历史ROI +1.25%');
   assert.ok(preview.summary.length <= 70);
   assert.ok(preview.detail.length <= 400);
-  assert.match(preview.summary, /^历史ROI \+1\.25%｜/);
+  assert.match(preview.summary, /^英格兰是明确热门/);
+  assert.doesNotMatch(preview.summary, /历史ROI/);
+  assert.doesNotMatch(preview.detail, /历史ROI/);
   assert.match(preview.summary, /…$/);
   assert.match(preview.detail, /…$/);
 });

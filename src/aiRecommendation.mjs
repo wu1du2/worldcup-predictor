@@ -17,9 +17,10 @@ export function getAiRecommendationForMatch(matchId) {
 }
 
 export function getAiReasonPreview(reason, { roiLabel = '', summaryLimit = 70, detailLimit = 400 } = {}) {
-  const summaryPrefix = roiLabel ? `历史ROI ${roiLabel}｜` : '';
+  const roiText = roiLabel ? `历史ROI ${roiLabel}` : '';
   return {
-    summary: truncateText(`${summaryPrefix}${reason}`, summaryLimit),
+    roiText,
+    summary: truncateText(reason, summaryLimit),
     detail: truncateText(reason, detailLimit),
   };
 }
