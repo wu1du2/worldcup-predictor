@@ -3,6 +3,7 @@ export const aiRecommendationPlayerName = 'AI推荐';
 const aiRecommendationsByMatchId = {
   'espn-760437': {
     matchId: 'espn-760437',
+    scores: ['0-0', '0-1', '1-0', '1-1'],
     roiLabel: '+1.25%',
     reason: '英格兰是明确热门，但克罗地亚经验强、阵容完整，赛前市场也偏向小比分和谨慎开局。AI因此覆盖低比分平局、英格兰小胜和克罗地亚小胜，避免只押单边热门。',
   },
@@ -14,6 +15,11 @@ export function isAiPlayer(player) {
 
 export function getAiRecommendationForMatch(matchId) {
   return aiRecommendationsByMatchId[matchId] || null;
+}
+
+export function getAiRecommendedScores(matchId) {
+  const recommendation = getAiRecommendationForMatch(matchId);
+  return Array.isArray(recommendation?.scores) ? recommendation.scores : [];
 }
 
 export function getAiReasonPreview(reason, { roiLabel = '', summaryLimit = 70, detailLimit = 400 } = {}) {

@@ -26,8 +26,7 @@ import {
 } from './supabaseData.mjs';
 import { formatReportStatusText } from './importReports.mjs';
 import {
-  getAiReasonPreview,
-  getAiRecommendationForMatch,
+  getAiRecommendedScores,
   isAiPlayer,
 } from './aiRecommendation.mjs';
 import {
@@ -66,7 +65,6 @@ function App() {
   const [reportDialog, setReportDialog] = useState({ open: false, status: 'idle', reports: [], error: '' });
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [createdHintOpen, setCreatedHintOpen] = useState(false);
-  const [aiReasonDialog, setAiReasonDialog] = useState(null);
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -128,8 +126,8 @@ function App() {
     });
   }
 
-  const selectedPlayer = players.find((player) => player.id === state.selectedPlayerId);
-  const selectedPlayerIsAi = isAiPlayer(selectedPlayer);
+  const selectablePlayers = players.filter((player) => !isAiPlayer(player));
+  const selectedPlayer = selectablePlayers.find((player) => player.id === state.selectedPlayerId);
   const dateTabs = buildDateTabs(matches);
   const selectedDate = state.selectedDate || getDefaultMatchDateCn(matches);
   const visibleMatches = matches.filter((match) => match.date === selectedDate);
@@ -343,10 +341,10 @@ function App() {
           <strong>{selectedPlayer ? selectedPlayer.name : '未选择'}</strong>
         </div>
         <div className="player-grid">
-          {players.map((player) => (
+          {selectablePlayers.map((player) => (
             <button
               key={player.id}
-              className={`player-chip ${isAiPlayer(player) ? 'ai-player-chip' : ''} ${player.id === state.selectedPlayerId ? 'selected' : ''}`}
+              className={`player-chip ${player.id === state.selectedPlayerId ? 'selected' : ''}`}
               data-player-id={player.id}
               onClick={() => selectPlayer(player.id)}
             >
@@ -377,9 +375,7 @@ function App() {
             match={match}
             picks={selectedScores(match.id)}
             selectedPlayerId={state.selectedPlayerId}
-            isAiSelected={selectedPlayerIsAi}
-            aiRecommendation={selectedPlayerIsAi ? getAiRecommendationForMatch(match.id) : null}
-            onOpenAiReason={setAiReasonDialog}
+            recommendedScores={getAiRecommendedScores(match.id)}
             scoreOptions={scoreOddsByMatch[match.id] || fallbackScoreOptions}
             onToggle={toggleMatchScore}
           />
@@ -404,13 +400,6 @@ function App() {
         <ExportDialog
           text={state.exportText}
           onClose={() => setState((current) => ({ ...current, exportText: '' }))}
-        />
-      ) : null}
-
-      {aiReasonDialog ? (
-        <AiReasonDialog
-          dialog={aiReasonDialog}
-          onClose={() => setAiReasonDialog(null)}
         />
       ) : null}
 
@@ -511,16 +500,10 @@ function MatchCard({
   match,
   picks,
   selectedPlayerId,
-  isAiSelected,
-  aiRecommendation,
-  onOpenAiReason,
+  recommendedScores,
   scoreOptions,
   onToggle,
 }) {
-  const aiReason = aiRecommendation?.reason
-    ? getAiReasonPreview(aiRecommendation.reason, { roiLabel: aiRecommendation.roiLabel })
-    : null;
-
   return (
     <article className="match-card">
       <div className="match-header">
@@ -534,59 +517,31 @@ function MatchCard({
           <div className="score-pill">{getMatchScoreText(match)}</div>
         </div>
       </div>
-      {isAiSelected && aiReason ? (
-        <button
-          className="ai-reason-inline"
-          type="button"
-          onClick={() => onOpenAiReason({ match, recommendation: aiRecommendation })}
-        >
-          <span className="ai-reason-inline-copy">
-            {aiReason.roiText ? <span className="ai-roi-badge">{aiReason.roiText}</span> : null}
-            <span className="ai-reason-summary">{aiReason.summary}</span>
-          </span>
-          <strong>查看</strong>
-        </button>
-      ) : null}
       <div className="score-grid">
-        {scoreOptions.map((option) => (
-          <button
-            key={option.score}
-            className={`score-chip ${picks.includes(option.score) ? 'selected' : ''} ${isAiSelected && picks.includes(option.score) ? 'ai-selected' : ''} ${formatScoreTrendLabel(option) ? 'with-trend' : ''} ${isCorrectScoreOption(match, option) ? 'correct-result' : ''}`}
-            data-match-id={match.id}
-            data-score={option.score}
-            disabled={!selectedPlayerId}
-            onClick={() => onToggle(match.id, option.score)}
-          >
-            <span className="score-main-label">{formatScoreOptionLabel(option)}</span>
-            {formatScoreTrendLabel(option) ? (
-              <span className={`score-trend trend-${getScoreTrendDirection(option)}`}>
-                {formatScoreTrendLabel(option)}
-              </span>
-            ) : null}
-          </button>
-        ))}
+        {scoreOptions.map((option) => {
+          const isRecommended = recommendedScores.includes(option.score);
+
+          return (
+            <button
+              key={option.score}
+              className={`score-chip ${picks.includes(option.score) ? 'selected' : ''} ${isRecommended ? 'ai-recommended' : ''} ${formatScoreTrendLabel(option) ? 'with-trend' : ''} ${isCorrectScoreOption(match, option) ? 'correct-result' : ''}`}
+              data-match-id={match.id}
+              data-score={option.score}
+              disabled={!selectedPlayerId}
+              onClick={() => onToggle(match.id, option.score)}
+            >
+              {isRecommended ? <span className="ai-recommendation-star" aria-label="AI推荐">★</span> : null}
+              <span className="score-main-label">{formatScoreOptionLabel(option)}</span>
+              {formatScoreTrendLabel(option) ? (
+                <span className={`score-trend trend-${getScoreTrendDirection(option)}`}>
+                  {formatScoreTrendLabel(option)}
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
       </div>
     </article>
-  );
-}
-
-function AiReasonDialog({ dialog, onClose }) {
-  const preview = getAiReasonPreview(dialog.recommendation.reason, {
-    roiLabel: dialog.recommendation.roiLabel,
-  });
-
-  return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="推荐理由">
-      <div className="dialog ai-reason-dialog" data-ai-reason-dialog>
-        <button className="ai-reason-close-button" type="button" aria-label="返回" onClick={onClose}>
-          ‹
-        </button>
-        <div className="ai-reason-dialog-body">
-          {preview.roiText ? <span className="ai-roi-badge">{preview.roiText}</span> : null}
-          <p>{preview.detail}</p>
-        </div>
-      </div>
-    </div>
   );
 }
 

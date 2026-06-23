@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  getAiRecommendedScores,
   getAiRecommendationForMatch,
   getAiReasonPreview,
   isAiPlayer,
@@ -18,7 +19,13 @@ test('getAiRecommendationForMatch reads recommendation by match id', () => {
 
   assert.equal(recommendation?.matchId, 'espn-760437');
   assert.equal(recommendation.roiLabel, '+1.25%');
+  assert.deepEqual(recommendation.scores, ['0-0', '0-1', '1-0', '1-1']);
   assert.match(recommendation.reason, /英格兰是明确热门/);
+});
+
+test('getAiRecommendedScores exposes score recommendations for option badges', () => {
+  assert.deepEqual(getAiRecommendedScores('espn-760437'), ['0-0', '0-1', '1-0', '1-1']);
+  assert.deepEqual(getAiRecommendedScores('missing-match'), []);
 });
 
 test('getAiReasonPreview keeps summary and detail within UI limits', () => {

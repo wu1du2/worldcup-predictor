@@ -12,25 +12,19 @@ function componentSource(name, nextName) {
   );
 }
 
-test('AI reason dialog keeps the header visually minimal on mobile', () => {
-  const dialogSource = componentSource('AiReasonDialog', 'AddPlayerDialog');
-
-  assert.ok(dialogSource.includes('aria-label="返回"'));
-  assert.doesNotMatch(dialogSource, />返回</);
-  assert.doesNotMatch(dialogSource, /AI推荐理由/);
-  assert.doesNotMatch(dialogSource, /dialog\.match\.home/);
-  assert.doesNotMatch(dialogSource, /dialog\.match\.away/);
-  assert.doesNotMatch(dialogSource, /dialog-header ai-reason-dialog-header/);
-  assert.doesNotMatch(stylesSource, /\\.ai-reason-dialog-header/);
+test('AI recommendation is a score badge, not a selectable user or reason panel', () => {
+  assert.match(mainSource, /const selectablePlayers = players\.filter\(\(player\) => !isAiPlayer\(player\)\)/);
+  assert.match(mainSource, /selectablePlayers\.map/);
+  assert.doesNotMatch(mainSource, /const selectedPlayerIsAi/);
+  assert.doesNotMatch(mainSource, /function AiReasonDialog/);
+  assert.doesNotMatch(stylesSource, /ai-reason/);
 });
 
-test('AI reason preview is full-width between the match header and score grid', () => {
-  const matchCardSource = componentSource('MatchCard', 'AiReasonDialog');
-  const headerCloseIndex = matchCardSource.indexOf('      </div>\n      {isAiSelected && aiReason ? (');
-  const reasonIndex = matchCardSource.indexOf('className="ai-reason-inline"');
+test('AI recommended scores render a star inside score options', () => {
+  const matchCardSource = componentSource('MatchCard', 'AddPlayerDialog');
+  const starIndex = matchCardSource.indexOf('className="ai-recommendation-star"');
   const scoreGridIndex = matchCardSource.indexOf('className="score-grid"');
 
-  assert.notEqual(headerCloseIndex, -1);
-  assert.ok(headerCloseIndex < reasonIndex);
-  assert.ok(reasonIndex < scoreGridIndex);
+  assert.match(matchCardSource, /recommendedScores\.includes\(option\.score\)/);
+  assert.ok(scoreGridIndex < starIndex);
 });
