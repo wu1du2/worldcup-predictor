@@ -24,6 +24,7 @@ test('odds import workflow supports off-peak hourly schedule, manual runs, and f
   assert.match(workflow, /SUPABASE_URL: \$\{\{ secrets\.SUPABASE_URL \}\}/);
   assert.match(workflow, /SUPABASE_SERVICE_ROLE_KEY: \$\{\{ secrets\.SUPABASE_SERVICE_ROLE_KEY \}\}/);
   assert.match(workflow, /npm run import:odds/);
+  assert.match(workflow, /npm run backfill:odds-trends/);
   assert.match(workflow, /if: failure\(\)/);
   assert.match(workflow, /node scripts\/reportActionFailure\.mjs --job=odds/);
 });

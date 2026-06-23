@@ -36,6 +36,9 @@ jobs:
       - name: Import odds
         run: npm run import:odds
 
+      - name: Backfill odds trends
+        run: npm run backfill:odds-trends
+
       - name: Report workflow failure
         if: failure()
         run: node scripts/reportActionFailure.mjs --job=odds --message="Odds workflow failed before import completed."
