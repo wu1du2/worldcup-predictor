@@ -66,7 +66,7 @@ function App() {
   const [reportDialog, setReportDialog] = useState({ open: false, status: 'idle', reports: [], error: '' });
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [createdHintOpen, setCreatedHintOpen] = useState(false);
-  const [expandedAiReasons, setExpandedAiReasons] = useState({});
+  const [aiReasonDialog, setAiReasonDialog] = useState(null);
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -164,13 +164,6 @@ function App() {
       ...current,
       selectedPlayerId: playerId,
       draftPicks: {},
-    }));
-  }
-
-  function toggleAiReason(matchId) {
-    setExpandedAiReasons((current) => ({
-      ...current,
-      [matchId]: !current[matchId],
     }));
   }
 
@@ -386,8 +379,7 @@ function App() {
             selectedPlayerId={state.selectedPlayerId}
             isAiSelected={selectedPlayerIsAi}
             aiRecommendation={selectedPlayerIsAi ? getAiRecommendationForMatch(match.id) : null}
-            aiReasonExpanded={Boolean(expandedAiReasons[match.id])}
-            onToggleAiReason={toggleAiReason}
+            onOpenAiReason={setAiReasonDialog}
             scoreOptions={scoreOddsByMatch[match.id] || fallbackScoreOptions}
             onToggle={toggleMatchScore}
           />
@@ -412,6 +404,13 @@ function App() {
         <ExportDialog
           text={state.exportText}
           onClose={() => setState((current) => ({ ...current, exportText: '' }))}
+        />
+      ) : null}
+
+      {aiReasonDialog ? (
+        <AiReasonDialog
+          dialog={aiReasonDialog}
+          onClose={() => setAiReasonDialog(null)}
         />
       ) : null}
 
@@ -514,12 +513,13 @@ function MatchCard({
   selectedPlayerId,
   isAiSelected,
   aiRecommendation,
-  aiReasonExpanded,
-  onToggleAiReason,
+  onOpenAiReason,
   scoreOptions,
   onToggle,
 }) {
-  const aiReason = aiRecommendation?.reason ? getAiReasonPreview(aiRecommendation.reason) : null;
+  const aiReason = aiRecommendation?.reason
+    ? getAiReasonPreview(aiRecommendation.reason, { roiLabel: aiRecommendation.roiLabel })
+    : null;
 
   return (
     <article className="match-card">
@@ -529,6 +529,16 @@ function MatchCard({
           <h2>
             {match.home} <span>vs</span> {match.away}
           </h2>
+          {isAiSelected && aiReason ? (
+            <button
+              className="ai-reason-inline"
+              type="button"
+              onClick={() => onOpenAiReason({ match, recommendation: aiRecommendation })}
+            >
+              <span>{aiReason.summary}</span>
+              <strong>查看</strong>
+            </button>
+          ) : null}
         </div>
         <div className="match-side">
           <div className="score-pill">{getMatchScoreText(match)}</div>
@@ -553,18 +563,35 @@ function MatchCard({
           </button>
         ))}
       </div>
-      {isAiSelected && aiReason ? (
-        <div className="ai-reason-panel">
-          <button className="ai-reason-toggle" type="button" onClick={() => onToggleAiReason(match.id)}>
-            <span>{aiReason.summary}</span>
-            <strong>{aiReasonExpanded ? '收起' : '展开'}</strong>
-          </button>
-          {aiReasonExpanded ? (
-            <p>{aiReason.detail}</p>
-          ) : null}
-        </div>
-      ) : null}
     </article>
+  );
+}
+
+function AiReasonDialog({ dialog, onClose }) {
+  const preview = getAiReasonPreview(dialog.recommendation.reason, {
+    roiLabel: dialog.recommendation.roiLabel,
+  });
+
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="AI推荐理由">
+      <div className="dialog ai-reason-dialog" data-ai-reason-dialog>
+        <div className="dialog-header ai-reason-dialog-header">
+          <div>
+            <p className="eyebrow">AI推荐理由</p>
+            <h2>
+              {dialog.match.home} <span>vs</span> {dialog.match.away}
+            </h2>
+          </div>
+          <button className="ai-reason-close-button" type="button" onClick={onClose}>
+            返回
+          </button>
+        </div>
+        <div className="ai-reason-dialog-body">
+          <strong>{preview.summary}</strong>
+          <p>{preview.detail}</p>
+        </div>
+      </div>
+    </div>
   );
 }
 
