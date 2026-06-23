@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import { toAppMatch } from './matchSchedule.mjs';
 import { sportteryScoreTemplate } from './scoreTemplate.mjs';
 
+export const aiPlayerName = 'AI推荐';
+
 export function createSupabaseBrowserClient() {
   const url = import.meta.env.VITE_SUPABASE_URL;
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -31,7 +33,14 @@ export function generateGroupCode(random = Math.random) {
 }
 
 export function mergePlayers(dbPlayers) {
-  return dbPlayers || [];
+  const players = dbPlayers || [];
+  const aiPlayer = players.find((player) => player.name === aiPlayerName);
+  const regularPlayers = players.filter((player) => player.name !== aiPlayerName);
+
+  return [
+    { ...(aiPlayer || { id: 'ai-player', name: aiPlayerName }), isAi: true },
+    ...regularPlayers,
+  ];
 }
 
 export function mapPredictionsByPlayer(rows) {
@@ -183,6 +192,7 @@ function isCompleteMatchRow(row) {
 
 export async function loadGroupState({ client, groupCode }) {
   const group = await findOrCreateGroup(client, groupCode);
+  await ensureAiPlayer({ client, groupId: group.id });
 
   const [{ data: players, error: playersError }, { data: predictions, error: predictionsError }] = await Promise.all([
     client.from('players').select('id,name').eq('group_id', group.id).order('created_at', { ascending: true }),
@@ -197,6 +207,27 @@ export async function loadGroupState({ client, groupCode }) {
     players: mergePlayers(players || []),
     predictions: mapPredictionsByPlayer(predictions || []),
   };
+}
+
+export async function ensureAiPlayer({ client, groupId }) {
+  const { data: existing, error: existingError } = await client
+    .from('players')
+    .select('id,name')
+    .eq('group_id', groupId)
+    .eq('name', aiPlayerName)
+    .maybeSingle();
+
+  if (existingError) throw existingError;
+  if (existing) return existing;
+
+  const { data, error } = await client
+    .from('players')
+    .insert({ group_id: groupId, name: aiPlayerName })
+    .select('id,name')
+    .single();
+
+  if (error) throw error;
+  return data;
 }
 
 export async function createGroupPlayer({ client, groupId, name }) {
@@ -242,6 +273,10 @@ export async function saveGroupPredictions({ client, groupId, playerId, entries 
 }
 
 async function findOrCreateGroup(client, groupCode) {
+  return getGroupByCode({ client, groupCode });
+}
+
+export async function getGroupByCode({ client, groupCode }) {
   const { data: existing, error: existingError } = await client
     .from('groups')
     .select('id,code,name')

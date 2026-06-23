@@ -1,0 +1,139 @@
+{
+  "match": "英格兰 vs 克罗地亚",
+  "kickoff_utc8": "2026-06-18T04:00:00+08:00",
+  "fetched_at": "2026-06-23T21:20:00+08:00",
+  "copyright_policy": "Store metadata, source URLs, short snippets, and extracted facts. Do not store full copyrighted articles.",
+  "extracts": [
+    {
+      "source_id": "fifa_match_preview",
+      "type": "official_fixture",
+      "title": "England v Croatia | World Cup | Match preview",
+      "publisher": "FIFA",
+      "url": "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/england-croatia-live-stream-team-news-tickets",
+      "published_at": "2026-06-16",
+      "timestamp_precision": "date_only",
+      "enters_context": false,
+      "exclude_reason": "Official and relevant, but fetched text did not expose exact publish/update time; kept as audit-only.",
+      "short_extract": "Find out where to watch, team news, ticket and stadium information.",
+      "facts": [
+        "Official FIFA preview page for the Group L England v Croatia match.",
+        "Confirms match-preview scope: watching information, team news, tickets and stadium information."
+      ]
+    },
+    {
+      "source_id": "fox_betting_preview",
+      "type": "betting_market",
+      "title": "England vs. Croatia Prediction, Odds, Picks For World Cup Match",
+      "publisher": "FOX Sports",
+      "url": "https://www.foxsports.com/stories/soccer/2026-world-cup-england-croatia-odds-prediction-picks",
+      "published_at": "2026-06-17T12:30:00-04:00",
+      "timestamp_precision": "minute",
+      "enters_context": true,
+      "short_extract": "Bet on a first half draw and under 2.5 goals.",
+      "facts": [
+        "Moneyline listed England -140, Croatia +420, Draw +270.",
+        "Total 2.5 listed Over +116, Under -142.",
+        "Analyst angle leaned conservative: first-half draw and under 2.5 goals."
+      ]
+    },
+    {
+      "source_id": "draftkings_lineups",
+      "type": "confirmed_lineups_and_market",
+      "title": "World Cup 2026: England vs. Croatia Lineups, Odds",
+      "publisher": "DraftKings Network",
+      "url": "https://dknetwork.draftkings.com/2026/06/17/world-cup-2026-england-vs-croatia-lineups-odds/",
+      "published_at": "2026-06-17T14:37:00-04:00",
+      "timestamp_precision": "minute",
+      "enters_context": true,
+      "short_extract": "Both teams’ lineups are now set.",
+      "facts": [
+        "Published before the 16:00 ET kickoff.",
+        "England listed as -145, Croatia +425, Draw +275.",
+        "England XI: Pickford, O'Reilly, Konsa, Stones, James, Anderson, Rice, Bellingham, Gordon, Kane, Madueke.",
+        "Croatia XI: Livakovic, Gvardiol, Sutalo, Vuskovic, Stanisic, Modric, Pasalic, Sucic, Perisic, Baturina, Musa.",
+        "Saka, Guehi and Rashford were noted as not starting."
+      ]
+    },
+    {
+      "source_id": "oddschecker_preview",
+      "type": "form_team_news_prediction",
+      "title": "England vs Croatia: Lineups, Prediction, Betting Tips & Odds",
+      "publisher": "Oddschecker",
+      "url": "https://www.oddschecker.com/tips/football/world-cup-2026/20260617-england-vs-croatia-lineups-prediction-betting-tips-odds",
+      "published_at": "2026-06-17T12:15:00+01:00",
+      "timestamp_precision": "minute",
+      "enters_context": true,
+      "short_extract": "England 2-0 Croatia",
+      "facts": [
+        "Reported England won all eight qualifying matches without conceding.",
+        "Reported Croatia had seven wins and a draw in qualifying, conceding four goals.",
+        "No injuries or suspensions reported for either side.",
+        "Predicted England 2-0 Croatia."
+      ]
+    },
+    {
+      "source_id": "sky_lineup_debate",
+      "type": "team_selection_analysis",
+      "title": "England vs Croatia: Sky Sports writers pick their Three Lions starting XIs",
+      "publisher": "Sky Sports",
+      "url": "https://www.skysports.com/football/news/11095/13552970/england-vs-croatia-sky-sports-writers-pick-their-three-lions-starting-xis-for-2026-world-cup-opener-in-texas",
+      "published_at": "2026-06-17",
+      "timestamp_precision": "date_only",
+      "enters_context": false,
+      "exclude_reason": "Useful selection analysis, but exact publication time was not available from fetched text.",
+      "short_extract": "Bellingham's ability to get up and down the pitch.",
+      "facts": [
+        "Discussed England selection debates around Bellingham/Rogers, Saka/Madueke, Gordon/Rashford, and centre-back pairing.",
+        "Highlighted physical conditions in Texas as a consideration."
+      ]
+    },
+    {
+      "source_id": "rotowire_group_preview",
+      "type": "tactical_group_preview",
+      "title": "2026 World Cup Group L Preview: England, Croatia, Ghana & Panama",
+      "publisher": "RotoWire",
+      "url": "https://www.rotowire.com/soccer/article/2026-world-cup-group-l-preview-england-croatia-ghana-and-panama-lineups-odds-predictions-and-tactics-113532",
+      "published_at": "2026-06-02",
+      "timestamp_precision": "date_only",
+      "enters_context": false,
+      "exclude_reason": "Good group-level background, but exact publication time unavailable; use for audit and candidate-strategy research only.",
+      "short_extract": "The midfield three of Modric, Kovacic and Pasalic.",
+      "facts": [
+        "Emphasized Croatia dependence on Modric, Kovacic and Gvardiol fitness.",
+        "Framed Croatia as tournament-experienced with strong possession-control midfield."
+      ]
+    },
+    {
+      "source_id": "fanduel_bets",
+      "type": "betting_market",
+      "title": "England vs. Croatia World Cup Prediction, Best Bets, Picks and Props",
+      "publisher": "FanDuel Research",
+      "url": "https://www.fanduel.com/research/england-vs-croatia-world-cup-prediction-best-bets-picks-and-props-for-today-june-17",
+      "published_at": "2026-06-17",
+      "timestamp_precision": "date_only",
+      "enters_context": false,
+      "exclude_reason": "Useful market read but no exact timestamp in fetched text.",
+      "short_extract": "England Moneyline (-140); Under 2.5 Goals (-148).",
+      "facts": [
+        "Picked England moneyline and under 2.5.",
+        "Reasoned that opening matches between quality sides are often cautious."
+      ]
+    },
+    {
+      "source_id": "accuweather_monthly",
+      "type": "weather_context",
+      "title": "Arlington, TX Monthly Weather",
+      "publisher": "AccuWeather",
+      "url": "https://www.accuweather.com/en/us/arlington/76010/june-weather/331134",
+      "published_at": null,
+      "timestamp_precision": "none",
+      "enters_context": false,
+      "exclude_reason": "Weather context was fetched after match and did not expose a pre-match publication timestamp.",
+      "short_extract": "June 2026 forecast shows daily high temperatures ranging from 95° to 99°.",
+      "facts": [
+        "Arlington June forecast context suggested hot conditions.",
+        "Useful for research, but excluded from trusted prediction context due timestamp gate."
+      ]
+    }
+  ]
+}

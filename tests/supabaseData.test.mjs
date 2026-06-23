@@ -2,7 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  aiPlayerName,
+  ensureAiPlayer,
   generateGroupCode,
+  getGroupByCode,
   getGroupCodeFromSearch,
   loadImportReports,
   loadScoreOdds,
@@ -32,8 +35,179 @@ test('mergePlayers returns only group-specific database players', () => {
   ]);
 
   assert.deepEqual(merged, [
+    { id: 'ai-player', name: 'AI推荐', isAi: true },
     { id: 'db-p01', name: '阿哲' },
     { id: 'db-custom', name: '小吴' },
+  ]);
+});
+
+test('mergePlayers keeps existing AI player first without duplicating it', () => {
+  const merged = mergePlayers([
+    { id: 'db-p01', name: '阿哲' },
+    { id: 'db-ai', name: aiPlayerName },
+    { id: 'db-custom', name: '小吴' },
+  ]);
+
+  assert.deepEqual(merged, [
+    { id: 'db-ai', name: 'AI推荐', isAi: true },
+    { id: 'db-p01', name: '阿哲' },
+    { id: 'db-custom', name: '小吴' },
+  ]);
+});
+
+test('ensureAiPlayer returns existing AI player or creates one for the group', async () => {
+  const calls = [];
+  const existingClient = {
+    from(table) {
+      calls.push(['from', table]);
+      assert.equal(table, 'players');
+      return {
+        select(columns) {
+          calls.push(['select', columns]);
+          return {
+            eq(column, value) {
+              calls.push(['eq', column, value]);
+              return {
+                eq(column2, value2) {
+                  calls.push(['eq', column2, value2]);
+                  return {
+                    maybeSingle() {
+                      calls.push(['maybeSingle']);
+                      return Promise.resolve({ data: { id: 'db-ai', name: aiPlayerName }, error: null });
+                    },
+                  };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  assert.deepEqual(await ensureAiPlayer({ client: existingClient, groupId: 'g1' }), {
+    id: 'db-ai',
+    name: 'AI推荐',
+  });
+  assert.deepEqual(calls, [
+    ['from', 'players'],
+    ['select', 'id,name'],
+    ['eq', 'group_id', 'g1'],
+    ['eq', 'name', 'AI推荐'],
+    ['maybeSingle'],
+  ]);
+
+  const createCalls = [];
+  const createClient = {
+    from(table) {
+      createCalls.push(['from', table]);
+      return {
+        select(columns) {
+          createCalls.push(['select', columns]);
+          return {
+            eq(column, value) {
+              createCalls.push(['eq', column, value]);
+              return {
+                eq(column2, value2) {
+                  createCalls.push(['eq', column2, value2]);
+                  return {
+                    maybeSingle() {
+                      createCalls.push(['maybeSingle']);
+                      return Promise.resolve({ data: null, error: null });
+                    },
+                  };
+                },
+              };
+            },
+          };
+        },
+        insert(row) {
+          createCalls.push(['insert', row]);
+          return {
+            select(columns) {
+              createCalls.push(['select', columns]);
+              return {
+                single() {
+                  createCalls.push(['single']);
+                  return Promise.resolve({ data: { id: 'new-ai', name: aiPlayerName }, error: null });
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  assert.deepEqual(await ensureAiPlayer({ client: createClient, groupId: 'g2' }), {
+    id: 'new-ai',
+    name: 'AI推荐',
+  });
+  assert.deepEqual(createCalls, [
+    ['from', 'players'],
+    ['select', 'id,name'],
+    ['eq', 'group_id', 'g2'],
+    ['eq', 'name', 'AI推荐'],
+    ['maybeSingle'],
+    ['from', 'players'],
+    ['insert', { group_id: 'g2', name: 'AI推荐' }],
+    ['select', 'id,name'],
+    ['single'],
+  ]);
+});
+
+test('getGroupByCode returns or creates a group by URL code', async () => {
+  const calls = [];
+  const client = {
+    from(table) {
+      calls.push(['from', table]);
+      return {
+        select(columns) {
+          calls.push(['select', columns]);
+          return {
+            eq(column, value) {
+              calls.push(['eq', column, value]);
+              return {
+                maybeSingle() {
+                  calls.push(['maybeSingle']);
+                  return Promise.resolve({ data: null, error: null });
+                },
+              };
+            },
+          };
+        },
+        insert(row) {
+          calls.push(['insert', row]);
+          return {
+            select(columns) {
+              calls.push(['select', columns]);
+              return {
+                single() {
+                  calls.push(['single']);
+                  return Promise.resolve({ data: { id: 'g-new', code: 'wx-ai', name: 'wx-ai' }, error: null });
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  assert.deepEqual(await getGroupByCode({ client, groupCode: 'wx-ai' }), {
+    id: 'g-new',
+    code: 'wx-ai',
+    name: 'wx-ai',
+  });
+  assert.deepEqual(calls, [
+    ['from', 'groups'],
+    ['select', 'id,code,name'],
+    ['eq', 'code', 'wx-ai'],
+    ['maybeSingle'],
+    ['from', 'groups'],
+    ['insert', { code: 'wx-ai', name: 'wx-ai' }],
+    ['select', 'id,code,name'],
+    ['single'],
   ]);
 });
 

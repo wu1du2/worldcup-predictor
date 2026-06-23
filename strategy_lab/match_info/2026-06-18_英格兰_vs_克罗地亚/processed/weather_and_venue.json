@@ -1,0 +1,16 @@
+{
+  "type": "weather_and_venue",
+  "match": "英格兰 vs 克罗地亚",
+  "trusted_source_ids": [],
+  "audit_source_ids": ["accuweather_monthly", "sky_lineup_debate"],
+  "venue": {
+    "name": "Dallas Stadium / AT&T Stadium",
+    "city": "Arlington, Texas",
+    "source": "Local Supabase schedule and multiple previews"
+  },
+  "weather_context": {
+    "trusted_for_prediction": false,
+    "reason": "No exact pre-kickoff weather source timestamp was captured for this sample.",
+    "audit_note": "Available post-hoc/forecast snippets indicate hot Arlington conditions and hydration-break discussion, but this is kept out of trusted context."
+  }
+}

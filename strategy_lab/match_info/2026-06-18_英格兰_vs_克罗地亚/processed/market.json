@@ -1,0 +1,27 @@
+{
+  "type": "market",
+  "match": "英格兰 vs 克罗地亚",
+  "trusted_source_ids": ["fox_betting_preview", "draftkings_lineups"],
+  "moneyline_consensus": {
+    "england": ["-140", "-145"],
+    "draw": ["+270", "+275"],
+    "croatia": ["+420", "+425"],
+    "interpretation": "Market clearly favoured England while keeping draw as the second-most plausible non-win outcome."
+  },
+  "totals": {
+    "fox_total_2_5": {
+      "over": "+116",
+      "under": "-142"
+    },
+    "interpretation": "Market/previews leaned toward a lower-scoring game despite England favouritism."
+  },
+  "correct_score_inputs": {
+    "source": "Local Supabase Sporttery/500.com odds",
+    "baseline_scores": [
+      { "score": "0-0", "odds": 10, "change_pct": 5.263157894736836 },
+      { "score": "0-1", "odds": 13, "change_pct": 18.181818181818187 },
+      { "score": "1-0", "odds": 6.3, "change_pct": 14.54545454545455 },
+      { "score": "1-1", "odds": 5.8, "change_pct": -3.3333333333333326 }
+    ]
+  }
+}

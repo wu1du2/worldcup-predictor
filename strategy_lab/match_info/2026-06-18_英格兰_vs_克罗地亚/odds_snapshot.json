@@ -1,0 +1,32 @@
+{
+  "match": "英格兰 vs 克罗地亚",
+  "kickoff_utc8": "2026-06-18T04:00:00+08:00",
+  "source": "Supabase score_odds and score_odds_trends imported from Sporttery/500.com",
+  "snapshot_basis": "first odds to latest odds trend rows available locally",
+  "score_options": [
+    { "score": "1-0", "odds": 6.3, "first_odds": 5.5, "latest_odds": 6.3, "change_pct": 14.54545454545455 },
+    { "score": "2-0", "odds": 7.5, "first_odds": 6.4, "latest_odds": 7.5, "change_pct": 17.1875 },
+    { "score": "2-1", "odds": 5.6, "first_odds": 7, "latest_odds": 5.6, "change_pct": -20.000000000000007 },
+    { "score": "3-0", "odds": 13.5, "first_odds": 11.5, "latest_odds": 13.5, "change_pct": 17.391304347826097 },
+    { "score": "3-1", "odds": 11.5, "first_odds": 13, "latest_odds": 11.5, "change_pct": -11.538461538461542 },
+    { "score": "3-2", "odds": 23, "first_odds": 30, "latest_odds": 23, "change_pct": -23.33333333333333 },
+    { "score": "4-0", "odds": 35, "first_odds": 25, "latest_odds": 35, "change_pct": 39.99999999999999 },
+    { "score": "4-1", "odds": 36, "first_odds": 30, "latest_odds": 36, "change_pct": 19.999999999999996 },
+    { "score": "4-2", "odds": 60, "first_odds": 75, "latest_odds": 60, "change_pct": -19.999999999999996 },
+    { "score": "5-0", "odds": 100, "first_odds": 75, "latest_odds": 100, "change_pct": 33.33333333333333 },
+    { "score": "5-1", "odds": 110, "first_odds": 90, "latest_odds": 110, "change_pct": 22.222222222222232 },
+    { "score": "5-2", "odds": 150, "first_odds": 200, "latest_odds": 150, "change_pct": -25 },
+    { "score": "胜其他", "odds": 80, "first_odds": 60, "latest_odds": 80, "change_pct": 33.33333333333333 },
+    { "score": "0-0", "odds": 10, "first_odds": 9.5, "latest_odds": 10, "change_pct": 5.263157894736836 },
+    { "score": "1-1", "odds": 5.8, "first_odds": 6, "latest_odds": 5.8, "change_pct": -3.3333333333333326 },
+    { "score": "2-2", "odds": 12, "first_odds": 17, "latest_odds": 12, "change_pct": -29.411764705882348 },
+    { "score": "3-3", "odds": 40, "first_odds": 100, "latest_odds": 40, "change_pct": -60 },
+    { "score": "平其他", "odds": 300, "first_odds": 400, "latest_odds": 300, "change_pct": -25 },
+    { "score": "0-1", "odds": 13, "first_odds": 11, "latest_odds": 13, "change_pct": 18.181818181818187 },
+    { "score": "1-2", "odds": 15.5, "first_odds": 14, "latest_odds": 15.5, "change_pct": 10.71428571428572 }
+  ],
+  "notes": [
+    "Full Sporttery template has more rows; this sample keeps the most relevant exact-score rows plus other-score bucket examples for review readability.",
+    "Main strategy only consumes 0-0, 0-1, 1-0, and 1-1 in v0."
+  ]
+}

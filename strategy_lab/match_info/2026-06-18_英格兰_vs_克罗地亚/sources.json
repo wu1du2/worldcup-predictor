@@ -1,0 +1,133 @@
+{
+  "match": "英格兰 vs 克罗地亚",
+  "kickoff_utc8": "2026-06-18T04:00:00+08:00",
+  "fetched_at": "2026-06-23T20:45:00+08:00",
+  "policy": "Only sources with a known publication/update time earlier than kickoff_utc8 may enter context.json. Sources updated after kickoff or without enough timestamp precision are kept for audit but excluded from trusted context.",
+  "trusted_sources": [
+    {
+      "id": "tsz_preview",
+      "title": "England vs Croatia Preview: Team News & Prediction | FIFA World Cup 2026 | Group Stage",
+      "publisher": "The Stats Zone",
+      "url": "https://www.thestatszone.com/england-vs-croatia-preview-team-news-prediction-fifa-world-cup-2026-group-stage-195850",
+      "published_at": "2026-06-12T14:38:00+01:00",
+      "updated_at": "2026-06-17T10:38:00+01:00",
+      "enters_context": true,
+      "evidence_quality": "media_preview",
+      "reason": "Updated before the 2026-06-18 04:00 UTC+8 kickoff."
+    },
+    {
+      "id": "goal_preview",
+      "title": "England vs Croatia FIFA World Cup 2026 Preview: Everything you need to know",
+      "publisher": "Goal.com US",
+      "url": "https://www.goal.com/en-us/news/england-croatia-world-cup-preview/bltde3becdc05790db0",
+      "published_at": "2026-06-17T13:17:00+05:30",
+      "enters_context": true,
+      "evidence_quality": "media_preview",
+      "reason": "Published before the 2026-06-18 04:00 UTC+8 kickoff."
+    },
+    {
+      "id": "fox_betting_preview",
+      "title": "England vs. Croatia Prediction, Odds, Picks For World Cup Match",
+      "publisher": "FOX Sports",
+      "url": "https://www.foxsports.com/stories/soccer/2026-world-cup-england-croatia-odds-prediction-picks",
+      "published_at": "2026-06-17T12:30:00-04:00",
+      "enters_context": true,
+      "evidence_quality": "betting_market",
+      "reason": "Updated before the 2026-06-18 04:00 UTC+8 kickoff."
+    },
+    {
+      "id": "draftkings_lineups",
+      "title": "World Cup 2026: England vs. Croatia Lineups, Odds",
+      "publisher": "DraftKings Network",
+      "url": "https://dknetwork.draftkings.com/2026/06/17/world-cup-2026-england-vs-croatia-lineups-odds/",
+      "published_at": "2026-06-17T14:37:00-04:00",
+      "enters_context": true,
+      "evidence_quality": "confirmed_lineups_and_market",
+      "reason": "Published before the 2026-06-18 04:00 UTC+8 kickoff."
+    },
+    {
+      "id": "oddschecker_preview",
+      "title": "England vs Croatia: Lineups, Prediction, Betting Tips & Odds",
+      "publisher": "Oddschecker",
+      "url": "https://www.oddschecker.com/tips/football/world-cup-2026/20260617-england-vs-croatia-lineups-prediction-betting-tips-odds",
+      "published_at": "2026-06-17T12:15:00+01:00",
+      "enters_context": true,
+      "evidence_quality": "form_team_news_prediction",
+      "reason": "Published before the 2026-06-18 04:00 UTC+8 kickoff."
+    }
+  ],
+  "audit_only_sources": [
+    {
+      "id": "fifa_match_preview",
+      "title": "England v Croatia | World Cup | Match preview",
+      "publisher": "FIFA",
+      "url": "https://www.fifa.com/en/tournaments/mens/worldcup/canadamexicousa2026/articles/england-croatia-live-stream-team-news-tickets",
+      "published_at": "2026-06-16",
+      "enters_context": false,
+      "evidence_quality": "official_but_timestamp_too_coarse",
+      "reason": "Official and relevant, but fetched text did not expose exact publish/update time."
+    },
+    {
+      "id": "sky_lineup_debate",
+      "title": "England vs Croatia: Sky Sports writers pick their Three Lions starting XIs",
+      "publisher": "Sky Sports",
+      "url": "https://www.skysports.com/football/news/11095/13552970/england-vs-croatia-sky-sports-writers-pick-their-three-lions-starting-xis-for-2026-world-cup-opener-in-texas",
+      "published_at": "2026-06-17",
+      "enters_context": false,
+      "evidence_quality": "timestamp_too_coarse",
+      "reason": "Useful selection analysis, but exact publication time was unavailable."
+    },
+    {
+      "id": "rotowire_group_preview",
+      "title": "2026 World Cup Group L Preview: England, Croatia, Ghana & Panama",
+      "publisher": "RotoWire",
+      "url": "https://www.rotowire.com/soccer/article/2026-world-cup-group-l-preview-england-croatia-ghana-and-panama-lineups-odds-predictions-and-tactics-113532",
+      "published_at": "2026-06-02",
+      "enters_context": false,
+      "evidence_quality": "timestamp_too_coarse",
+      "reason": "Good group-level background, but exact publication time unavailable."
+    },
+    {
+      "id": "fanduel_bets",
+      "title": "England vs. Croatia World Cup Prediction, Best Bets, Picks and Props",
+      "publisher": "FanDuel Research",
+      "url": "https://www.fanduel.com/research/england-vs-croatia-world-cup-prediction-best-bets-picks-and-props-for-today-june-17",
+      "published_at": "2026-06-17",
+      "enters_context": false,
+      "evidence_quality": "timestamp_too_coarse",
+      "reason": "Useful market read but no exact timestamp in fetched text."
+    },
+    {
+      "id": "accuweather_monthly",
+      "title": "Arlington, TX Monthly Weather",
+      "publisher": "AccuWeather",
+      "url": "https://www.accuweather.com/en/us/arlington/76010/june-weather/331134",
+      "published_at": null,
+      "enters_context": false,
+      "evidence_quality": "no_pre_match_timestamp",
+      "reason": "Weather context did not expose a pre-match publication timestamp."
+    },
+    {
+      "id": "si_preview",
+      "title": "England vs. Croatia—World Cup: Preview, Predictions and Lineups",
+      "publisher": "Sports Illustrated",
+      "url": "https://www.si.com/soccer/england-vs-croatia-world-cup-preview-predictions-lineups-6-17-26",
+      "published_at": "2026-06-17",
+      "modified_at": "2026-06-17",
+      "enters_context": false,
+      "evidence_quality": "timestamp_too_coarse",
+      "reason": "Date is before kickoff date in UTC+8, but no exact publication time was available in the fetched page."
+    },
+    {
+      "id": "sports_mole_preview",
+      "title": "Preview: England vs Croatia - prediction, team news, lineups | World Cup 2026",
+      "publisher": "Sports Mole",
+      "url": "https://www.sportsmole.co.uk/football/england/world-cup-2026/preview/england-vs-croatia-prediction-team-news-lineups_599262.html",
+      "published_at": "2026-06-15T15:02:00+01:00",
+      "updated_at": "2026-06-18T10:55:00+01:00",
+      "enters_context": false,
+      "evidence_quality": "post_kickoff_update",
+      "reason": "The current page includes the final score and a post-kickoff update timestamp, so it is excluded from prediction context."
+    }
+  ]
+}

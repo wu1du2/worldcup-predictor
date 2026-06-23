@@ -1,0 +1,20 @@
+{
+  "type": "form_and_tactics",
+  "match": "英格兰 vs 克罗地亚",
+  "trusted_source_ids": ["oddschecker_preview", "tsz_preview", "goal_preview"],
+  "form": {
+    "england": [
+      "Oddschecker reported England won all eight qualifying matches without conceding.",
+      "England were described across trusted previews as organised, aggressive, and deep in attacking talent."
+    ],
+    "croatia": [
+      "Oddschecker reported Croatia won seven and drew one in qualifying, conceding four goals.",
+      "Croatia were repeatedly described as disciplined, technical, pragmatic, and tournament-experienced."
+    ]
+  },
+  "tactical_read": [
+    "England were a clear favourite, but several sources expected a cautious or close opening-match script.",
+    "Croatia midfield experience made a low-score draw or narrow England win plausible before kickoff.",
+    "This supports keeping low-score baseline selections in the context even when England are favoured."
+  ]
+}

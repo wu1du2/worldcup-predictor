@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-23T20:45:00+08:00",
+  "match": {
+    "id": "espn-760437",
+    "date": "2026-06-18",
+    "time": "04:00",
+    "kickoffAt": "2026-06-17T20:00:00+00:00",
+    "kickoff_utc8": "2026-06-18T04:00:00+08:00",
+    "home": "英格兰",
+    "away": "克罗地亚",
+    "stage": "Group Stage"
+  },
+  "sourceGate": {
+    "rule": "published_at or updated_at must be earlier than kickoff_utc8 to enter this context",
+    "accepted_source_ids": ["tsz_preview", "goal_preview", "fox_betting_preview", "draftkings_lineups", "oddschecker_preview"],
+    "excluded_source_ids": ["fifa_match_preview", "sky_lineup_debate", "rotowire_group_preview", "fanduel_bets", "accuweather_monthly", "si_preview", "sports_mole_preview"]
+  },
+  "market": {
+    "scoreOptions": [
+      { "score": "0-0", "odds": 10, "trend": { "firstOdds": 9.5, "latestOdds": 10, "changePct": 5.263157894736836 } },
+      { "score": "0-1", "odds": 13, "trend": { "firstOdds": 11, "latestOdds": 13, "changePct": 18.181818181818187 } },
+      { "score": "1-0", "odds": 6.3, "trend": { "firstOdds": 5.5, "latestOdds": 6.3, "changePct": 14.54545454545455 } },
+      { "score": "1-1", "odds": 5.8, "trend": { "firstOdds": 6, "latestOdds": 5.8, "changePct": -3.3333333333333326 } },
+      { "score": "2-1", "odds": 5.6, "trend": { "firstOdds": 7, "latestOdds": 5.6, "changePct": -20.000000000000007 } },
+      { "score": "2-2", "odds": 12, "trend": { "firstOdds": 17, "latestOdds": 12, "changePct": -29.411764705882348 } }
+    ]
+  },
+  "publicContext": {
+    "processedFiles": [
+      "processed/market.json",
+      "processed/team_news.json",
+      "processed/form_and_tactics.json",
+      "processed/weather_and_venue.json"
+    ],
+    "media": [
+      {
+        "source_id": "tsz_preview",
+        "summary": "England were favourites but under pressure; Croatia were described as resilient and difficult to face. Preview expected a close contest and leaned England win with under 3.5 goals."
+      },
+      {
+        "source_id": "goal_preview",
+        "summary": "Goal framed the game as a high-significance opener: England aggressive and organised under Tuchel, Croatia disciplined, pragmatic, and technically composed."
+      },
+      {
+        "source_id": "oddschecker_preview",
+        "summary": "Oddschecker reported England's perfect defensive qualifying run and Croatia's strong qualifying campaign, then predicted England 2-0."
+      }
+    ],
+    "teamNews": [
+      {
+        "source_id": "tsz_preview",
+        "summary": "England expected Stones/Konsa at centre back, Bellingham ahead of Rogers, Saka fitness managed, Livramento withdrawn."
+      },
+      {
+        "source_id": "tsz_preview",
+        "summary": "Croatia had fitness notes around Gvardiol, Modric, and Kovacic, but all were expected to be fit enough to start."
+      },
+      {
+        "source_id": "draftkings_lineups",
+        "summary": "Confirmed pre-kickoff lineups had England starting Pickford, O'Reilly, Konsa, Stones, James, Anderson, Rice, Bellingham, Gordon, Kane and Madueke; Saka, Guehi and Rashford were reserves."
+      },
+      {
+        "source_id": "draftkings_lineups",
+        "summary": "Croatia started Livakovic, Gvardiol, Sutalo, Vuskovic, Stanisic, Modric, Pasalic, Sucic, Perisic, Baturina and Musa."
+      }
+    ],
+    "formAndTactics": [
+      {
+        "source_id": "oddschecker_preview",
+        "summary": "England were reported as winning all eight qualifiers without conceding; Croatia were reported as seven wins and one draw in qualifying, conceding four."
+      },
+      {
+        "source_id": "tsz_preview",
+        "summary": "Previews expected a close match rather than a free-scoring mismatch, partly because of Croatia experience and tournament resilience."
+      }
+    ],
+    "marketRead": [
+      "Baseline low-score scores were all available: 0-0, 0-1, 1-0, 1-1.",
+      "1-1 had one of the lowest correct-score odds at 5.8, while 0-0 and 0-1 drifted upward from first odds.",
+      "FOX listed England -140, Croatia +420 and Draw +270; DraftKings listed England -145, Croatia +425 and Draw +275.",
+      "FOX and FanDuel-style market reads leaned toward under 2.5, but only FOX had an exact trusted timestamp in this sample."
+    ],
+    "weatherAndVenue": [
+      {
+        "source_id": "local_schedule",
+        "summary": "Venue was Dallas Stadium / AT&T Stadium in Arlington, Texas."
+      },
+      {
+        "source_id": "accuweather_monthly",
+        "summary": "Hot-weather context is audit-only because no exact pre-match timestamp was captured."
+      }
+    ]
+  }
+}

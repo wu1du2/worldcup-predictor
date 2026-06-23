@@ -18,6 +18,9 @@
     "probe:odds": "node scripts/probeSportteryOdds.mjs",
     "import:odds": "node scripts/importSportteryOdds.mjs",
     "import:odds:dry": "node scripts/importSportteryOdds.mjs --dry-run",
+    "backtest:strategies": "node scripts/backtestStrategies.mjs",
+    "strategy:lab": "node scripts/runStrategyLab.mjs",
+    "ai:sync-prediction": "node scripts/syncAiPrediction.mjs",
     "backfill:odds-trends": "node scripts/backfillScoreOddsTrends.mjs",
     "backfill:odds-trends:dry": "node scripts/backfillScoreOddsTrends.mjs --dry-run"
   },

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "strategy_file": "../strategies/main_strategy.md",
+  "strategy_name": "main_strategy",
+  "executed_at": "2026-06-23T20:45:00+08:00",
+  "match_context_file": "../match_info/2026-06-18_英格兰_vs_克罗地亚/context.json",
+  "prediction": {
+    "reason": "主策略是低比分篮子 v0，本场 context 中 0-0、0-1、1-0、1-1 均有可用赔率。赛前媒体、赔率市场和阵容信息共同指向：英格兰是明确热门，但克罗地亚经验强、市场也偏向 under 2.5/谨慎开局。因此这场不触发候选策略的激进改动，保留低比分篮子，输出四个比分各 1 注。",
+    "stakes": [
+      { "score": "0-0", "stake": 1 },
+      { "score": "0-1", "stake": 1 },
+      { "score": "1-0", "stake": 1 },
+      { "score": "1-1", "stake": 1 }
+    ]
+  },
+  "audit": {
+    "no_result_in_context": true,
+    "context_source_gate_passed": true,
+    "notes": "This sample was generated after the match only to review folder structure. The context intentionally excludes final score fields."
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "team_news",
+  "match": "英格兰 vs 克罗地亚",
+  "trusted_source_ids": ["draftkings_lineups", "oddschecker_preview", "goal_preview", "tsz_preview"],
+  "injuries_and_suspensions": {
+    "england": "No injuries or suspensions reported by Goal/Oddschecker in trusted pre-match context.",
+    "croatia": "No injuries or suspensions reported by Goal/Oddschecker in trusted pre-match context."
+  },
+  "confirmed_lineups": {
+    "source_id": "draftkings_lineups",
+    "england": ["Pickford", "O'Reilly", "Konsa", "Stones", "James", "Anderson", "Rice", "Bellingham", "Gordon", "Kane", "Madueke"],
+    "croatia": ["Livakovic", "Gvardiol", "Sutalo", "Vuskovic", "Stanisic", "Modric", "Pasalic", "Sucic", "Perisic", "Baturina", "Musa"],
+    "notable_england_bench": ["Saka", "Guehi", "Rashford"]
+  },
+  "prediction_signal": [
+    "England XI still had Kane, Bellingham and Rice, so favourite status remained supported.",
+    "Saka/Rashford not starting slightly reduced confidence in the most aggressive England attacking scripts.",
+    "Croatia started Modric, Gvardiol and Perisic, supporting the idea of experienced resistance rather than an easy collapse."
+  ]
+}
