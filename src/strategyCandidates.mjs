@@ -1,4 +1,8 @@
 import { exactSportteryScores } from './scoreTemplate.mjs';
+import {
+  buildContextPoissonEvSelection,
+  buildMarketPoissonEvSelection,
+} from './poissonEvStrategy.mjs';
 
 export const candidateStrategies = [
   {
@@ -85,6 +89,18 @@ export const candidateStrategies = [
     description: '避开最低赔和超高赔，选择 8-18 区间内市场仍认可的三个比分。',
     selectPicks: ({ odds }) => sortByOdds(odds.filter((pick) => pick.odds >= 8 && pick.odds <= 18)).slice(0, 3),
   },
+  {
+    id: 'market_poisson_ev',
+    name: '市场泊松EV',
+    description: '用比分赔率拟合 Poisson/Dixon-Coles 分布，再买模型概率乘赔率后的最高 EV 比分。',
+    selectPicks: ({ odds, context }) => buildMarketPoissonEvSelection({ odds, context }).picks,
+  },
+  {
+    id: 'context_poisson_ev',
+    name: '赛前泊松EV',
+    description: '用赛前 context 独立估计双方期望进球，再与赔率比较选择最高 EV 比分。',
+    selectPicks: ({ odds, context }) => buildContextPoissonEvSelection({ odds, context }).picks,
+  },
 ];
 
 export function runCandidateStrategyBacktests({
@@ -130,7 +146,7 @@ function runOneStrategy({ strategy, matches, scoreOddsByMatch }) {
   for (const match of matches || []) {
     if (!isCompletedMatch(match)) continue;
     const odds = normalizeOdds(scoreOddsByMatch?.[match.id]);
-    const picks = uniquePicks(strategy.selectPicks({ match, odds }) || []);
+    const picks = uniquePicks(strategy.selectPicks({ match, odds, context: match.strategyContext || {} }) || []);
     if (!picks.length) continue;
 
     rows.push(buildSettledRow({ match, picks }));
@@ -287,7 +303,13 @@ function uniquePicks(picks) {
   for (const pick of picks) {
     if (!pick?.score || seen.has(pick.score)) continue;
     seen.add(pick.score);
-    unique.push({ score: pick.score, odds: pick.odds, ...(pick.changePct !== null ? { changePct: pick.changePct } : {}) });
+    unique.push({
+      score: pick.score,
+      odds: pick.odds,
+      ...(pick.changePct !== null ? { changePct: pick.changePct } : {}),
+      ...(Number.isFinite(Number(pick.probability)) ? { probability: pick.probability } : {}),
+      ...(Number.isFinite(Number(pick.ev)) ? { ev: pick.ev } : {}),
+    });
   }
   return unique;
 }

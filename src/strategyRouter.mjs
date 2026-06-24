@@ -176,6 +176,8 @@ function scoreStrategyFeatures({ strategy, odds }) {
   if (strategy.id === 'favorite_six_cover') return market.heavyFavorite ? 0.95 : 0.05;
   if (strategy.id === 'favorite_draw_saver_4') return market.heavyFavorite ? 0.85 : 0.25;
   if (strategy.id === 'mid_odds_value_3') return market.hasHealthyMidOdds ? 0.85 : 0.05;
+  if (strategy.id === 'market_poisson_ev') return market.hasCompleteScoreBoard ? 1.05 : 0.35;
+  if (strategy.id === 'context_poisson_ev') return market.hasCompleteScoreBoard ? 0.65 : 0.2;
   return 0;
 }
 
@@ -199,6 +201,7 @@ function getMarketFeatures(odds) {
     hasStrongPositiveTrend: topPositiveTrend >= 20,
     hasStrongNegativeTrend: topNegativeTrend <= -15,
     hasHealthyMidOdds: odds.filter((pick) => pick.odds >= 8 && pick.odds <= 18).length >= 3,
+    hasCompleteScoreBoard: odds.length >= 28,
   };
 }
 
@@ -213,6 +216,7 @@ function describeMarket(odds) {
   if (market.balancedOutcomes) parts.push('胜平负相对均衡');
   if (market.drawLean) parts.push('平局锚点可用');
   if (market.hasStrongPositiveTrend) parts.push('有明显赔率上升项');
+  if (market.hasCompleteScoreBoard) parts.push('比分盘完整');
   return parts.join('，');
 }
 

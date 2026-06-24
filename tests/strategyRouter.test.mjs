@@ -81,3 +81,30 @@ test('buildRoutedAiPredictionEntries falls back to low-score scores when odds ar
   assert.equal(entries[1].route.strategyId, 'low_score_basket_4');
   assert.match(entries[1].route.reason, /缺少可用赔率/);
 });
+
+test('routeStrategyForMatch can select the market Poisson EV flagship when it has history and a complete odds board', () => {
+  const fullScoreOptions = [
+    '1-0', '2-0', '2-1', '3-0', '3-1', '3-2', '4-0', '4-1', '4-2', '5-0',
+    '5-1', '5-2', '胜其他', '0-0', '1-1', '2-2', '3-3', '平其他', '0-1',
+    '0-2', '1-2', '0-3', '1-3', '2-3', '0-4', '1-4', '2-4', '0-5',
+    '1-5', '2-5', '负其他',
+  ].map((score, index) => ({ score, odds: 6 + index }));
+  const route = routeStrategyForMatch({
+    match: { id: 'm4', date: '2026-06-25', time: '03:00', home: '波黑', away: '卡塔尔' },
+    scoreOptions: fullScoreOptions,
+    historicalResults: [
+      ...historicalResults,
+      {
+        strategyId: 'market_poisson_ev',
+        strategyName: '市场泊松EV',
+        rows: [
+          { date: '2026-06-18', time: '03:00', hitScore: '1-1', cost: 2, revenue: 12 },
+          { date: '2026-06-19', time: '03:00', hitScore: '', cost: 2, revenue: 0 },
+        ],
+      },
+    ],
+  });
+
+  assert.equal(route.strategyId, 'market_poisson_ev');
+  assert.match(route.reason, /市场泊松EV/);
+});
