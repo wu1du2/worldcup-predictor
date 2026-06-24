@@ -3,10 +3,9 @@ import { candidateStrategies } from './strategyCandidates.mjs';
 
 const fallbackStrategyId = 'low_score_basket_4';
 export const routerCandidateStrategyIds = [
-  'context_poisson_ev_v2',
+  'tem_hybrid_draw_poisson_v2_d1_n2',
+  'tem_draw_anchor_3_max5_5',
   'context_poisson_ev_v3',
-  'draw_anchor_3',
-  'low_score_basket_4',
 ];
 
 export function buildRollingStrategyStats({ historicalResults, cutoffDate, cutoffTime = '00:00' }) {
@@ -227,6 +226,8 @@ function scoreStrategyFeatures({ strategy, odds }) {
   if (strategy.id === 'context_poisson_ev') return market.hasCompleteScoreBoard ? 0.65 : 0.2;
   if (strategy.id === 'context_poisson_ev_v2') return market.hasCompleteScoreBoard ? 0.7 : 0.2;
   if (strategy.id === 'context_poisson_ev_v3') return market.hasCompleteScoreBoard ? 0.75 : 0.2;
+  if (strategy.id === 'tem_hybrid_draw_poisson_v2_d1_n2') return market.hasCompleteScoreBoard && market.drawLean ? 0.95 : 0.35;
+  if (strategy.id === 'tem_draw_anchor_3_max5_5') return market.drawLean ? 1 : 0.2;
   return 0;
 }
 

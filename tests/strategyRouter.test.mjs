@@ -27,6 +27,15 @@ const historicalResults = [
       { date: '2026-06-14', time: '03:00', hitScore: '', cost: 4, revenue: 0 },
     ],
   },
+  {
+    strategyId: 'tem_draw_anchor_3_max5_5',
+    strategyName: '平局锚点 4 格',
+    rows: [
+      { date: '2026-06-13', time: '03:00', hitScore: '1-1', cost: 4, revenue: 5.3 },
+      { date: '2026-06-14', time: '03:00', hitScore: '1-1', cost: 4, revenue: 11 },
+      { date: '2026-06-26', time: '04:00', hitScore: '', cost: 4, revenue: 0 },
+    ],
+  },
 ];
 
 const scoreOptions = [
@@ -58,9 +67,9 @@ test('routeStrategyForMatch chooses an available positive-history strategy and r
     historicalResults,
   });
 
-  assert.equal(route.strategyId, 'draw_anchor_3');
-  assert.equal(route.strategyName, '平局锚点');
-  assert.equal(route.roiLabel, '+171.67%');
+  assert.equal(route.strategyId, 'tem_draw_anchor_3_max5_5');
+  assert.equal(route.strategyName, '平局锚点 4 格');
+  assert.equal(route.roiLabel, '+103.75%');
   assert.match(route.reason, /滚动历史 ROI/);
   assert.match(route.reason, /葡萄牙 vs 乌兹别克斯坦/);
 });
@@ -78,7 +87,7 @@ test('buildRoutedAiPredictionEntries falls back to low-score scores when odds ar
   });
 
   assert.deepEqual(entries.map((entry) => entry.matchId), ['with-odds', 'no-odds']);
-  assert.deepEqual(entries[0].scores, ['1-1', '0-0', '2-2']);
+  assert.deepEqual(entries[0].scores, ['1-1', '2-2', '0-0', '1-0']);
   assert.deepEqual(entries[1].scores, ['0-0', '0-1', '1-0', '1-1']);
   assert.equal(entries[1].route.strategyId, 'low_score_basket_4');
   assert.match(entries[1].route.reason, /缺少可用赔率/);
@@ -126,8 +135,8 @@ test('routeStrategyForMatch only considers the production router candidate pool 
         ],
       },
       {
-        strategyId: 'context_poisson_ev_v2',
-        strategyName: '赛前泊松EV精选',
+        strategyId: 'tem_hybrid_draw_poisson_v2_d1_n2',
+        strategyName: '平局泊松混合 2 格',
         rows: [
           { date: '2026-06-18', time: '03:00', hitScore: '1-1', cost: 2, revenue: 8 },
         ],
@@ -136,10 +145,9 @@ test('routeStrategyForMatch only considers the production router candidate pool 
   });
 
   assert.deepEqual(routerCandidateStrategyIds, [
-    'context_poisson_ev_v2',
+    'tem_hybrid_draw_poisson_v2_d1_n2',
+    'tem_draw_anchor_3_max5_5',
     'context_poisson_ev_v3',
-    'draw_anchor_3',
-    'low_score_basket_4',
   ]);
   assert.ok(routerCandidateStrategyIds.includes(route.strategyId));
   assert.notEqual(route.strategyId, 'market_poisson_ev');

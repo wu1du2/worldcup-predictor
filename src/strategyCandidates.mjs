@@ -115,6 +115,18 @@ export const candidateStrategies = [
     description: '赛前泊松EV的均衡覆盖版本，加入平局和低比分修正，保留更多候选以提高信息量。',
     selectPicks: ({ odds, context }) => buildContextPoissonEvV3Selection({ odds, context }).picks,
   },
+  {
+    id: 'tem_hybrid_draw_poisson_v2_d1_n2',
+    name: '平局泊松混合 2 格',
+    description: 'final3 精选型：先保留 1-1，再用赛前泊松EV精选补足到 2 个比分。',
+    selectPicks: ({ odds, context }) => pickHybridDrawPoissonV2(odds, context),
+  },
+  {
+    id: 'tem_draw_anchor_3_max5_5',
+    name: '平局锚点 4 格',
+    description: 'final3 均衡型：平局赔率较低时覆盖 1-1、2-2、0-0、1-0，否则回落到低平局三格。',
+    selectPicks: ({ odds }) => pickFinalDrawAnchor(odds),
+  },
 ];
 
 export function runCandidateStrategyBacktests({
@@ -272,6 +284,28 @@ function pickFavoriteDrawSaver(odds) {
     return pickFixedScores(odds, ['0-1', '0-2', '1-2', '1-1']);
   }
   return pickFixedScores(odds, ['0-0', '1-1', '2-2']);
+}
+
+function pickHybridDrawPoissonV2(odds, context) {
+  return uniquePicks([
+    ...pickFixedScores(odds, ['1-1']),
+    ...buildContextPoissonEvV2Selection({
+      odds,
+      context,
+      options: {
+        maxPicks: 2,
+        minPicks: 1,
+      },
+    }).picks,
+  ]).slice(0, 2);
+}
+
+function pickFinalDrawAnchor(odds) {
+  const drawMin = minOddsForOutcome(odds, 'draw');
+  const scores = drawMin <= 5.5
+    ? ['1-1', '2-2', '0-0', '1-0']
+    : ['1-1', '0-0', '2-2'];
+  return pickFixedScores(odds, scores);
 }
 
 function getOutcomeStrength(odds) {

@@ -51,9 +51,9 @@ const sampleOdds = {
   ],
 };
 
-test('candidate strategy set contains eighteen named offline strategies', () => {
-  assert.equal(candidateStrategies.length, 18);
-  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 18);
+test('candidate strategy set contains final3 production candidates and offline strategies', () => {
+  assert.equal(candidateStrategies.length, 20);
+  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 20);
   assert.deepEqual(candidateStrategies.map((strategy) => strategy.id), [
     'low_score_basket_4',
     'lowest_odds_2',
@@ -73,6 +73,8 @@ test('candidate strategy set contains eighteen named offline strategies', () => 
     'context_poisson_ev',
     'context_poisson_ev_v2',
     'context_poisson_ev_v3',
+    'tem_hybrid_draw_poisson_v2_d1_n2',
+    'tem_draw_anchor_3_max5_5',
   ]);
 });
 
@@ -82,7 +84,7 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
     scoreOddsByMatch: sampleOdds,
   });
 
-  assert.equal(results.length, 18);
+  assert.equal(results.length, 20);
 
   const lowScore = results.find((result) => result.strategyId === 'low_score_basket_4');
   assert.equal(lowScore.cost, 8);
@@ -120,6 +122,15 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.ok(contextPoissonV3.rows[0].picks.length >= 2);
   assert.ok(Number.isFinite(contextPoissonV3.rows[0].picks[0].probability));
 
+  const hybridFinal = results.find((result) => result.strategyId === 'tem_hybrid_draw_poisson_v2_d1_n2');
+  assert.equal(hybridFinal.settledMatches, 2);
+  assert.ok(hybridFinal.rows[0].picks.length <= 2);
+  assert.equal(hybridFinal.rows[0].picks[0].score, '1-1');
+
+  const drawFinal = results.find((result) => result.strategyId === 'tem_draw_anchor_3_max5_5');
+  assert.equal(drawFinal.settledMatches, 2);
+  assert.deepEqual(drawFinal.rows[0].picks.map((pick) => pick.score), ['1-1', '0-0']);
+
   const summary = formatCandidateStrategySummary(results);
   assert.match(summary, /候选策略回测/);
   assert.match(summary, /low_score_basket_4/);
@@ -127,4 +138,6 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.match(summary, /market_poisson_ev/);
   assert.match(summary, /context_poisson_ev_v2/);
   assert.match(summary, /context_poisson_ev_v3/);
+  assert.match(summary, /tem_hybrid_draw_poisson_v2_d1_n2/);
+  assert.match(summary, /tem_draw_anchor_3_max5_5/);
 });
