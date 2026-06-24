@@ -3,6 +3,8 @@ import test from 'node:test';
 
 import {
   buildContextPoissonEvSelection,
+  buildContextPoissonEvV2Selection,
+  buildContextPoissonEvV3Selection,
   buildMarketPoissonEvSelection,
 } from '../src/poissonEvStrategy.mjs';
 import { candidateStrategies, runCandidateStrategyBacktests } from '../src/strategyCandidates.mjs';
@@ -79,6 +81,30 @@ test('context Poisson EV uses independent expected goals before comparing with o
   assert.ok(selection.reason.includes('独立赛前 context'));
 });
 
+test('context Poisson EV v2 is a stricter selected-value variant', () => {
+  const selection = buildContextPoissonEvV2Selection({ odds: scoreOptions });
+
+  assert.equal(selection.strategyId, 'context_poisson_ev_v2');
+  assert.equal(selection.strategyName, '赛前泊松EV精选');
+  assert.ok(selection.picks.length >= 1);
+  assert.ok(selection.picks.length <= 2);
+  assert.ok(selection.picks.every((pick) => pick.odds <= 50));
+  assert.ok(selection.picks.every((pick) => pick.probability >= 0.012));
+  assert.match(selection.reason, /精选/);
+});
+
+test('context Poisson EV v3 keeps a richer balanced coverage basket', () => {
+  const selection = buildContextPoissonEvV3Selection({ odds: scoreOptions });
+
+  assert.equal(selection.strategyId, 'context_poisson_ev_v3');
+  assert.equal(selection.strategyName, '赛前泊松EV均衡');
+  assert.ok(selection.picks.length >= 2);
+  assert.ok(selection.picks.length <= 4);
+  assert.ok(selection.picks.every((pick) => pick.odds <= 55));
+  assert.ok(Math.abs(sum(selection.probabilityTable.map((row) => row.probability)) - 1) < 0.000001);
+  assert.match(selection.reason, /均衡覆盖/);
+});
+
 test('Poisson EV selection ignores extreme longshot odds by default', () => {
   const selection = buildMarketPoissonEvSelection({
     odds: [
@@ -99,6 +125,8 @@ test('candidate strategy backtests include both Poisson EV flagship strategies',
   const ids = candidateStrategies.map((strategy) => strategy.id);
   assert.ok(ids.includes('market_poisson_ev'));
   assert.ok(ids.includes('context_poisson_ev'));
+  assert.ok(ids.includes('context_poisson_ev_v2'));
+  assert.ok(ids.includes('context_poisson_ev_v3'));
 
   const results = runCandidateStrategyBacktests({
     matches: [
@@ -118,6 +146,8 @@ test('candidate strategy backtests include both Poisson EV flagship strategies',
 
   assert.ok(results.some((result) => result.strategyId === 'market_poisson_ev' && result.settledMatches === 1));
   assert.ok(results.some((result) => result.strategyId === 'context_poisson_ev' && result.settledMatches === 1));
+  assert.ok(results.some((result) => result.strategyId === 'context_poisson_ev_v2' && result.settledMatches === 1));
+  assert.ok(results.some((result) => result.strategyId === 'context_poisson_ev_v3' && result.settledMatches === 1));
 });
 
 function sum(values) {

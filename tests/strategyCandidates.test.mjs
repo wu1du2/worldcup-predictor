@@ -51,9 +51,9 @@ const sampleOdds = {
   ],
 };
 
-test('candidate strategy set contains sixteen named offline strategies', () => {
-  assert.equal(candidateStrategies.length, 16);
-  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 16);
+test('candidate strategy set contains eighteen named offline strategies', () => {
+  assert.equal(candidateStrategies.length, 18);
+  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 18);
   assert.deepEqual(candidateStrategies.map((strategy) => strategy.id), [
     'low_score_basket_4',
     'lowest_odds_2',
@@ -71,6 +71,8 @@ test('candidate strategy set contains sixteen named offline strategies', () => {
     'mid_odds_value_3',
     'market_poisson_ev',
     'context_poisson_ev',
+    'context_poisson_ev_v2',
+    'context_poisson_ev_v3',
   ]);
 });
 
@@ -80,7 +82,7 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
     scoreOddsByMatch: sampleOdds,
   });
 
-  assert.equal(results.length, 16);
+  assert.equal(results.length, 18);
 
   const lowScore = results.find((result) => result.strategyId === 'low_score_basket_4');
   assert.equal(lowScore.cost, 8);
@@ -108,9 +110,21 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.ok(contextPoisson.rows[0].picks[0].score);
   assert.ok(Number.isFinite(contextPoisson.rows[0].picks[0].probability));
 
+  const contextPoissonV2 = results.find((result) => result.strategyId === 'context_poisson_ev_v2');
+  assert.equal(contextPoissonV2.settledMatches, 2);
+  assert.ok(contextPoissonV2.rows[0].picks.length <= 2);
+  assert.ok(Number.isFinite(contextPoissonV2.rows[0].picks[0].ev));
+
+  const contextPoissonV3 = results.find((result) => result.strategyId === 'context_poisson_ev_v3');
+  assert.equal(contextPoissonV3.settledMatches, 2);
+  assert.ok(contextPoissonV3.rows[0].picks.length >= 2);
+  assert.ok(Number.isFinite(contextPoissonV3.rows[0].picks[0].probability));
+
   const summary = formatCandidateStrategySummary(results);
   assert.match(summary, /候选策略回测/);
   assert.match(summary, /low_score_basket_4/);
   assert.match(summary, /trend_risers_2/);
   assert.match(summary, /market_poisson_ev/);
+  assert.match(summary, /context_poisson_ev_v2/);
+  assert.match(summary, /context_poisson_ev_v3/);
 });

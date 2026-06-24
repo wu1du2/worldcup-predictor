@@ -218,6 +218,8 @@ function scoreStrategyFeatures({ strategy, odds }) {
   if (strategy.id === 'mid_odds_value_3') return market.hasHealthyMidOdds ? 0.85 : 0.05;
   if (strategy.id === 'market_poisson_ev') return market.hasCompleteScoreBoard ? 1.05 : 0.35;
   if (strategy.id === 'context_poisson_ev') return market.hasCompleteScoreBoard ? 0.65 : 0.2;
+  if (strategy.id === 'context_poisson_ev_v2') return market.hasCompleteScoreBoard ? 0.7 : 0.2;
+  if (strategy.id === 'context_poisson_ev_v3') return market.hasCompleteScoreBoard ? 0.75 : 0.2;
   return 0;
 }
 

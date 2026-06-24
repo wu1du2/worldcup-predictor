@@ -1,6 +1,8 @@
 import { exactSportteryScores } from './scoreTemplate.mjs';
 import {
   buildContextPoissonEvSelection,
+  buildContextPoissonEvV2Selection,
+  buildContextPoissonEvV3Selection,
   buildMarketPoissonEvSelection,
 } from './poissonEvStrategy.mjs';
 
@@ -100,6 +102,18 @@ export const candidateStrategies = [
     name: '赛前泊松EV',
     description: '用赛前 context 独立估计双方期望进球，再与赔率比较选择最高 EV 比分。',
     selectPicks: ({ odds, context }) => buildContextPoissonEvSelection({ odds, context }).picks,
+  },
+  {
+    id: 'context_poisson_ev_v2',
+    name: '赛前泊松EV精选',
+    description: '赛前泊松EV的精选版本，提高概率门槛并限制最多 2 个比分，优先减少低置信噪音。',
+    selectPicks: ({ odds, context }) => buildContextPoissonEvV2Selection({ odds, context }).picks,
+  },
+  {
+    id: 'context_poisson_ev_v3',
+    name: '赛前泊松EV均衡',
+    description: '赛前泊松EV的均衡覆盖版本，加入平局和低比分修正，保留更多候选以提高信息量。',
+    selectPicks: ({ odds, context }) => buildContextPoissonEvV3Selection({ odds, context }).picks,
   },
 ];
 

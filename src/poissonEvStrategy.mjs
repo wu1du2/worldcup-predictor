@@ -30,26 +30,96 @@ export function buildMarketPoissonEvSelection({ odds, context = {}, options = {}
 }
 
 export function buildContextPoissonEvSelection({ odds, context = {}, options = {} }) {
-  const selectionOptions = { maxSelectableOdds: 60, minSelectableProbability: 0.003, ...options };
+  return buildContextPoissonEvVariant({
+    odds,
+    context,
+    options,
+    defaultOptions: { maxSelectableOdds: 60, minSelectableProbability: 0.003 },
+    strategyId: 'context_poisson_ev',
+    strategyName: '赛前泊松EV',
+    reasonParts: ({ adjustedModel }) => [
+      `独立赛前 context 估计 λ=${formatMetric(adjustedModel.lambdaHome)}-${formatMetric(adjustedModel.lambdaAway)}。`,
+      '赔率只用于 EV 结算比较，不作为主概率先验。',
+    ],
+  });
+}
+
+export function buildContextPoissonEvV2Selection({ odds, context = {}, options = {} }) {
+  return buildContextPoissonEvVariant({
+    odds,
+    context,
+    options,
+    defaultOptions: {
+      maxSelectableOdds: 50,
+      minSelectableProbability: 0.012,
+      maxPicks: 2,
+      minPicks: 1,
+    },
+    strategyId: 'context_poisson_ev_v2',
+    strategyName: '赛前泊松EV精选',
+    reasonParts: ({ adjustedModel }) => [
+      `精选赛前 context EV，λ=${formatMetric(adjustedModel.lambdaHome)}-${formatMetric(adjustedModel.lambdaAway)}。`,
+      '提高概率门槛并限制最多 2 个比分，优先减少低置信噪音。',
+    ],
+  });
+}
+
+export function buildContextPoissonEvV3Selection({ odds, context = {}, options = {} }) {
+  return buildContextPoissonEvVariant({
+    odds,
+    context,
+    options,
+    baseContext: {
+      model: {
+        expectedGoals: { home: 1.25, away: 1.08 },
+        drawMultiplier: 1.18,
+        lowScoreMultiplier: 1.12,
+        rhoAdjustment: -0.06,
+      },
+    },
+    defaultOptions: {
+      maxSelectableOdds: 55,
+      minSelectableProbability: 0.01,
+      maxPicks: 4,
+      minPicks: 2,
+    },
+    strategyId: 'context_poisson_ev_v3',
+    strategyName: '赛前泊松EV均衡',
+    reasonParts: ({ adjustedModel }) => [
+      `均衡覆盖赛前 context EV，λ=${formatMetric(adjustedModel.lambdaHome)}-${formatMetric(adjustedModel.lambdaAway)}。`,
+      '加入平局和低比分修正，保留 2-4 个候选以提高信息量。',
+    ],
+  });
+}
+
+function buildContextPoissonEvVariant({
+  odds,
+  context = {},
+  options = {},
+  baseContext = {},
+  defaultOptions,
+  strategyId,
+  strategyName,
+  reasonParts,
+}) {
+  const mergedContext = mergeContext(baseContext, context);
+  const selectionOptions = { ...defaultOptions, ...options };
   const normalizedOdds = normalizeOdds(odds);
-  const base = getContextExpectedGoals(context);
-  const adjustedModel = applyLambdaContextAdjustments(base, context);
+  const base = getContextExpectedGoals(mergedContext);
+  const adjustedModel = applyLambdaContextAdjustments(base, mergedContext);
   const table = buildPoissonScoreProbabilityTable(adjustedModel);
-  const adjustedTable = applyProbabilityContextAdjustments(table, context);
+  const adjustedTable = applyProbabilityContextAdjustments(table, mergedContext);
   const evTable = buildEvTable({ probabilityTable: adjustedTable, odds: normalizedOdds });
   const picks = selectEvPicks(evTable, selectionOptions);
 
   return {
-    strategyId: 'context_poisson_ev',
-    strategyName: '赛前泊松EV',
+    strategyId,
+    strategyName,
     model: adjustedModel,
     probabilityTable: adjustedTable,
     evTable,
     picks,
-    reason: [
-      `独立赛前 context 估计 λ=${formatMetric(adjustedModel.lambdaHome)}-${formatMetric(adjustedModel.lambdaAway)}。`,
-      '赔率只用于 EV 结算比较，不作为主概率先验。',
-    ].join(''),
+    reason: reasonParts({ adjustedModel, selectionOptions }).join(''),
   };
 }
 
@@ -141,6 +211,37 @@ function getContextExpectedGoals(context) {
     lambdaHome: clamp(lambdaHome, 0.15, 5.5),
     lambdaAway: clamp(lambdaAway, 0.15, 5.5),
     rho: clamp(Number(model.rho ?? publicContext.rho ?? -0.03), -0.25, 0.25),
+  };
+}
+
+function mergeContext(baseContext, context) {
+  return {
+    ...baseContext,
+    ...context,
+    model: mergeModel(baseContext?.model, context?.model),
+    publicContext: {
+      ...(baseContext?.publicContext || {}),
+      ...(context?.publicContext || {}),
+      expectedGoals: {
+        ...(baseContext?.publicContext?.expectedGoals || {}),
+        ...(context?.publicContext?.expectedGoals || {}),
+      },
+      modelAdjustments: {
+        ...(baseContext?.publicContext?.modelAdjustments || {}),
+        ...(context?.publicContext?.modelAdjustments || {}),
+      },
+    },
+  };
+}
+
+function mergeModel(baseModel, model) {
+  return {
+    ...(baseModel || {}),
+    ...(model || {}),
+    expectedGoals: {
+      ...(baseModel?.expectedGoals || {}),
+      ...(model?.expectedGoals || {}),
+    },
   };
 }
 
