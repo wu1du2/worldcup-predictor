@@ -15,16 +15,20 @@ test('isAiPlayer recognizes the special AI player', () => {
 });
 
 test('getAiRecommendationForMatch reads recommendation by match id', () => {
-  const recommendation = getAiRecommendationForMatch('espn-760437');
+  const recommendation = getAiRecommendationForMatch('espn-760462');
 
-  assert.equal(recommendation?.matchId, 'espn-760437');
-  assert.equal(recommendation.roiLabel, '+1.25%');
-  assert.deepEqual(recommendation.scores, ['0-0', '0-1', '1-0', '1-1']);
-  assert.match(recommendation.reason, /英格兰是明确热门/);
+  assert.equal(recommendation?.matchId, 'espn-760462');
+  assert.equal(recommendation.strategyName, '热门小胜');
+  assert.equal(recommendation.roiLabel, '-58%');
+  assert.deepEqual(recommendation.scores, ['1-0', '2-1', '2-0']);
+  assert.deepEqual(recommendation.scoreLabels, ['1-0(8)', '2-1(6)', '2-0(6.25)']);
+  assert.match(recommendation.strategyFeature, /强弱分明/);
+  assert.match(recommendation.matchReasonSummary, /波黑占优/);
+  assert.match(recommendation.matchReasonDetail, /2-1 和 2-0/);
 });
 
 test('getAiRecommendedScores exposes score recommendations for option badges', () => {
-  assert.deepEqual(getAiRecommendedScores('espn-760437'), ['0-0', '0-1', '1-0', '1-1']);
+  assert.deepEqual(getAiRecommendedScores('espn-760462'), ['1-0', '2-1', '2-0']);
   assert.deepEqual(getAiRecommendedScores('missing-match'), []);
 });
 

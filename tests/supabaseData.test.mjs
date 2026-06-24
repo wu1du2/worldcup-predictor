@@ -7,12 +7,16 @@ import {
   generateGroupCode,
   getGroupByCode,
   getGroupCodeFromSearch,
+  loadAiRecommendations,
+  loadAiStrategyStats,
   loadImportReports,
   loadScoreOdds,
   loadMatches,
+  mapAiRecommendationsByMatch,
   mapScoreOddsByMatch,
   mapPredictionsByPlayer,
   mergePlayers,
+  submitAiUserStrategy,
 } from '../src/supabaseData.mjs';
 
 test('getGroupCodeFromSearch reads group query param and falls back to default', () => {
@@ -600,6 +604,187 @@ test('loadScoreOdds paginates beyond Supabase default row limits', async () => {
   });
   assert.equal(ranges.filter(([from, to]) => from === 0 && to === 999).length, 2);
   assert.equal(ranges.filter(([from, to]) => from === 1000 && to === 1999).length, 1);
+});
+
+test('mapAiRecommendationsByMatch converts database recommendation rows to app shape', () => {
+  const rows = [
+    {
+      match_id: 'espn-1',
+      scores: ['1-0', '2-1'],
+      score_labels: ['1-0(8)', '2-1(6)'],
+      strategy_id: 'favorite_narrow_win_3',
+      strategy_name: '热门小胜',
+      strategy_roi: -58.33,
+      strategy_roi_label: '-58.33%',
+      strategy_feature: '覆盖热门方一球或两球小胜。',
+      router_reason: '市场更像小胜。',
+      match_reason_summary: '波黑占优。',
+      match_reason_detail: '2-1 和 2-0 是核心区间。',
+      prediction_summary: '推荐小胜。',
+      prediction_run_id: 'run-1',
+      predicted_at: '2026-06-24T10:00:00.000Z',
+    },
+  ];
+
+  assert.deepEqual(mapAiRecommendationsByMatch(rows), {
+    'espn-1': {
+      matchId: 'espn-1',
+      scores: ['1-0', '2-1'],
+      scoreLabels: ['1-0(8)', '2-1(6)'],
+      strategyId: 'favorite_narrow_win_3',
+      strategyName: '热门小胜',
+      strategyRoi: -58.33,
+      roiLabel: '-58.33%',
+      strategyFeature: '覆盖热门方一球或两球小胜。',
+      routerReason: '市场更像小胜。',
+      matchReasonSummary: '波黑占优。',
+      matchReasonDetail: '2-1 和 2-0 是核心区间。',
+      predictionSummary: '推荐小胜。',
+      predictionRunId: 'run-1',
+      predictedAt: '2026-06-24T10:00:00.000Z',
+    },
+  });
+});
+
+test('loadAiRecommendations reads recommendation details ordered by prediction time', async () => {
+  const calls = [];
+  const rows = [
+    {
+      match_id: 'espn-1',
+      scores: ['1-0'],
+      score_labels: ['1-0(8)'],
+      strategy_id: 's1',
+      strategy_name: '热门小胜',
+      strategy_roi: 12.5,
+      strategy_roi_label: '+12.5%',
+      strategy_feature: '特征',
+      router_reason: 'router reason',
+      match_reason_summary: 'summary',
+      match_reason_detail: 'detail',
+      prediction_summary: 'prediction',
+      prediction_run_id: 'run',
+      predicted_at: '2026-06-24T10:00:00.000Z',
+    },
+  ];
+  const client = {
+    from(table) {
+      calls.push(['from', table]);
+      assert.equal(table, 'ai_recommendations');
+      return {
+        select(columns) {
+          calls.push(['select', columns]);
+          return {
+            order(column, options) {
+              calls.push(['order', column, options]);
+              return Promise.resolve({ data: rows, error: null });
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const recommendations = await loadAiRecommendations({ client });
+
+  assert.equal(recommendations['espn-1'].strategyName, '热门小胜');
+  assert.deepEqual(calls, [
+    ['from', 'ai_recommendations'],
+    ['select', 'match_id,scores,score_labels,strategy_id,strategy_name,strategy_roi,strategy_roi_label,strategy_feature,router_reason,match_reason_summary,match_reason_detail,prediction_summary,prediction_run_id,predicted_at'],
+    ['order', 'predicted_at', { ascending: false }],
+  ]);
+});
+
+test('submitAiUserStrategy trims and inserts a pending strategy prompt', async () => {
+  const calls = [];
+  const client = {
+    from(table) {
+      calls.push(['from', table]);
+      assert.equal(table, 'ai_user_strategies');
+      return {
+        insert(row) {
+          calls.push(['insert', row]);
+          return {
+            select(columns) {
+              calls.push(['select', columns]);
+              return {
+                single() {
+                  calls.push(['single']);
+                  return Promise.resolve({
+                    data: { id: 'strategy-1', ...row },
+                    error: null,
+                  });
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const row = await submitAiUserStrategy({
+    client,
+    groupCode: 'lzscqjd',
+    authorName: ' yao ',
+    strategyName: ' 冷门保护 ',
+    strategyPrompt: ' 先看低比分，再买弱队偷分 ',
+  });
+
+  assert.equal(row.id, 'strategy-1');
+  assert.deepEqual(calls, [
+    ['from', 'ai_user_strategies'],
+    ['insert', {
+      group_code: 'lzscqjd',
+      author_name: 'yao',
+      strategy_name: '冷门保护',
+      strategy_prompt: '先看低比分，再买弱队偷分',
+      status: 'pending',
+    }],
+    ['select', 'id,group_code,author_name,strategy_name,strategy_prompt,status,created_at'],
+    ['single'],
+  ]);
+});
+
+test('loadAiStrategyStats reads one leaderboard page with hasNext', async () => {
+  const calls = [];
+  const rows = [
+    { strategy_id: 's1', strategy_name: '平局锚点', matches_count: 10, cost: 30, revenue: 45, profit: 15, roi: 50, updated_at: '2026-06-24T10:00:00.000Z' },
+    { strategy_id: 's2', strategy_name: '低比分篮子', matches_count: 10, cost: 40, revenue: 30, profit: -10, roi: -25, updated_at: '2026-06-24T10:00:00.000Z' },
+    { strategy_id: 's3', strategy_name: '热门小胜', matches_count: 10, cost: 30, revenue: 20, profit: -10, roi: -33.33, updated_at: '2026-06-24T10:00:00.000Z' },
+  ];
+  const client = {
+    from(table) {
+      calls.push(['from', table]);
+      assert.equal(table, 'ai_strategy_stats');
+      return {
+        select(columns) {
+          calls.push(['select', columns]);
+          return {
+            order(column, options) {
+              calls.push(['order', column, options]);
+              return {
+                range(from, to) {
+                  calls.push(['range', from, to]);
+                  return Promise.resolve({ data: rows, error: null });
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const page = await loadAiStrategyStats({ client, page: 0, pageSize: 2 });
+
+  assert.equal(page.hasNext, true);
+  assert.deepEqual(page.rows.map((row) => row.strategyName), ['平局锚点', '低比分篮子']);
+  assert.deepEqual(calls, [
+    ['from', 'ai_strategy_stats'],
+    ['select', 'strategy_id,strategy_name,matches_count,cost,revenue,profit,roi,updated_at'],
+    ['order', 'roi', { ascending: false }],
+    ['range', 0, 2],
+  ]);
 });
 
 test('loadImportReports reads recent backend reports ordered by creation time', async () => {

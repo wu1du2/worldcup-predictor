@@ -2,12 +2,16 @@ import { createClient } from '@supabase/supabase-js';
 import { readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
-import { buildAiPredictionEntries } from '../src/aiPredictionSync.mjs';
+import {
+  buildAiPredictionEntries,
+  buildAiRecommendationRows,
+} from '../src/aiPredictionSync.mjs';
 import {
   aiPlayerName,
   ensureAiPlayer,
   getGroupByCode,
   saveGroupPredictions,
+  upsertAiRecommendations,
 } from '../src/supabaseData.mjs';
 
 await loadLocalEnv();
@@ -28,6 +32,12 @@ const absolutePredictionFile = resolve(predictionFile);
 const predictionLog = JSON.parse(await readFile(absolutePredictionFile, 'utf8'));
 const contextsByFile = await loadContextsForPredictionLog(predictionLog, dirname(absolutePredictionFile));
 const entries = buildAiPredictionEntries({ predictionLog, contextsByFile });
+const recommendationRows = buildAiRecommendationRows({
+  predictionLog,
+  contextsByFile,
+  predictionRunId: predictionLog.generatedAt || new Date().toISOString(),
+  sourceFile: predictionFile,
+});
 const group = await getGroupByCode({ client, groupCode });
 const aiPlayer = await ensureAiPlayer({ client, groupId: group.id });
 
@@ -37,8 +47,10 @@ await saveGroupPredictions({
   playerId: aiPlayer.id,
   entries,
 });
+await upsertAiRecommendations({ client, rows: recommendationRows });
 
 console.log(`Synced ${entries.length} AI prediction(s).`);
+console.log(`Synced ${recommendationRows.length} AI recommendation detail row(s).`);
 console.log(`Group: ${groupCode} (${group.id})`);
 console.log(`Player: ${aiPlayerName} (${aiPlayer.id})`);
 for (const entry of entries) {

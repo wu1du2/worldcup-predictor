@@ -18,14 +18,21 @@ import {
   createSupabaseBrowserClient,
   generateGroupCode,
   getGroupCodeFromSearch,
+  loadAiRecommendations,
+  loadAiStrategyStats,
   loadImportReports,
   loadGroupState,
   loadMatches,
   loadScoreOdds,
   saveGroupPredictions,
+  submitAiUserStrategy,
 } from './supabaseData.mjs';
 import { formatReportStatusText } from './importReports.mjs';
-import { isAiPlayer } from './aiRecommendation.mjs';
+import {
+  getAiReasonPreview,
+  getAiRecommendationForMatch,
+  isAiPlayer,
+} from './aiRecommendation.mjs';
 import {
   buildDateTabs,
   formatChinaDateLabel,
@@ -62,6 +69,11 @@ function App() {
   const [reportDialog, setReportDialog] = useState({ open: false, status: 'idle', reports: [], error: '' });
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [createdHintOpen, setCreatedHintOpen] = useState(false);
+  const [aiRecommendationDialog, setAiRecommendationDialog] = useState(null);
+  const [aiRecommendationsByMatch, setAiRecommendationsByMatch] = useState({});
+  const [aiStrategyOpen, setAiStrategyOpen] = useState(false);
+  const [aiStrategyForm, setAiStrategyForm] = useState({ authorName: '', strategyName: '', strategyPrompt: '', status: 'idle', error: '' });
+  const [strategyRankDialog, setStrategyRankDialog] = useState({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' });
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -78,15 +90,17 @@ function App() {
 
     try {
       const loadedMatches = await loadMatches({ client });
-      const [loaded, loadedScoreOdds] = await Promise.all([
+      const [loaded, loadedScoreOdds, loadedAiRecommendations] = await Promise.all([
         loadGroupState({ client, groupCode }),
         loadScoreOdds({ client, matches: loadedMatches }),
+        loadAiRecommendations({ client }),
       ]);
       const availableDates = new Set(loadedMatches.map((match) => match.date));
       setGroup(loaded.group);
       setPlayers(loaded.players);
       setMatches(loadedMatches);
       setScoreOddsByMatch(loadedScoreOdds);
+      setAiRecommendationsByMatch(loadedAiRecommendations);
       updateState((current) => ({
         ...current,
         selectedPlayerId: current.groupCode === groupCode ? current.selectedPlayerId : '',
@@ -135,17 +149,18 @@ function App() {
   const inviteMatches = inviteDate ? matches.filter((match) => match.date === inviteDate) : [];
   const inviteDateLabel = inviteDate ? formatChinaDateLabel(inviteDate) : '';
 
-  if (!groupCode) {
-    return <HomePage />;
-  }
-
   useEffect(() => {
+    if (!groupCode) return;
     selectedDateButtonRef.current?.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest',
       inline: 'start',
     });
-  }, [selectedDate, dateTabs.length]);
+  }, [groupCode, selectedDate, dateTabs.length]);
+
+  if (!groupCode) {
+    return <HomePage />;
+  }
 
   function selectedScores(matchId, currentState = state) {
     const playerId = currentState.selectedPlayerId;
@@ -272,6 +287,64 @@ function App() {
     }
   }
 
+  async function showAiStrategyLeaderboard(page = 0) {
+    setMoreMenuOpen(false);
+    if (!client) {
+      setStrategyRankDialog({ open: true, status: 'error', rows: [], page, hasNext: false, error: 'Supabase 配置缺失' });
+      return;
+    }
+
+    setStrategyRankDialog((current) => ({ ...current, open: true, status: 'loading', page, error: '' }));
+
+    try {
+      const result = await loadAiStrategyStats({ client, page, pageSize: 6 });
+      setStrategyRankDialog({
+        open: true,
+        status: 'ready',
+        rows: result.rows,
+        page: result.page,
+        hasNext: result.hasNext,
+        error: '',
+      });
+    } catch (error) {
+      setStrategyRankDialog({
+        open: true,
+        status: 'error',
+        rows: [],
+        page,
+        hasNext: false,
+        error: error.message || 'AI预测排行榜加载失败',
+      });
+    }
+  }
+
+  async function submitAiStrategy() {
+    if (!client) {
+      setAiStrategyForm((current) => ({ ...current, status: 'error', error: 'Supabase 配置缺失' }));
+      return;
+    }
+
+    setAiStrategyForm((current) => ({ ...current, status: 'saving', error: '' }));
+
+    try {
+      await submitAiUserStrategy({
+        client,
+        groupCode,
+        authorName: aiStrategyForm.authorName || selectedPlayer?.name || '',
+        strategyName: aiStrategyForm.strategyName,
+        strategyPrompt: aiStrategyForm.strategyPrompt,
+      });
+      setAiStrategyForm({ authorName: '', strategyName: '', strategyPrompt: '', status: 'saved', error: '' });
+      updateState((current) => ({ ...current, flash: 'AI策略已提交，我会后续回测它。' }));
+    } catch (error) {
+      setAiStrategyForm((current) => ({
+        ...current,
+        status: 'error',
+        error: error.message || 'AI策略提交失败',
+      }));
+    }
+  }
+
   async function confirmAddPlayer() {
     if (!group || !client) return;
 
@@ -309,7 +382,10 @@ function App() {
         </div>
         <div className="topbar-actions">
           <button className="ghost-button" data-action="export" onClick={showExport}>
-            导出文本
+            预测结果
+          </button>
+          <button className="ghost-button ai-strategy-button" data-action="open-ai-strategy" onClick={() => setAiStrategyOpen(true)}>
+            AI策略
           </button>
           <button className="icon-button topbar-menu-button" data-action="more-menu" aria-label="更多" onClick={() => setMoreMenuOpen(true)}>
             ...
@@ -368,17 +444,24 @@ function App() {
       ) : null}
 
       <section className="match-board" aria-label="比赛预测">
-        {visibleMatches.map((match) => (
-          <MatchCard
-            key={match.id}
-            match={match}
-            picks={selectedScores(match.id)}
-            selectedPlayerId={state.selectedPlayerId}
-            recommendedScores={aiPredictions[match.id] || []}
-            scoreOptions={scoreOddsByMatch[match.id] || fallbackScoreOptions}
-            onToggle={toggleMatchScore}
-          />
-        ))}
+        {visibleMatches.map((match) => {
+          const aiRecommendation = getAiRecommendationForMatch(match.id);
+          const dbAiRecommendation = aiRecommendationsByMatch[match.id];
+          const recommendation = dbAiRecommendation || aiRecommendation;
+          return (
+            <MatchCard
+              key={match.id}
+              match={match}
+              picks={selectedScores(match.id)}
+              selectedPlayerId={state.selectedPlayerId}
+              recommendedScores={recommendation?.scores || aiPredictions[match.id] || []}
+              aiRecommendation={recommendation}
+              scoreOptions={scoreOddsByMatch[match.id] || fallbackScoreOptions}
+              onToggle={toggleMatchScore}
+              onOpenAiRecommendation={setAiRecommendationDialog}
+            />
+          );
+        })}
         {loadStatus === 'ready' && visibleMatches.length === 0 ? (
           <section className="status-panel" aria-label="暂无比赛">
             当天暂无比赛
@@ -407,6 +490,16 @@ function App() {
           onClose={() => setMoreMenuOpen(false)}
           onShowAllTimeStats={showAllTimeStats}
           onShowBackendReports={showBackendReports}
+          onShowAiStrategyLeaderboard={() => showAiStrategyLeaderboard(0)}
+        />
+      ) : null}
+
+      {aiStrategyOpen ? (
+        <AiStrategyDialog
+          form={aiStrategyForm}
+          onChange={(patch) => setAiStrategyForm((current) => ({ ...current, ...patch, status: current.status === 'saved' ? 'idle' : current.status, error: '' }))}
+          onClose={() => setAiStrategyOpen(false)}
+          onSubmit={submitAiStrategy}
         />
       ) : null}
 
@@ -431,6 +524,21 @@ function App() {
         <BackendReportDialog
           dialog={reportDialog}
           onClose={() => setReportDialog({ open: false, status: 'idle', reports: [], error: '' })}
+        />
+      ) : null}
+
+      {strategyRankDialog.open ? (
+        <AiStrategyLeaderboardDialog
+          dialog={strategyRankDialog}
+          onClose={() => setStrategyRankDialog({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' })}
+          onPageChange={showAiStrategyLeaderboard}
+        />
+      ) : null}
+
+      {aiRecommendationDialog ? (
+        <AiRecommendationDialog
+          recommendation={aiRecommendationDialog}
+          onClose={() => setAiRecommendationDialog(null)}
         />
       ) : null}
     </main>
@@ -472,7 +580,7 @@ function InfoDialog({ title, message, onClose }) {
   );
 }
 
-function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports }) {
+function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onShowAiStrategyLeaderboard }) {
   return (
     <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="更多">
       <div className="dialog compact-dialog more-menu-dialog" data-more-menu-dialog>
@@ -489,6 +597,9 @@ function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports }) {
           <button className="menu-action-button" data-action="backend-report" onClick={onShowBackendReports}>
             后台报告
           </button>
+          <button className="menu-action-button" data-action="ai-strategy-leaderboard" onClick={onShowAiStrategyLeaderboard}>
+            AI预测排行榜
+          </button>
         </div>
       </div>
     </div>
@@ -500,9 +611,15 @@ function MatchCard({
   picks,
   selectedPlayerId,
   recommendedScores,
+  aiRecommendation,
   scoreOptions,
   onToggle,
+  onOpenAiRecommendation,
 }) {
+  const aiPreview = aiRecommendation
+    ? getAiReasonPreview(aiRecommendation.matchReasonSummary, { roiLabel: aiRecommendation.roiLabel, summaryLimit: 42 })
+    : null;
+
   return (
     <article className="match-card">
       <div className="match-header">
@@ -511,6 +628,18 @@ function MatchCard({
           <h2>
             {match.home} <span>vs</span> {match.away}
           </h2>
+          {aiRecommendation ? (
+            <button
+              className="ai-summary-button"
+              data-action="open-ai-recommendation"
+              onClick={() => onOpenAiRecommendation(aiRecommendation)}
+            >
+              <strong>AI推荐</strong>
+              <span>· 历史[{aiRecommendation.roiLabel}]</span>
+              <span>· 理由 {aiPreview.summary}</span>
+              <span aria-hidden="true">›</span>
+            </button>
+          ) : null}
         </div>
         <div className="match-side">
           <div className="score-pill">{getMatchScoreText(match)}</div>
@@ -544,6 +673,56 @@ function MatchCard({
   );
 }
 
+function AiRecommendationDialog({ recommendation, onClose }) {
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="AI推荐详情">
+      <div className="dialog ai-detail-dialog" data-ai-recommendation-dialog>
+        <div className="ai-detail-header">
+          <button className="icon-button ai-back-button" data-action="close-ai-recommendation" aria-label="返回" onClick={onClose}>
+            ‹
+          </button>
+          <div>
+            <p>AI推荐</p>
+            <h2>{recommendation.strategyName}</h2>
+          </div>
+          <span className="ai-roi-badge">历史收益率 {recommendation.roiLabel}</span>
+        </div>
+
+        <div className="ai-score-strip" aria-label="推荐结果">
+          {(recommendation.scoreLabels || recommendation.scores).map((score) => (
+            <span key={score}>{score}</span>
+          ))}
+        </div>
+
+        <section className="ai-detail-section">
+          <h3>本场摘要</h3>
+          <p>{recommendation.matchReasonSummary}</p>
+        </section>
+
+        <section className="ai-detail-section">
+          <h3>策略特点</h3>
+          <p>{recommendation.strategyFeature}</p>
+        </section>
+
+        <section className="ai-detail-section">
+          <h3>Router 选择理由</h3>
+          <p>{recommendation.routerReason}</p>
+        </section>
+
+        <section className="ai-detail-section">
+          <h3>本次预测</h3>
+          <p>{recommendation.predictionSummary}</p>
+        </section>
+
+        <section className="ai-detail-section">
+          <h3>完整说明</h3>
+          <p>{recommendation.matchReasonDetail}</p>
+        </section>
+      </div>
+    </div>
+  );
+}
+
 function AddPlayerDialog({ name, onNameChange, onClose, onConfirm }) {
   return (
     <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="新增名字">
@@ -565,6 +744,114 @@ function AddPlayerDialog({ name, onNameChange, onClose, onConfirm }) {
         <button className="primary-button full-button" data-action="confirm-add-player" onClick={onConfirm}>
           确定新增
         </button>
+      </div>
+    </div>
+  );
+}
+
+function AiStrategyDialog({ form, onChange, onClose, onSubmit }) {
+  const saving = form.status === 'saving';
+  const saved = form.status === 'saved';
+
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="AI策略">
+      <div className="dialog strategy-dialog">
+        <div className="dialog-header">
+          <div>
+            <h2>AI策略</h2>
+            <p>输入你的策略，我会后续实现、回测并反馈。</p>
+          </div>
+          <button className="icon-button" data-action="close-ai-strategy" aria-label="关闭" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <label>
+          <span>昵称</span>
+          <input
+            className="name-input"
+            value={form.authorName}
+            placeholder="可选"
+            onChange={(event) => onChange({ authorName: event.target.value })}
+          />
+        </label>
+
+        <label>
+          <span>策略名</span>
+          <input
+            className="name-input"
+            value={form.strategyName}
+            placeholder="例如：冷门保护"
+            onChange={(event) => onChange({ strategyName: event.target.value })}
+          />
+        </label>
+
+        <label>
+          <span>策略内容</span>
+          <textarea
+            className="strategy-input"
+            value={form.strategyPrompt}
+            placeholder="写下你希望 AI 怎样选比分，例如：强队热门时买 2-0、2-1，再加一个平局保护。"
+            onChange={(event) => onChange({ strategyPrompt: event.target.value })}
+          />
+        </label>
+
+        {form.error ? <p className="form-status error">{form.error}</p> : null}
+        {saved ? <p className="form-status success">已提交，等待回测。</p> : null}
+
+        <button className="primary-button full-button" data-action="submit-ai-strategy" disabled={saving} onClick={onSubmit}>
+          {saving ? '提交中...' : '提交策略'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="AI预测排行榜">
+      <div className="dialog strategy-rank-dialog" data-ai-strategy-leaderboard-dialog>
+        <div className="dialog-header">
+          <h2>AI预测排行榜</h2>
+          <button className="icon-button" data-action="close-ai-strategy-rank" aria-label="关闭" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        {dialog.status === 'loading' ? <div className="report-empty">正在读取...</div> : null}
+        {dialog.status === 'error' ? <div className="report-empty">{dialog.error}</div> : null}
+        {dialog.status === 'ready' && dialog.rows.length === 0 ? <div className="report-empty">暂无 AI 策略回测结果</div> : null}
+
+        {dialog.status === 'ready' && dialog.rows.length > 0 ? (
+          <div className="strategy-rank-list">
+            {dialog.rows.map((row, index) => (
+              <article className="strategy-rank-item" key={row.strategyId}>
+                <div className="strategy-rank-header">
+                  <strong>{dialog.page * 6 + index + 1}. {row.strategyName}</strong>
+                  <span>{formatPercent(row.roi)}</span>
+                </div>
+                <p>
+                  净收益 {formatSignedNumber(row.profit)}
+                  {' · '}
+                  成本 {formatNumber(row.cost)}
+                  {' · '}
+                  返还 {formatNumber(row.revenue)}
+                </p>
+                <small>{row.matchesCount} 场比赛</small>
+              </article>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="pager-actions">
+          <button className="ghost-button" disabled={dialog.page <= 0 || dialog.status === 'loading'} onClick={() => onPageChange(dialog.page - 1)}>
+            上一页
+          </button>
+          <span>第 {dialog.page + 1} 页</span>
+          <button className="ghost-button" disabled={!dialog.hasNext || dialog.status === 'loading'} onClick={() => onPageChange(dialog.page + 1)}>
+            下一页
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -659,6 +946,19 @@ function formatReportTime(value) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+}
+
+function formatPercent(value) {
+  return `${Number(value) > 0 ? '+' : ''}${formatNumber(value)}%`;
+}
+
+function formatSignedNumber(value) {
+  return `${Number(value) > 0 ? '+' : ''}${formatNumber(value)}`;
+}
+
+function formatNumber(value) {
+  const rounded = Math.round((Number(value || 0) + Number.EPSILON) * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/0+$/, '').replace(/\.$/, '');
 }
 
 createRoot(document.getElementById('root')).render(

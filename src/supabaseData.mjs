@@ -88,6 +88,117 @@ export async function loadImportReports({ client, limit = 8 }) {
   return (data || []).map(toAppImportReport);
 }
 
+export async function loadAiRecommendations({ client }) {
+  const { data, error } = await client
+    .from('ai_recommendations')
+    .select('match_id,scores,score_labels,strategy_id,strategy_name,strategy_roi,strategy_roi_label,strategy_feature,router_reason,match_reason_summary,match_reason_detail,prediction_summary,prediction_run_id,predicted_at')
+    .order('predicted_at', { ascending: false });
+
+  if (error) throw error;
+  return mapAiRecommendationsByMatch(data || []);
+}
+
+export function mapAiRecommendationsByMatch(rows) {
+  const recommendations = {};
+
+  for (const row of rows || []) {
+    if (!row?.match_id) continue;
+    recommendations[row.match_id] = {
+      matchId: row.match_id,
+      scores: normalizeScores(row.scores),
+      scoreLabels: normalizeScores(row.score_labels),
+      strategyId: row.strategy_id || '',
+      strategyName: row.strategy_name || '',
+      strategyRoi: Number.isFinite(Number(row.strategy_roi)) ? Number(row.strategy_roi) : null,
+      roiLabel: row.strategy_roi_label || '',
+      strategyFeature: row.strategy_feature || '',
+      routerReason: row.router_reason || '',
+      matchReasonSummary: row.match_reason_summary || '',
+      matchReasonDetail: row.match_reason_detail || '',
+      predictionSummary: row.prediction_summary || '',
+      predictionRunId: row.prediction_run_id || '',
+      predictedAt: row.predicted_at || '',
+    };
+  }
+
+  return recommendations;
+}
+
+export async function submitAiUserStrategy({
+  client,
+  groupCode,
+  authorName,
+  strategyName,
+  strategyPrompt,
+}) {
+  const trimmedStrategyName = String(strategyName || '').trim();
+  const trimmedPrompt = String(strategyPrompt || '').trim();
+  if (!trimmedStrategyName) throw new Error('策略名不能为空');
+  if (!trimmedPrompt) throw new Error('策略内容不能为空');
+
+  const row = {
+    group_code: String(groupCode || '').trim() || null,
+    author_name: String(authorName || '').trim() || '匿名',
+    strategy_name: trimmedStrategyName,
+    strategy_prompt: trimmedPrompt,
+    status: 'pending',
+  };
+
+  const { data, error } = await client
+    .from('ai_user_strategies')
+    .insert(row)
+    .select('id,group_code,author_name,strategy_name,strategy_prompt,status,created_at')
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function loadAiStrategyStats({ client, page = 0, pageSize = 6 }) {
+  const safePage = Math.max(0, Number(page) || 0);
+  const safePageSize = Math.max(1, Number(pageSize) || 6);
+  const from = safePage * safePageSize;
+  const to = from + safePageSize;
+
+  const { data, error } = await client
+    .from('ai_strategy_stats')
+    .select('strategy_id,strategy_name,matches_count,cost,revenue,profit,roi,updated_at')
+    .order('roi', { ascending: false })
+    .range(from, to);
+
+  if (error) throw error;
+  const rows = (data || []).slice(0, safePageSize).map(toAppAiStrategyStat);
+  return {
+    rows,
+    page: safePage,
+    pageSize: safePageSize,
+    hasNext: (data || []).length > safePageSize,
+  };
+}
+
+function toAppAiStrategyStat(row) {
+  return {
+    strategyId: row.strategy_id,
+    strategyName: row.strategy_name || '',
+    matchesCount: Number(row.matches_count) || 0,
+    cost: Number(row.cost) || 0,
+    revenue: Number(row.revenue) || 0,
+    profit: Number(row.profit) || 0,
+    roi: Number(row.roi) || 0,
+    updatedAt: row.updated_at || '',
+  };
+}
+
+export async function upsertAiRecommendations({ client, rows }) {
+  if (!rows?.length) return;
+
+  const { error } = await client
+    .from('ai_recommendations')
+    .upsert(rows, { onConflict: 'match_id' });
+
+  if (error) throw error;
+}
+
 function toAppImportReport(row) {
   return {
     id: row.id,
