@@ -1,0 +1,3918 @@
+{
+  "generatedAt": "2026-06-24T15:03:44.214Z",
+  "sourcePool": {
+    "tempTop10": [
+      "tem_draw_anchor_3_max5_5",
+      "tem_draw_anchor_1_max5_5",
+      "tem_basket_draw_low3",
+      "tem_hybrid_draw_poisson_v2_d3_n3",
+      "tem_hybrid_draw_poisson_v2_d1_n2",
+      "tem_draw_anchor_3_max6_5",
+      "tem_hybrid_draw_poisson_v3_d1_n2",
+      "tem_draw_anchor_4_max6_5",
+      "tem_draw_anchor_4_max5_5",
+      "tem_draw_anchor_5_max5_5"
+    ],
+    "productionRouterCandidates": [
+      "low_score_basket_4",
+      "draw_anchor_3",
+      "context_poisson_ev_v2",
+      "context_poisson_ev_v3"
+    ]
+  },
+  "selected": [
+    {
+      "strategyId": "tem_hybrid_draw_poisson_v2_d1_n2",
+      "strategyName": "平局泊松混合 2 格",
+      "description": "先保留 1-1，再用泊松 EV 补足到 2 个比分。",
+      "settledMatches": 42,
+      "cost": 84,
+      "revenue": 115.75,
+      "netProfit": 31.75,
+      "roiPercent": 37.8,
+      "hitMatches": 9,
+      "rows": [
+        {
+          "matchId": "espn-760416",
+          "date": "2026-06-13",
+          "time": "03:00",
+          "match": "加拿大 vs 波黑",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.3
+            },
+            {
+              "score": "0-2",
+              "odds": 28,
+              "probability": 0.0575,
+              "ev": 0.609
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 5.3,
+          "cost": 2,
+          "revenue": 5.3,
+          "netProfit": 3.3
+        },
+        {
+          "matchId": "espn-760417",
+          "date": "2026-06-13",
+          "time": "09:00",
+          "match": "美国 vs 巴拉圭",
+          "actualScore": "4-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.05
+            },
+            {
+              "score": "0-2",
+              "odds": 23,
+              "probability": 0.0575,
+              "ev": 0.3217
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760420",
+          "date": "2026-06-14",
+          "time": "03:00",
+          "match": "卡塔尔 vs 瑞士",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 11
+            },
+            {
+              "score": "1-0",
+              "odds": 27,
+              "probability": 0.1208,
+              "ev": 2.2621
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 11,
+          "cost": 2,
+          "revenue": 11,
+          "netProfit": 9
+        },
+        {
+          "matchId": "espn-760419",
+          "date": "2026-06-14",
+          "time": "06:00",
+          "match": "巴西 vs 摩洛哥",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.05
+            },
+            {
+              "score": "0-2",
+              "odds": 38,
+              "probability": 0.0575,
+              "ev": 1.1836
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.05,
+          "cost": 2,
+          "revenue": 6.05,
+          "netProfit": 4.05
+        },
+        {
+          "matchId": "espn-760418",
+          "date": "2026-06-14",
+          "time": "09:00",
+          "match": "海地 vs 苏格兰",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8
+            },
+            {
+              "score": "1-0",
+              "odds": 21,
+              "probability": 0.1208,
+              "ev": 1.5372
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760421",
+          "date": "2026-06-14",
+          "time": "12:00",
+          "match": "澳大利亚 vs 土耳其",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.2
+            },
+            {
+              "score": "2-0",
+              "odds": 28,
+              "probability": 0.0761,
+              "ev": 1.1314
+            }
+          ],
+          "hitScore": "2-0",
+          "hitOdds": 28,
+          "cost": 2,
+          "revenue": 28,
+          "netProfit": 26
+        },
+        {
+          "matchId": "espn-760422",
+          "date": "2026-06-15",
+          "time": "01:00",
+          "match": "德国 vs 库拉索",
+          "actualScore": "7-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 35
+            },
+            {
+              "score": "1-0",
+              "odds": 17,
+              "probability": 0.1208,
+              "ev": 1.0539
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760425",
+          "date": "2026-06-15",
+          "time": "04:00",
+          "match": "荷兰 vs 日本",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 4.5
+            },
+            {
+              "score": "0-0",
+              "odds": 13,
+              "probability": 0.1063,
+              "ev": 0.3813
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760423",
+          "date": "2026-06-15",
+          "time": "07:00",
+          "match": "科特迪瓦 vs 厄瓜多尔",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 3.9
+            },
+            {
+              "score": "3-1",
+              "odds": 40,
+              "probability": 0.0328,
+              "ev": 0.3125
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760424",
+          "date": "2026-06-15",
+          "time": "10:00",
+          "match": "瑞典 vs 突尼斯",
+          "actualScore": "5-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.3
+            },
+            {
+              "score": "0-2",
+              "odds": 27,
+              "probability": 0.0575,
+              "ev": 0.5515
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760428",
+          "date": "2026-06-16",
+          "time": "00:00",
+          "match": "西班牙 vs 佛得角",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 24,
+              "changePct": 37.142857142857146
+            },
+            {
+              "score": "0-0",
+              "odds": 34,
+              "probability": 0.1063,
+              "ev": 2.6126
+            }
+          ],
+          "hitScore": "0-0",
+          "hitOdds": 34,
+          "cost": 2,
+          "revenue": 34,
+          "netProfit": 32
+        },
+        {
+          "matchId": "espn-760426",
+          "date": "2026-06-16",
+          "time": "03:00",
+          "match": "比利时 vs 埃及",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.7,
+              "changePct": 1.5151515151515138
+            },
+            {
+              "score": "0-2",
+              "odds": 38,
+              "probability": 0.0575,
+              "ev": 1.1836
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.7,
+          "cost": 2,
+          "revenue": 6.7,
+          "netProfit": 4.7
+        },
+        {
+          "matchId": "espn-760429",
+          "date": "2026-06-16",
+          "time": "06:00",
+          "match": "沙特阿拉伯 vs 乌拉圭",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.9,
+              "changePct": -10.967741935483865
+            },
+            {
+              "score": "2-0",
+              "odds": 45,
+              "probability": 0.0761,
+              "ev": 2.4254
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.9,
+          "cost": 2,
+          "revenue": 6.9,
+          "netProfit": 4.9
+        },
+        {
+          "matchId": "espn-760427",
+          "date": "2026-06-16",
+          "time": "09:00",
+          "match": "伊朗 vs 新西兰",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.8,
+              "changePct": -3.3333333333333326
+            },
+            {
+              "score": "0-2",
+              "odds": 32,
+              "probability": 0.0575,
+              "ev": 0.8388
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760432",
+          "date": "2026-06-17",
+          "time": "03:00",
+          "match": "法国 vs 塞内加尔",
+          "actualScore": "3-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8,
+              "changePct": 17.647058823529417
+            },
+            {
+              "score": "0-2",
+              "odds": 50,
+              "probability": 0.0575,
+              "ev": 1.8732
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760430",
+          "date": "2026-06-17",
+          "time": "06:00",
+          "match": "伊拉克 vs 挪威",
+          "actualScore": "1-4",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 10.5,
+              "changePct": 5.000000000000004
+            },
+            {
+              "score": "1-0",
+              "odds": 25,
+              "probability": 0.1208,
+              "ev": 2.0205
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760433",
+          "date": "2026-06-17",
+          "time": "09:00",
+          "match": "阿根廷 vs 阿尔及利亚",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.25,
+              "changePct": 6.451612903225801
+            },
+            {
+              "score": "0-2",
+              "odds": 50,
+              "probability": 0.0575,
+              "ev": 1.8732
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760431",
+          "date": "2026-06-17",
+          "time": "12:00",
+          "match": "奥地利 vs 约旦",
+          "actualScore": "3-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "changePct": 0
+            },
+            {
+              "score": "0-1",
+              "odds": 22,
+              "probability": 0.1045,
+              "ev": 1.298
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760435",
+          "date": "2026-06-18",
+          "time": "01:00",
+          "match": "葡萄牙 vs 刚果民主共和国",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 11.5,
+              "changePct": 14.999999999999991
+            },
+            {
+              "score": "0-1",
+              "odds": 32,
+              "probability": 0.1045,
+              "ev": 2.3425
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 11.5,
+          "cost": 2,
+          "revenue": 11.5,
+          "netProfit": 9.5
+        },
+        {
+          "matchId": "espn-760437",
+          "date": "2026-06-18",
+          "time": "04:00",
+          "match": "英格兰 vs 克罗地亚",
+          "actualScore": "4-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.8,
+              "changePct": -3.3333333333333326
+            },
+            {
+              "score": "0-1",
+              "odds": 13,
+              "probability": 0.1045,
+              "ev": 0.3579
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760434",
+          "date": "2026-06-18",
+          "time": "07:00",
+          "match": "加纳 vs 巴拿马",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 4.85,
+              "changePct": -11.818181818181827
+            },
+            {
+              "score": "0-3",
+              "odds": 50,
+              "probability": 0.0203,
+              "ev": 0.0152
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760436",
+          "date": "2026-06-18",
+          "time": "10:00",
+          "match": "乌兹别克斯坦 vs 哥伦比亚",
+          "actualScore": "1-3",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 9.5,
+              "changePct": 18.75
+            },
+            {
+              "score": "2-1",
+              "odds": 30,
+              "probability": 0.0807,
+              "ev": 1.4206
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760438",
+          "date": "2026-06-19",
+          "time": "00:00",
+          "match": "捷克 vs 南非",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.3,
+              "changePct": 19.999999999999996
+            },
+            {
+              "score": "0-2",
+              "odds": 28,
+              "probability": 0.0575,
+              "ev": 0.609
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.3,
+          "cost": 2,
+          "revenue": 6.3,
+          "netProfit": 4.3
+        },
+        {
+          "matchId": "espn-760439",
+          "date": "2026-06-19",
+          "time": "03:00",
+          "match": "瑞士 vs 波黑",
+          "actualScore": "4-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.4,
+              "changePct": -8.571428571428562
+            },
+            {
+              "score": "0-2",
+              "odds": 45,
+              "probability": 0.0575,
+              "ev": 1.5858
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760440",
+          "date": "2026-06-19",
+          "time": "06:00",
+          "match": "加拿大 vs 卡塔尔",
+          "actualScore": "6-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "changePct": 9.677419354838701
+            },
+            {
+              "score": "0-1",
+              "odds": 27,
+              "probability": 0.1045,
+              "ev": 1.8202
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760441",
+          "date": "2026-06-19",
+          "time": "09:00",
+          "match": "墨西哥 vs 韩国",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.1,
+              "changePct": 0
+            },
+            {
+              "score": "0-2",
+              "odds": 27,
+              "probability": 0.0575,
+              "ev": 0.5515
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760442",
+          "date": "2026-06-20",
+          "time": "03:00",
+          "match": "美国 vs 澳大利亚",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 7.2,
+              "changePct": 10.769230769230775
+            },
+            {
+              "score": "0-2",
+              "odds": 38,
+              "probability": 0.0575,
+              "ev": 1.1836
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760445",
+          "date": "2026-06-20",
+          "time": "06:00",
+          "match": "苏格兰 vs 摩洛哥",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.85,
+              "changePct": 1.7391304347825987
+            },
+            {
+              "score": "2-0",
+              "odds": 32,
+              "probability": 0.0761,
+              "ev": 1.4358
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760444",
+          "date": "2026-06-20",
+          "time": "08:30",
+          "match": "巴西 vs 海地",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 23,
+              "changePct": 53.33333333333334
+            },
+            {
+              "score": "0-0",
+              "odds": 38,
+              "probability": 0.1063,
+              "ev": 3.0376
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760443",
+          "date": "2026-06-20",
+          "time": "11:00",
+          "match": "土耳其 vs 巴拉圭",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.85,
+              "changePct": 6.363636363636349
+            },
+            {
+              "score": "0-2",
+              "odds": 21,
+              "probability": 0.0575,
+              "ev": 0.2067
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760447",
+          "date": "2026-06-21",
+          "time": "01:00",
+          "match": "荷兰 vs 瑞典",
+          "actualScore": "5-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.5,
+              "changePct": 10.169491525423723
+            },
+            {
+              "score": "0-2",
+              "odds": 32,
+              "probability": 0.0575,
+              "ev": 0.8388
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760448",
+          "date": "2026-06-21",
+          "time": "04:00",
+          "match": "德国 vs 科特迪瓦",
+          "actualScore": "2-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "changePct": 26.86567164179103
+            },
+            {
+              "score": "0-2",
+              "odds": 45,
+              "probability": 0.0575,
+              "ev": 1.5858
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760446",
+          "date": "2026-06-21",
+          "time": "08:00",
+          "match": "厄瓜多尔 vs 库拉索",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 16,
+              "changePct": 18.518518518518512
+            },
+            {
+              "score": "0-1",
+              "odds": 50,
+              "probability": 0.1045,
+              "ev": 4.2227
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760449",
+          "date": "2026-06-21",
+          "time": "12:00",
+          "match": "突尼斯 vs 日本",
+          "actualScore": "0-4",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8,
+              "changePct": 33.33333333333333
+            },
+            {
+              "score": "2-1",
+              "odds": 25,
+              "probability": 0.0807,
+              "ev": 1.0172
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760453",
+          "date": "2026-06-22",
+          "time": "00:00",
+          "match": "西班牙 vs 沙特阿拉伯",
+          "actualScore": "4-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 22,
+              "changePct": 46.66666666666666
+            },
+            {
+              "score": "0-0",
+              "odds": 34,
+              "probability": 0.1063,
+              "ev": 2.6126
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760451",
+          "date": "2026-06-22",
+          "time": "03:00",
+          "match": "比利时 vs 伊朗",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.25,
+              "changePct": 10.000000000000009
+            },
+            {
+              "score": "0-2",
+              "odds": 50,
+              "probability": 0.0575,
+              "ev": 1.8732
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760450",
+          "date": "2026-06-22",
+          "time": "06:00",
+          "match": "乌拉圭 vs 佛得角",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 7.3,
+              "changePct": 2.8169014084507005
+            },
+            {
+              "score": "0-2",
+              "odds": 50,
+              "probability": 0.0575,
+              "ev": 1.8732
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760452",
+          "date": "2026-06-22",
+          "time": "09:00",
+          "match": "新西兰 vs 埃及",
+          "actualScore": "1-3",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.8,
+              "changePct": -2.857142857142858
+            },
+            {
+              "score": "2-0",
+              "odds": 35,
+              "probability": 0.0761,
+              "ev": 1.6642
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760456",
+          "date": "2026-06-23",
+          "time": "01:00",
+          "match": "阿根廷 vs 奥地利",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 7.8,
+              "changePct": 19.999999999999996
+            },
+            {
+              "score": "0-2",
+              "odds": 48,
+              "probability": 0.0575,
+              "ev": 1.7582
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760457",
+          "date": "2026-06-23",
+          "time": "05:00",
+          "match": "法国 vs 伊拉克",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 24,
+              "changePct": 33.33333333333333
+            },
+            {
+              "score": "0-0",
+              "odds": 34,
+              "probability": 0.1063,
+              "ev": 2.6126
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760454",
+          "date": "2026-06-23",
+          "time": "08:00",
+          "match": "挪威 vs 塞内加尔",
+          "actualScore": "3-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.5,
+              "changePct": 8.333333333333325
+            },
+            {
+              "score": "0-2",
+              "odds": 25,
+              "probability": 0.0575,
+              "ev": 0.4366
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760455",
+          "date": "2026-06-23",
+          "time": "11:00",
+          "match": "约旦 vs 阿尔及利亚",
+          "actualScore": "1-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 7.75,
+              "changePct": 10.71428571428572
+            },
+            {
+              "score": "2-0",
+              "odds": 40,
+              "probability": 0.0761,
+              "ev": 2.0448
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        }
+      ],
+      "family": "hybrid",
+      "style": "selected",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v2",
+        "maxPicks": 2
+      },
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "avgPicks": 2,
+      "minPicks": 2,
+      "maxPicks": 2,
+      "selectionSignature": "1-1,0-2|1-1,0-2|1-1,1-0|1-1,0-2|1-1,1-0|1-1,2-0|1-1,1-0|1-1,0-0|1-1,3-1|1-1,0-2|1-1,0-0|1-1,0-2|1-1,2-0|1-1,0-2|1-1,0-2|1-1,1-0|1-1,0-2|1-1,0-1|1-1,0-1|1-1,0-1|1-1,0-3|1-1,2-1|1-1,0-2|1-1,0-2|1-1,0-1|1-1,0-2|1-1,0-2|1-1,2-0|1-1,0-0|1-1,0-2|1-1,0-2|1-1,0-2|1-1,0-1|1-1,2-1|1-1,0-0|1-1,0-2|1-1,0-2|1-1,2-0|1-1,0-2|1-1,0-0|1-1,0-2|1-1,2-0",
+      "hitRatePercent": 21.43,
+      "qualified": true,
+      "failedGateReasons": [],
+      "source": "tem_strategy_top10",
+      "finalProfile": "精选型",
+      "finalReason": "下注少、成本低，适合作为高置信推荐入口。"
+    },
+    {
+      "strategyId": "tem_draw_anchor_3_max5_5",
+      "strategyName": "平局锚点 4 格",
+      "description": "以 1-1 为核心，平局最低赔率不高于 5.5 时优先覆盖 1-1、2-2、0-0、1-0。",
+      "settledMatches": 42,
+      "cost": 132,
+      "revenue": 202.3,
+      "netProfit": 70.3,
+      "roiPercent": 53.26,
+      "hitMatches": 16,
+      "rows": [
+        {
+          "matchId": "espn-760416",
+          "date": "2026-06-13",
+          "time": "03:00",
+          "match": "加拿大 vs 波黑",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.3
+            },
+            {
+              "score": "2-2",
+              "odds": 17.5
+            },
+            {
+              "score": "0-0",
+              "odds": 9.5
+            },
+            {
+              "score": "1-0",
+              "odds": 5.1
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 5.3,
+          "cost": 4,
+          "revenue": 5.3,
+          "netProfit": 1.3
+        },
+        {
+          "matchId": "espn-760417",
+          "date": "2026-06-13",
+          "time": "09:00",
+          "match": "美国 vs 巴拉圭",
+          "actualScore": "4-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.05
+            },
+            {
+              "score": "0-0",
+              "odds": 7.5
+            },
+            {
+              "score": "2-2",
+              "odds": 20
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760420",
+          "date": "2026-06-14",
+          "time": "03:00",
+          "match": "卡塔尔 vs 瑞士",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 11
+            },
+            {
+              "score": "0-0",
+              "odds": 16
+            },
+            {
+              "score": "2-2",
+              "odds": 28
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 11,
+          "cost": 3,
+          "revenue": 11,
+          "netProfit": 8
+        },
+        {
+          "matchId": "espn-760419",
+          "date": "2026-06-14",
+          "time": "06:00",
+          "match": "巴西 vs 摩洛哥",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.05
+            },
+            {
+              "score": "0-0",
+              "odds": 10
+            },
+            {
+              "score": "2-2",
+              "odds": 12
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.05,
+          "cost": 3,
+          "revenue": 6.05,
+          "netProfit": 3.05
+        },
+        {
+          "matchId": "espn-760418",
+          "date": "2026-06-14",
+          "time": "09:00",
+          "match": "海地 vs 苏格兰",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8
+            },
+            {
+              "score": "0-0",
+              "odds": 17
+            },
+            {
+              "score": "2-2",
+              "odds": 22
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760421",
+          "date": "2026-06-14",
+          "time": "12:00",
+          "match": "澳大利亚 vs 土耳其",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.2
+            },
+            {
+              "score": "0-0",
+              "odds": 9.5
+            },
+            {
+              "score": "2-2",
+              "odds": 16
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760422",
+          "date": "2026-06-15",
+          "time": "01:00",
+          "match": "德国 vs 库拉索",
+          "actualScore": "7-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 35
+            },
+            {
+              "score": "0-0",
+              "odds": 60
+            },
+            {
+              "score": "2-2",
+              "odds": 80
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760425",
+          "date": "2026-06-15",
+          "time": "04:00",
+          "match": "荷兰 vs 日本",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 4.5
+            },
+            {
+              "score": "2-2",
+              "odds": 11
+            },
+            {
+              "score": "0-0",
+              "odds": 13
+            },
+            {
+              "score": "1-0",
+              "odds": 8
+            }
+          ],
+          "hitScore": "2-2",
+          "hitOdds": 11,
+          "cost": 4,
+          "revenue": 11,
+          "netProfit": 7
+        },
+        {
+          "matchId": "espn-760423",
+          "date": "2026-06-15",
+          "time": "07:00",
+          "match": "科特迪瓦 vs 厄瓜多尔",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 3.9
+            },
+            {
+              "score": "2-2",
+              "odds": 16.5
+            },
+            {
+              "score": "0-0",
+              "odds": 6
+            },
+            {
+              "score": "1-0",
+              "odds": 7.25
+            }
+          ],
+          "hitScore": "1-0",
+          "hitOdds": 7.25,
+          "cost": 4,
+          "revenue": 7.25,
+          "netProfit": 3.25
+        },
+        {
+          "matchId": "espn-760424",
+          "date": "2026-06-15",
+          "time": "10:00",
+          "match": "瑞典 vs 突尼斯",
+          "actualScore": "5-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.3
+            },
+            {
+              "score": "2-2",
+              "odds": 18
+            },
+            {
+              "score": "0-0",
+              "odds": 9.5
+            },
+            {
+              "score": "1-0",
+              "odds": 5.3
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760428",
+          "date": "2026-06-16",
+          "time": "00:00",
+          "match": "西班牙 vs 佛得角",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 24,
+              "changePct": 37.142857142857146
+            },
+            {
+              "score": "0-0",
+              "odds": 34,
+              "changePct": 13.33333333333333
+            },
+            {
+              "score": "2-2",
+              "odds": 70,
+              "changePct": 55.55555555555556
+            }
+          ],
+          "hitScore": "0-0",
+          "hitOdds": 34,
+          "cost": 3,
+          "revenue": 34,
+          "netProfit": 31
+        },
+        {
+          "matchId": "espn-760426",
+          "date": "2026-06-16",
+          "time": "03:00",
+          "match": "比利时 vs 埃及",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.7,
+              "changePct": 1.5151515151515138
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "changePct": 19.999999999999996
+            },
+            {
+              "score": "2-2",
+              "odds": 18.5,
+              "changePct": 2.777777777777768
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.7,
+          "cost": 3,
+          "revenue": 6.7,
+          "netProfit": 3.7
+        },
+        {
+          "matchId": "espn-760429",
+          "date": "2026-06-16",
+          "time": "06:00",
+          "match": "沙特阿拉伯 vs 乌拉圭",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.9,
+              "changePct": -10.967741935483865
+            },
+            {
+              "score": "0-0",
+              "odds": 10.5,
+              "changePct": -4.545454545454541
+            },
+            {
+              "score": "2-2",
+              "odds": 22,
+              "changePct": -8.333333333333337
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.9,
+          "cost": 3,
+          "revenue": 6.9,
+          "netProfit": 3.9
+        },
+        {
+          "matchId": "espn-760427",
+          "date": "2026-06-16",
+          "time": "09:00",
+          "match": "伊朗 vs 新西兰",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.8,
+              "changePct": -3.3333333333333326
+            },
+            {
+              "score": "0-0",
+              "odds": 8.5,
+              "changePct": 0
+            },
+            {
+              "score": "2-2",
+              "odds": 19,
+              "changePct": 0
+            }
+          ],
+          "hitScore": "2-2",
+          "hitOdds": 19,
+          "cost": 3,
+          "revenue": 19,
+          "netProfit": 16
+        },
+        {
+          "matchId": "espn-760432",
+          "date": "2026-06-17",
+          "time": "03:00",
+          "match": "法国 vs 塞内加尔",
+          "actualScore": "3-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8,
+              "changePct": 17.647058823529417
+            },
+            {
+              "score": "0-0",
+              "odds": 15,
+              "changePct": 42.85714285714286
+            },
+            {
+              "score": "2-2",
+              "odds": 17,
+              "changePct": -15.000000000000002
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760430",
+          "date": "2026-06-17",
+          "time": "06:00",
+          "match": "伊拉克 vs 挪威",
+          "actualScore": "1-4",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 10.5,
+              "changePct": 5.000000000000004
+            },
+            {
+              "score": "0-0",
+              "odds": 21,
+              "changePct": 16.666666666666675
+            },
+            {
+              "score": "2-2",
+              "odds": 26,
+              "changePct": 0
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760433",
+          "date": "2026-06-17",
+          "time": "09:00",
+          "match": "阿根廷 vs 阿尔及利亚",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.25,
+              "changePct": 6.451612903225801
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "changePct": 9.090909090909083
+            },
+            {
+              "score": "2-2",
+              "odds": 20,
+              "changePct": -16.666666666666664
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760431",
+          "date": "2026-06-17",
+          "time": "12:00",
+          "match": "奥地利 vs 约旦",
+          "actualScore": "3-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "changePct": 0
+            },
+            {
+              "score": "0-0",
+              "odds": 14,
+              "changePct": 0
+            },
+            {
+              "score": "2-2",
+              "odds": 22,
+              "changePct": 0
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760435",
+          "date": "2026-06-18",
+          "time": "01:00",
+          "match": "葡萄牙 vs 刚果民主共和国",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 11.5,
+              "changePct": 14.999999999999991
+            },
+            {
+              "score": "0-0",
+              "odds": 16,
+              "changePct": 6.666666666666665
+            },
+            {
+              "score": "2-2",
+              "odds": 33,
+              "changePct": 13.793103448275868
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 11.5,
+          "cost": 3,
+          "revenue": 11.5,
+          "netProfit": 8.5
+        },
+        {
+          "matchId": "espn-760437",
+          "date": "2026-06-18",
+          "time": "04:00",
+          "match": "英格兰 vs 克罗地亚",
+          "actualScore": "4-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.8,
+              "changePct": -3.3333333333333326
+            },
+            {
+              "score": "0-0",
+              "odds": 10,
+              "changePct": 5.263157894736836
+            },
+            {
+              "score": "2-2",
+              "odds": 12,
+              "changePct": -29.411764705882348
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760434",
+          "date": "2026-06-18",
+          "time": "07:00",
+          "match": "加纳 vs 巴拿马",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 4.85,
+              "changePct": -11.818181818181827
+            },
+            {
+              "score": "2-2",
+              "odds": 14,
+              "changePct": -12.5
+            },
+            {
+              "score": "0-0",
+              "odds": 8.25,
+              "changePct": 3.125
+            },
+            {
+              "score": "1-0",
+              "odds": 6.3,
+              "changePct": 14.54545454545455
+            }
+          ],
+          "hitScore": "1-0",
+          "hitOdds": 6.3,
+          "cost": 4,
+          "revenue": 6.3,
+          "netProfit": 2.3
+        },
+        {
+          "matchId": "espn-760436",
+          "date": "2026-06-18",
+          "time": "10:00",
+          "match": "乌兹别克斯坦 vs 哥伦比亚",
+          "actualScore": "1-3",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 9.5,
+              "changePct": 18.75
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "changePct": 9.090909090909083
+            },
+            {
+              "score": "2-2",
+              "odds": 25,
+              "changePct": 0
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760438",
+          "date": "2026-06-19",
+          "time": "00:00",
+          "match": "捷克 vs 南非",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.3,
+              "changePct": 19.999999999999996
+            },
+            {
+              "score": "0-0",
+              "odds": 9.8,
+              "changePct": 5.945945945945952
+            },
+            {
+              "score": "2-2",
+              "odds": 16,
+              "changePct": 14.28571428571428
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.3,
+          "cost": 3,
+          "revenue": 6.3,
+          "netProfit": 3.3
+        },
+        {
+          "matchId": "espn-760439",
+          "date": "2026-06-19",
+          "time": "03:00",
+          "match": "瑞士 vs 波黑",
+          "actualScore": "4-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.4,
+              "changePct": -8.571428571428562
+            },
+            {
+              "score": "0-0",
+              "odds": 11.5,
+              "changePct": 9.523809523809534
+            },
+            {
+              "score": "2-2",
+              "odds": 18,
+              "changePct": -9.999999999999998
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760440",
+          "date": "2026-06-19",
+          "time": "06:00",
+          "match": "加拿大 vs 卡塔尔",
+          "actualScore": "6-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "changePct": 9.677419354838701
+            },
+            {
+              "score": "0-0",
+              "odds": 16,
+              "changePct": 23.076923076923084
+            },
+            {
+              "score": "2-2",
+              "odds": 25,
+              "changePct": 19.047619047619047
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760441",
+          "date": "2026-06-19",
+          "time": "09:00",
+          "match": "墨西哥 vs 韩国",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.1,
+              "changePct": 0
+            },
+            {
+              "score": "2-2",
+              "odds": 9,
+              "changePct": -40
+            },
+            {
+              "score": "0-0",
+              "odds": 8.8,
+              "changePct": 10.000000000000009
+            },
+            {
+              "score": "1-0",
+              "odds": 7,
+              "changePct": 16.666666666666675
+            }
+          ],
+          "hitScore": "1-0",
+          "hitOdds": 7,
+          "cost": 4,
+          "revenue": 7,
+          "netProfit": 3
+        },
+        {
+          "matchId": "espn-760442",
+          "date": "2026-06-20",
+          "time": "03:00",
+          "match": "美国 vs 澳大利亚",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 7.2,
+              "changePct": 10.769230769230775
+            },
+            {
+              "score": "0-0",
+              "odds": 12.5,
+              "changePct": 19.047619047619047
+            },
+            {
+              "score": "2-2",
+              "odds": 14,
+              "changePct": -17.647058823529417
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760445",
+          "date": "2026-06-20",
+          "time": "06:00",
+          "match": "苏格兰 vs 摩洛哥",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.85,
+              "changePct": 1.7391304347825987
+            },
+            {
+              "score": "0-0",
+              "odds": 10,
+              "changePct": 11.111111111111116
+            },
+            {
+              "score": "2-2",
+              "odds": 17,
+              "changePct": 0
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760444",
+          "date": "2026-06-20",
+          "time": "08:30",
+          "match": "巴西 vs 海地",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 23,
+              "changePct": 53.33333333333334
+            },
+            {
+              "score": "0-0",
+              "odds": 38,
+              "changePct": 26.66666666666666
+            },
+            {
+              "score": "2-2",
+              "odds": 50,
+              "changePct": 66.66666666666667
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760443",
+          "date": "2026-06-20",
+          "time": "11:00",
+          "match": "土耳其 vs 巴拉圭",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 5.85,
+              "changePct": 6.363636363636349
+            },
+            {
+              "score": "0-0",
+              "odds": 10,
+              "changePct": 11.111111111111116
+            },
+            {
+              "score": "2-2",
+              "odds": 14,
+              "changePct": -6.666666666666665
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760447",
+          "date": "2026-06-21",
+          "time": "01:00",
+          "match": "荷兰 vs 瑞典",
+          "actualScore": "5-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.5,
+              "changePct": 10.169491525423723
+            },
+            {
+              "score": "0-0",
+              "odds": 16,
+              "changePct": 23.076923076923084
+            },
+            {
+              "score": "2-2",
+              "odds": 11.5,
+              "changePct": -14.814814814814813
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760448",
+          "date": "2026-06-21",
+          "time": "04:00",
+          "match": "德国 vs 科特迪瓦",
+          "actualScore": "2-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "changePct": 26.86567164179103
+            },
+            {
+              "score": "0-0",
+              "odds": 19,
+              "changePct": 26.66666666666666
+            },
+            {
+              "score": "2-2",
+              "odds": 14,
+              "changePct": 0
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760446",
+          "date": "2026-06-21",
+          "time": "08:00",
+          "match": "厄瓜多尔 vs 库拉索",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 16,
+              "changePct": 18.518518518518512
+            },
+            {
+              "score": "0-0",
+              "odds": 22,
+              "changePct": -8.333333333333337
+            },
+            {
+              "score": "2-2",
+              "odds": 50,
+              "changePct": 25
+            }
+          ],
+          "hitScore": "0-0",
+          "hitOdds": 22,
+          "cost": 3,
+          "revenue": 22,
+          "netProfit": 19
+        },
+        {
+          "matchId": "espn-760449",
+          "date": "2026-06-21",
+          "time": "12:00",
+          "match": "突尼斯 vs 日本",
+          "actualScore": "0-4",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8,
+              "changePct": 33.33333333333333
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "changePct": 9.090909090909083
+            },
+            {
+              "score": "2-2",
+              "odds": 21,
+              "changePct": 31.25
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760453",
+          "date": "2026-06-22",
+          "time": "00:00",
+          "match": "西班牙 vs 沙特阿拉伯",
+          "actualScore": "4-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 22,
+              "changePct": 46.66666666666666
+            },
+            {
+              "score": "0-0",
+              "odds": 34,
+              "changePct": 30.76923076923077
+            },
+            {
+              "score": "2-2",
+              "odds": 45,
+              "changePct": 0
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760451",
+          "date": "2026-06-22",
+          "time": "03:00",
+          "match": "比利时 vs 伊朗",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 8.25,
+              "changePct": 10.000000000000009
+            },
+            {
+              "score": "0-0",
+              "odds": 14,
+              "changePct": 7.692307692307687
+            },
+            {
+              "score": "2-2",
+              "odds": 19,
+              "changePct": 11.764705882352944
+            }
+          ],
+          "hitScore": "0-0",
+          "hitOdds": 14,
+          "cost": 3,
+          "revenue": 14,
+          "netProfit": 11
+        },
+        {
+          "matchId": "espn-760450",
+          "date": "2026-06-22",
+          "time": "06:00",
+          "match": "乌拉圭 vs 佛得角",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 7.3,
+              "changePct": 2.8169014084507005
+            },
+            {
+              "score": "0-0",
+              "odds": 9,
+              "changePct": 5.882352941176472
+            },
+            {
+              "score": "2-2",
+              "odds": 28,
+              "changePct": 3.703703703703698
+            }
+          ],
+          "hitScore": "2-2",
+          "hitOdds": 28,
+          "cost": 3,
+          "revenue": 28,
+          "netProfit": 25
+        },
+        {
+          "matchId": "espn-760452",
+          "date": "2026-06-22",
+          "time": "09:00",
+          "match": "新西兰 vs 埃及",
+          "actualScore": "1-3",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.8,
+              "changePct": -2.857142857142858
+            },
+            {
+              "score": "0-0",
+              "odds": 11,
+              "changePct": 10.000000000000009
+            },
+            {
+              "score": "2-2",
+              "odds": 17.5,
+              "changePct": 2.941176470588225
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760456",
+          "date": "2026-06-23",
+          "time": "01:00",
+          "match": "阿根廷 vs 奥地利",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 7.8,
+              "changePct": 19.999999999999996
+            },
+            {
+              "score": "0-0",
+              "odds": 13,
+              "changePct": 18.181818181818187
+            },
+            {
+              "score": "2-2",
+              "odds": 15,
+              "changePct": 3.4482758620689724
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760457",
+          "date": "2026-06-23",
+          "time": "05:00",
+          "match": "法国 vs 伊拉克",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 24,
+              "changePct": 33.33333333333333
+            },
+            {
+              "score": "0-0",
+              "odds": 34,
+              "changePct": 6.25
+            },
+            {
+              "score": "2-2",
+              "odds": 55,
+              "changePct": 37.5
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760454",
+          "date": "2026-06-23",
+          "time": "08:00",
+          "match": "挪威 vs 塞内加尔",
+          "actualScore": "3-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 6.5,
+              "changePct": 8.333333333333325
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "changePct": 9.090909090909083
+            },
+            {
+              "score": "2-2",
+              "odds": 9.5,
+              "changePct": -17.391304347826086
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760455",
+          "date": "2026-06-23",
+          "time": "11:00",
+          "match": "约旦 vs 阿尔及利亚",
+          "actualScore": "1-2",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 7.75,
+              "changePct": 10.71428571428572
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "changePct": 14.28571428571428
+            },
+            {
+              "score": "2-2",
+              "odds": 16,
+              "changePct": 0
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        }
+      ],
+      "family": "draw_anchor",
+      "style": "balanced",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "1-0"
+        ],
+        "drawMaxOdds": 5.5
+      },
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "avgPicks": 3.14,
+      "minPicks": 3,
+      "maxPicks": 4,
+      "selectionSignature": "1-1,2-2,0-0,1-0|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,2-2,0-0,1-0|1-1,2-2,0-0,1-0|1-1,2-2,0-0,1-0|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,2-2,0-0,1-0|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,2-2,0-0,1-0|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2|1-1,0-0,2-2",
+      "hitRatePercent": 38.1,
+      "qualified": true,
+      "failedGateReasons": [],
+      "source": "tem_strategy_top10",
+      "finalProfile": "均衡型",
+      "finalReason": "ROI、命中和可读性较均衡，适合作为默认推荐骨架。"
+    },
+    {
+      "strategyId": "context_poisson_ev_v3",
+      "strategyName": "赛前泊松EV均衡",
+      "description": "赛前泊松EV的均衡覆盖版本，加入平局和低比分修正，保留更多候选以提高信息量。",
+      "settledMatches": 42,
+      "cost": 159,
+      "revenue": 172.35,
+      "netProfit": 13.35,
+      "roiPercent": 8.4,
+      "hitMatches": 10,
+      "rows": [
+        {
+          "matchId": "espn-760416",
+          "date": "2026-06-13",
+          "time": "03:00",
+          "match": "加拿大 vs 波黑",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 28,
+              "probability": 0.0562,
+              "ev": 0.5737
+            },
+            {
+              "score": "1-3",
+              "odds": 55,
+              "probability": 0.0226,
+              "ev": 0.242
+            },
+            {
+              "score": "0-0",
+              "odds": 9.5,
+              "probability": 0.1275,
+              "ev": 0.2116
+            },
+            {
+              "score": "0-1",
+              "odds": 11,
+              "probability": 0.0924,
+              "ev": 0.0161
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760417",
+          "date": "2026-06-13",
+          "time": "09:00",
+          "match": "美国 vs 巴拉圭",
+          "actualScore": "4-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 23,
+              "probability": 0.0562,
+              "ev": 0.2927
+            },
+            {
+              "score": "1-3",
+              "odds": 52,
+              "probability": 0.0226,
+              "ev": 0.1743
+            },
+            {
+              "score": "1-1",
+              "odds": 6.05,
+              "probability": 0.1673,
+              "ev": 0.0124
+            },
+            {
+              "score": "1-2",
+              "odds": 16,
+              "probability": 0.0627,
+              "ev": 0.0037
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760420",
+          "date": "2026-06-14",
+          "time": "03:00",
+          "match": "卡塔尔 vs 瑞士",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "1-0",
+              "odds": 27,
+              "probability": 0.1088,
+              "ev": 1.9365
+            },
+            {
+              "score": "2-1",
+              "odds": 32,
+              "probability": 0.0726,
+              "ev": 1.3233
+            },
+            {
+              "score": "0-0",
+              "odds": 16,
+              "probability": 0.1275,
+              "ev": 1.0406
+            },
+            {
+              "score": "1-1",
+              "odds": 11,
+              "probability": 0.1673,
+              "ev": 0.8407
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 11,
+          "cost": 4,
+          "revenue": 11,
+          "netProfit": 7
+        },
+        {
+          "matchId": "espn-760419",
+          "date": "2026-06-14",
+          "time": "06:00",
+          "match": "巴西 vs 摩洛哥",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 38,
+              "probability": 0.0562,
+              "ev": 1.1358
+            },
+            {
+              "score": "0-0",
+              "odds": 10,
+              "probability": 0.1275,
+              "ev": 0.2754
+            },
+            {
+              "score": "0-1",
+              "odds": 13,
+              "probability": 0.0924,
+              "ev": 0.2009
+            },
+            {
+              "score": "1-1",
+              "odds": 6.05,
+              "probability": 0.1673,
+              "ev": 0.0124
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.05,
+          "cost": 4,
+          "revenue": 6.05,
+          "netProfit": 2.05
+        },
+        {
+          "matchId": "espn-760418",
+          "date": "2026-06-14",
+          "time": "09:00",
+          "match": "海地 vs 苏格兰",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "2-0",
+              "odds": 55,
+              "probability": 0.0753,
+              "ev": 3.1411
+            },
+            {
+              "score": "1-0",
+              "odds": 21,
+              "probability": 0.1088,
+              "ev": 1.2839
+            },
+            {
+              "score": "0-0",
+              "odds": 17,
+              "probability": 0.1275,
+              "ev": 1.1681
+            },
+            {
+              "score": "2-1",
+              "odds": 24,
+              "probability": 0.0726,
+              "ev": 0.7425
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760421",
+          "date": "2026-06-14",
+          "time": "12:00",
+          "match": "澳大利亚 vs 土耳其",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "2-0",
+              "odds": 28,
+              "probability": 0.0753,
+              "ev": 1.1082
+            },
+            {
+              "score": "3-1",
+              "odds": 52,
+              "probability": 0.0303,
+              "ev": 0.5731
+            },
+            {
+              "score": "1-0",
+              "odds": 11.5,
+              "probability": 0.1088,
+              "ev": 0.2507
+            },
+            {
+              "score": "0-0",
+              "odds": 9.5,
+              "probability": 0.1275,
+              "ev": 0.2116
+            }
+          ],
+          "hitScore": "2-0",
+          "hitOdds": 28,
+          "cost": 4,
+          "revenue": 28,
+          "netProfit": 24
+        },
+        {
+          "matchId": "espn-760422",
+          "date": "2026-06-15",
+          "time": "01:00",
+          "match": "德国 vs 库拉索",
+          "actualScore": "7-1",
+          "picks": [
+            {
+              "score": "1-1",
+              "odds": 35,
+              "probability": 0.1673,
+              "ev": 4.8569
+            },
+            {
+              "score": "1-0",
+              "odds": 17,
+              "probability": 0.1088,
+              "ev": 0.8489
+            },
+            {
+              "score": "2-1",
+              "odds": 18,
+              "probability": 0.0726,
+              "ev": 0.3069
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760425",
+          "date": "2026-06-15",
+          "time": "04:00",
+          "match": "荷兰 vs 日本",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 13,
+              "probability": 0.1275,
+              "ev": 0.658
+            },
+            {
+              "score": "0-2",
+              "odds": 22,
+              "probability": 0.0562,
+              "ev": 0.2365
+            },
+            {
+              "score": "0-1",
+              "odds": 11,
+              "probability": 0.0924,
+              "ev": 0.0161
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760423",
+          "date": "2026-06-15",
+          "time": "07:00",
+          "match": "科特迪瓦 vs 厄瓜多尔",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "3-0",
+              "odds": 55,
+              "probability": 0.028,
+              "ev": 0.5406
+            },
+            {
+              "score": "2-0",
+              "odds": 16.5,
+              "probability": 0.0753,
+              "ev": 0.2423
+            },
+            {
+              "score": "3-1",
+              "odds": 40,
+              "probability": 0.0303,
+              "ev": 0.21
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 3,
+          "revenue": 0,
+          "netProfit": -3
+        },
+        {
+          "matchId": "espn-760424",
+          "date": "2026-06-15",
+          "time": "10:00",
+          "match": "瑞典 vs 突尼斯",
+          "actualScore": "5-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 27,
+              "probability": 0.0562,
+              "ev": 0.5175
+            },
+            {
+              "score": "1-3",
+              "odds": 55,
+              "probability": 0.0226,
+              "ev": 0.242
+            },
+            {
+              "score": "0-0",
+              "odds": 9.5,
+              "probability": 0.1275,
+              "ev": 0.2116
+            },
+            {
+              "score": "0-1",
+              "odds": 13,
+              "probability": 0.0924,
+              "ev": 0.2009
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760428",
+          "date": "2026-06-16",
+          "time": "00:00",
+          "match": "西班牙 vs 佛得角",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 34,
+              "probability": 0.1275,
+              "ev": 3.3363
+            },
+            {
+              "score": "1-1",
+              "odds": 24,
+              "probability": 0.1673,
+              "ev": 3.0162
+            },
+            {
+              "score": "1-0",
+              "odds": 9.7,
+              "probability": 0.1088,
+              "ev": 0.0549
+            }
+          ],
+          "hitScore": "0-0",
+          "hitOdds": 34,
+          "cost": 3,
+          "revenue": 34,
+          "netProfit": 31
+        },
+        {
+          "matchId": "espn-760426",
+          "date": "2026-06-16",
+          "time": "03:00",
+          "match": "比利时 vs 埃及",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 38,
+              "probability": 0.0562,
+              "ev": 1.1358
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "probability": 0.1275,
+              "ev": 0.5305
+            },
+            {
+              "score": "0-1",
+              "odds": 16,
+              "probability": 0.0924,
+              "ev": 0.478
+            },
+            {
+              "score": "1-2",
+              "odds": 19,
+              "probability": 0.0627,
+              "ev": 0.1918
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760429",
+          "date": "2026-06-16",
+          "time": "06:00",
+          "match": "沙特阿拉伯 vs 乌拉圭",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "2-0",
+              "odds": 45,
+              "probability": 0.0753,
+              "ev": 2.3881
+            },
+            {
+              "score": "1-0",
+              "odds": 15,
+              "probability": 0.1088,
+              "ev": 0.6314
+            },
+            {
+              "score": "2-1",
+              "odds": 19,
+              "probability": 0.0726,
+              "ev": 0.3795
+            },
+            {
+              "score": "0-0",
+              "odds": 10.5,
+              "probability": 0.1275,
+              "ev": 0.3391
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760427",
+          "date": "2026-06-16",
+          "time": "09:00",
+          "match": "伊朗 vs 新西兰",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 32,
+              "probability": 0.0562,
+              "ev": 0.7986
+            },
+            {
+              "score": "0-1",
+              "odds": 12,
+              "probability": 0.0924,
+              "ev": 0.1085
+            },
+            {
+              "score": "0-0",
+              "odds": 8.5,
+              "probability": 0.1275,
+              "ev": 0.0841
+            },
+            {
+              "score": "1-2",
+              "odds": 17,
+              "probability": 0.0627,
+              "ev": 0.0664
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760432",
+          "date": "2026-06-17",
+          "time": "03:00",
+          "match": "法国 vs 塞内加尔",
+          "actualScore": "3-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 50,
+              "probability": 0.0562,
+              "ev": 1.8103
+            },
+            {
+              "score": "0-0",
+              "odds": 15,
+              "probability": 0.1275,
+              "ev": 0.9131
+            },
+            {
+              "score": "0-1",
+              "odds": 19,
+              "probability": 0.0924,
+              "ev": 0.7551
+            },
+            {
+              "score": "1-1",
+              "odds": 8,
+              "probability": 0.1673,
+              "ev": 0.3387
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760430",
+          "date": "2026-06-17",
+          "time": "06:00",
+          "match": "伊拉克 vs 挪威",
+          "actualScore": "1-4",
+          "picks": [
+            {
+              "score": "1-0",
+              "odds": 25,
+              "probability": 0.1088,
+              "ev": 1.7189
+            },
+            {
+              "score": "0-0",
+              "odds": 21,
+              "probability": 0.1275,
+              "ev": 1.6783
+            },
+            {
+              "score": "2-1",
+              "odds": 34,
+              "probability": 0.0726,
+              "ev": 1.4685
+            },
+            {
+              "score": "1-1",
+              "odds": 10.5,
+              "probability": 0.1673,
+              "ev": 0.7571
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760433",
+          "date": "2026-06-17",
+          "time": "09:00",
+          "match": "阿根廷 vs 阿尔及利亚",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 50,
+              "probability": 0.0562,
+              "ev": 1.8103
+            },
+            {
+              "score": "0-1",
+              "odds": 19,
+              "probability": 0.0924,
+              "ev": 0.7551
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "probability": 0.1275,
+              "ev": 0.5305
+            },
+            {
+              "score": "1-1",
+              "odds": 8.25,
+              "probability": 0.1673,
+              "ev": 0.3806
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760431",
+          "date": "2026-06-17",
+          "time": "12:00",
+          "match": "奥地利 vs 约旦",
+          "actualScore": "3-1",
+          "picks": [
+            {
+              "score": "0-1",
+              "odds": 22,
+              "probability": 0.0924,
+              "ev": 1.0322
+            },
+            {
+              "score": "0-0",
+              "odds": 14,
+              "probability": 0.1275,
+              "ev": 0.7855
+            },
+            {
+              "score": "1-2",
+              "odds": 25,
+              "probability": 0.0627,
+              "ev": 0.5682
+            },
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "probability": 0.1673,
+              "ev": 0.4224
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760435",
+          "date": "2026-06-18",
+          "time": "01:00",
+          "match": "葡萄牙 vs 刚果民主共和国",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "0-1",
+              "odds": 32,
+              "probability": 0.0924,
+              "ev": 1.956
+            },
+            {
+              "score": "1-2",
+              "odds": 41,
+              "probability": 0.0627,
+              "ev": 1.5719
+            },
+            {
+              "score": "0-0",
+              "odds": 16,
+              "probability": 0.1275,
+              "ev": 1.0406
+            },
+            {
+              "score": "1-1",
+              "odds": 11.5,
+              "probability": 0.1673,
+              "ev": 0.9244
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 11.5,
+          "cost": 4,
+          "revenue": 11.5,
+          "netProfit": 7.5
+        },
+        {
+          "matchId": "espn-760437",
+          "date": "2026-06-18",
+          "time": "04:00",
+          "match": "英格兰 vs 克罗地亚",
+          "actualScore": "4-2",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 10,
+              "probability": 0.1275,
+              "ev": 0.2754
+            },
+            {
+              "score": "0-1",
+              "odds": 13,
+              "probability": 0.0924,
+              "ev": 0.2009
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760434",
+          "date": "2026-06-18",
+          "time": "07:00",
+          "match": "加纳 vs 巴拿马",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 8.25,
+              "probability": 0.1275,
+              "ev": 0.0522
+            },
+            {
+              "score": "0-2",
+              "odds": 17,
+              "probability": 0.0562,
+              "ev": -0.0445
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 2,
+          "revenue": 0,
+          "netProfit": -2
+        },
+        {
+          "matchId": "espn-760436",
+          "date": "2026-06-18",
+          "time": "10:00",
+          "match": "乌兹别克斯坦 vs 哥伦比亚",
+          "actualScore": "1-3",
+          "picks": [
+            {
+              "score": "2-1",
+              "odds": 30,
+              "probability": 0.0726,
+              "ev": 1.1781
+            },
+            {
+              "score": "1-0",
+              "odds": 20,
+              "probability": 0.1088,
+              "ev": 1.1752
+            },
+            {
+              "score": "1-1",
+              "odds": 9.5,
+              "probability": 0.1673,
+              "ev": 0.5897
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "probability": 0.1275,
+              "ev": 0.5305
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760438",
+          "date": "2026-06-19",
+          "time": "00:00",
+          "match": "捷克 vs 南非",
+          "actualScore": "1-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 28,
+              "probability": 0.0562,
+              "ev": 0.5737
+            },
+            {
+              "score": "0-1",
+              "odds": 14,
+              "probability": 0.0924,
+              "ev": 0.2932
+            },
+            {
+              "score": "0-0",
+              "odds": 9.8,
+              "probability": 0.1275,
+              "ev": 0.2499
+            },
+            {
+              "score": "1-1",
+              "odds": 6.3,
+              "probability": 0.1673,
+              "ev": 0.0542
+            }
+          ],
+          "hitScore": "1-1",
+          "hitOdds": 6.3,
+          "cost": 4,
+          "revenue": 6.3,
+          "netProfit": 2.3
+        },
+        {
+          "matchId": "espn-760439",
+          "date": "2026-06-19",
+          "time": "03:00",
+          "match": "瑞士 vs 波黑",
+          "actualScore": "4-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 45,
+              "probability": 0.0562,
+              "ev": 1.5292
+            },
+            {
+              "score": "0-1",
+              "odds": 16,
+              "probability": 0.0924,
+              "ev": 0.478
+            },
+            {
+              "score": "0-0",
+              "odds": 11.5,
+              "probability": 0.1275,
+              "ev": 0.4667
+            },
+            {
+              "score": "1-2",
+              "odds": 20,
+              "probability": 0.0627,
+              "ev": 0.2546
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760440",
+          "date": "2026-06-19",
+          "time": "06:00",
+          "match": "加拿大 vs 卡塔尔",
+          "actualScore": "6-0",
+          "picks": [
+            {
+              "score": "0-1",
+              "odds": 27,
+              "probability": 0.0924,
+              "ev": 1.4941
+            },
+            {
+              "score": "0-0",
+              "odds": 16,
+              "probability": 0.1275,
+              "ev": 1.0406
+            },
+            {
+              "score": "1-2",
+              "odds": 27,
+              "probability": 0.0627,
+              "ev": 0.6937
+            },
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "probability": 0.1673,
+              "ev": 0.4224
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760441",
+          "date": "2026-06-19",
+          "time": "09:00",
+          "match": "墨西哥 vs 韩国",
+          "actualScore": "1-0",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 27,
+              "probability": 0.0562,
+              "ev": 0.5175
+            },
+            {
+              "score": "0-0",
+              "odds": 8.8,
+              "probability": 0.1275,
+              "ev": 0.1223
+            },
+            {
+              "score": "1-3",
+              "odds": 45,
+              "probability": 0.0226,
+              "ev": 0.0162
+            },
+            {
+              "score": "0-1",
+              "odds": 11,
+              "probability": 0.0924,
+              "ev": 0.0161
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760442",
+          "date": "2026-06-20",
+          "time": "03:00",
+          "match": "美国 vs 澳大利亚",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 38,
+              "probability": 0.0562,
+              "ev": 1.1358
+            },
+            {
+              "score": "0-1",
+              "odds": 18,
+              "probability": 0.0924,
+              "ev": 0.6627
+            },
+            {
+              "score": "0-0",
+              "odds": 12.5,
+              "probability": 0.1275,
+              "ev": 0.5942
+            },
+            {
+              "score": "1-2",
+              "odds": 23,
+              "probability": 0.0627,
+              "ev": 0.4428
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760445",
+          "date": "2026-06-20",
+          "time": "06:00",
+          "match": "苏格兰 vs 摩洛哥",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "2-0",
+              "odds": 32,
+              "probability": 0.0753,
+              "ev": 1.4093
+            },
+            {
+              "score": "1-0",
+              "odds": 14,
+              "probability": 0.1088,
+              "ev": 0.5226
+            },
+            {
+              "score": "2-1",
+              "odds": 19,
+              "probability": 0.0726,
+              "ev": 0.3795
+            },
+            {
+              "score": "0-0",
+              "odds": 10,
+              "probability": 0.1275,
+              "ev": 0.2754
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760444",
+          "date": "2026-06-20",
+          "time": "08:30",
+          "match": "巴西 vs 海地",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 38,
+              "probability": 0.1275,
+              "ev": 3.8464
+            },
+            {
+              "score": "1-1",
+              "odds": 23,
+              "probability": 0.1673,
+              "ev": 2.8488
+            },
+            {
+              "score": "2-2",
+              "odds": 50,
+              "probability": 0.0463,
+              "ev": 1.3131
+            },
+            {
+              "score": "1-0",
+              "odds": 11,
+              "probability": 0.1088,
+              "ev": 0.1963
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760443",
+          "date": "2026-06-20",
+          "time": "11:00",
+          "match": "土耳其 vs 巴拉圭",
+          "actualScore": "0-1",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 10,
+              "probability": 0.1275,
+              "ev": 0.2754
+            },
+            {
+              "score": "0-2",
+              "odds": 21,
+              "probability": 0.0562,
+              "ev": 0.1803
+            },
+            {
+              "score": "0-1",
+              "odds": 11.5,
+              "probability": 0.0924,
+              "ev": 0.0623
+            }
+          ],
+          "hitScore": "0-1",
+          "hitOdds": 11.5,
+          "cost": 3,
+          "revenue": 11.5,
+          "netProfit": 8.5
+        },
+        {
+          "matchId": "espn-760447",
+          "date": "2026-06-21",
+          "time": "01:00",
+          "match": "荷兰 vs 瑞典",
+          "actualScore": "5-1",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 16,
+              "probability": 0.1275,
+              "ev": 1.0406
+            },
+            {
+              "score": "0-2",
+              "odds": 32,
+              "probability": 0.0562,
+              "ev": 0.7986
+            },
+            {
+              "score": "0-1",
+              "odds": 17,
+              "probability": 0.0924,
+              "ev": 0.5704
+            },
+            {
+              "score": "1-1",
+              "odds": 6.5,
+              "probability": 0.1673,
+              "ev": 0.0877
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760448",
+          "date": "2026-06-21",
+          "time": "04:00",
+          "match": "德国 vs 科特迪瓦",
+          "actualScore": "2-1",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 45,
+              "probability": 0.0562,
+              "ev": 1.5292
+            },
+            {
+              "score": "0-0",
+              "odds": 19,
+              "probability": 0.1275,
+              "ev": 1.4232
+            },
+            {
+              "score": "0-1",
+              "odds": 23,
+              "probability": 0.0924,
+              "ev": 1.1246
+            },
+            {
+              "score": "1-1",
+              "odds": 8.5,
+              "probability": 0.1673,
+              "ev": 0.4224
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760446",
+          "date": "2026-06-21",
+          "time": "08:00",
+          "match": "厄瓜多尔 vs 库拉索",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "0-1",
+              "odds": 50,
+              "probability": 0.0924,
+              "ev": 3.6187
+            },
+            {
+              "score": "0-0",
+              "odds": 22,
+              "probability": 0.1275,
+              "ev": 1.8058
+            },
+            {
+              "score": "1-1",
+              "odds": 16,
+              "probability": 0.1673,
+              "ev": 1.6774
+            },
+            {
+              "score": "2-2",
+              "odds": 50,
+              "probability": 0.0463,
+              "ev": 1.3131
+            }
+          ],
+          "hitScore": "0-0",
+          "hitOdds": 22,
+          "cost": 4,
+          "revenue": 22,
+          "netProfit": 18
+        },
+        {
+          "matchId": "espn-760449",
+          "date": "2026-06-21",
+          "time": "12:00",
+          "match": "突尼斯 vs 日本",
+          "actualScore": "0-4",
+          "picks": [
+            {
+              "score": "2-0",
+              "odds": 55,
+              "probability": 0.0753,
+              "ev": 3.1411
+            },
+            {
+              "score": "2-1",
+              "odds": 25,
+              "probability": 0.0726,
+              "ev": 0.8151
+            },
+            {
+              "score": "1-0",
+              "odds": 15,
+              "probability": 0.1088,
+              "ev": 0.6314
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "probability": 0.1275,
+              "ev": 0.5305
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760453",
+          "date": "2026-06-22",
+          "time": "00:00",
+          "match": "西班牙 vs 沙特阿拉伯",
+          "actualScore": "4-0",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 34,
+              "probability": 0.1275,
+              "ev": 3.3363
+            },
+            {
+              "score": "1-1",
+              "odds": 22,
+              "probability": 0.1673,
+              "ev": 2.6815
+            },
+            {
+              "score": "1-2",
+              "odds": 50,
+              "probability": 0.0627,
+              "ev": 2.1364
+            },
+            {
+              "score": "2-2",
+              "odds": 45,
+              "probability": 0.0463,
+              "ev": 1.0818
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760451",
+          "date": "2026-06-22",
+          "time": "03:00",
+          "match": "比利时 vs 伊朗",
+          "actualScore": "0-0",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 50,
+              "probability": 0.0562,
+              "ev": 1.8103
+            },
+            {
+              "score": "0-1",
+              "odds": 21,
+              "probability": 0.0924,
+              "ev": 0.9399
+            },
+            {
+              "score": "0-0",
+              "odds": 14,
+              "probability": 0.1275,
+              "ev": 0.7855
+            },
+            {
+              "score": "1-2",
+              "odds": 23,
+              "probability": 0.0627,
+              "ev": 0.4428
+            }
+          ],
+          "hitScore": "0-0",
+          "hitOdds": 14,
+          "cost": 4,
+          "revenue": 14,
+          "netProfit": 10
+        },
+        {
+          "matchId": "espn-760450",
+          "date": "2026-06-22",
+          "time": "06:00",
+          "match": "乌拉圭 vs 佛得角",
+          "actualScore": "2-2",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 50,
+              "probability": 0.0562,
+              "ev": 1.8103
+            },
+            {
+              "score": "1-2",
+              "odds": 27,
+              "probability": 0.0627,
+              "ev": 0.6937
+            },
+            {
+              "score": "0-1",
+              "odds": 15,
+              "probability": 0.0924,
+              "ev": 0.3856
+            },
+            {
+              "score": "2-2",
+              "odds": 28,
+              "probability": 0.0463,
+              "ev": 0.2954
+            }
+          ],
+          "hitScore": "2-2",
+          "hitOdds": 28,
+          "cost": 4,
+          "revenue": 28,
+          "netProfit": 24
+        },
+        {
+          "matchId": "espn-760452",
+          "date": "2026-06-22",
+          "time": "09:00",
+          "match": "新西兰 vs 埃及",
+          "actualScore": "1-3",
+          "picks": [
+            {
+              "score": "2-0",
+              "odds": 35,
+              "probability": 0.0753,
+              "ev": 1.6352
+            },
+            {
+              "score": "1-0",
+              "odds": 14.5,
+              "probability": 0.1088,
+              "ev": 0.577
+            },
+            {
+              "score": "0-0",
+              "odds": 11,
+              "probability": 0.1275,
+              "ev": 0.4029
+            },
+            {
+              "score": "2-1",
+              "odds": 18,
+              "probability": 0.0726,
+              "ev": 0.3069
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760456",
+          "date": "2026-06-23",
+          "time": "01:00",
+          "match": "阿根廷 vs 奥地利",
+          "actualScore": "2-0",
+          "picks": [
+            {
+              "score": "0-2",
+              "odds": 48,
+              "probability": 0.0562,
+              "ev": 1.6978
+            },
+            {
+              "score": "0-1",
+              "odds": 20,
+              "probability": 0.0924,
+              "ev": 0.8475
+            },
+            {
+              "score": "0-0",
+              "odds": 13,
+              "probability": 0.1275,
+              "ev": 0.658
+            },
+            {
+              "score": "1-2",
+              "odds": 24,
+              "probability": 0.0627,
+              "ev": 0.5055
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760457",
+          "date": "2026-06-23",
+          "time": "05:00",
+          "match": "法国 vs 伊拉克",
+          "actualScore": "3-0",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 34,
+              "probability": 0.1275,
+              "ev": 3.3363
+            },
+            {
+              "score": "1-1",
+              "odds": 24,
+              "probability": 0.1673,
+              "ev": 3.0162
+            },
+            {
+              "score": "2-2",
+              "odds": 55,
+              "probability": 0.0463,
+              "ev": 1.5444
+            },
+            {
+              "score": "1-0",
+              "odds": 10.5,
+              "probability": 0.1088,
+              "ev": 0.142
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760454",
+          "date": "2026-06-23",
+          "time": "08:00",
+          "match": "挪威 vs 塞内加尔",
+          "actualScore": "3-2",
+          "picks": [
+            {
+              "score": "0-0",
+              "odds": 12,
+              "probability": 0.1275,
+              "ev": 0.5305
+            },
+            {
+              "score": "0-2",
+              "odds": 25,
+              "probability": 0.0562,
+              "ev": 0.4051
+            },
+            {
+              "score": "0-1",
+              "odds": 12.5,
+              "probability": 0.0924,
+              "ev": 0.1547
+            },
+            {
+              "score": "1-1",
+              "odds": 6.5,
+              "probability": 0.1673,
+              "ev": 0.0877
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        },
+        {
+          "matchId": "espn-760455",
+          "date": "2026-06-23",
+          "time": "11:00",
+          "match": "约旦 vs 阿尔及利亚",
+          "actualScore": "1-2",
+          "picks": [
+            {
+              "score": "2-0",
+              "odds": 40,
+              "probability": 0.0753,
+              "ev": 2.0117
+            },
+            {
+              "score": "1-0",
+              "odds": 17,
+              "probability": 0.1088,
+              "ev": 0.8489
+            },
+            {
+              "score": "2-1",
+              "odds": 22,
+              "probability": 0.0726,
+              "ev": 0.5973
+            },
+            {
+              "score": "0-0",
+              "odds": 12,
+              "probability": 0.1275,
+              "ev": 0.5305
+            }
+          ],
+          "hitScore": "",
+          "hitOdds": 0,
+          "cost": 4,
+          "revenue": 0,
+          "netProfit": -4
+        }
+      ],
+      "family": "poisson_ev",
+      "style": "balanced",
+      "parameters": {
+        "productionRouterCandidate": true
+      },
+      "explanation": "赛前泊松EV的均衡覆盖版本，加入平局和低比分修正，保留更多候选以提高信息量。",
+      "avgPicks": 3.79,
+      "minPicks": 2,
+      "maxPicks": 4,
+      "selectionSignature": "0-2,1-3,0-0,0-1|0-2,1-3,1-1,1-2|1-0,2-1,0-0,1-1|0-2,0-0,0-1,1-1|2-0,1-0,0-0,2-1|2-0,3-1,1-0,0-0|1-1,1-0,2-1|0-0,0-2,0-1|3-0,2-0,3-1|0-2,1-3,0-0,0-1|0-0,1-1,1-0|0-2,0-0,0-1,1-2|2-0,1-0,2-1,0-0|0-2,0-1,0-0,1-2|0-2,0-0,0-1,1-1|1-0,0-0,2-1,1-1|0-2,0-1,0-0,1-1|0-1,0-0,1-2,1-1|0-1,1-2,0-0,1-1|0-0,0-1|0-0,0-2|2-1,1-0,1-1,0-0|0-2,0-1,0-0,1-1|0-2,0-1,0-0,1-2|0-1,0-0,1-2,1-1|0-2,0-0,1-3,0-1|0-2,0-1,0-0,1-2|2-0,1-0,2-1,0-0|0-0,1-1,2-2,1-0|0-0,0-2,0-1|0-0,0-2,0-1,1-1|0-2,0-0,0-1,1-1|0-1,0-0,1-1,2-2|2-0,2-1,1-0,0-0|0-0,1-1,1-2,2-2|0-2,0-1,0-0,1-2|0-2,1-2,0-1,2-2|2-0,1-0,0-0,2-1|0-2,0-1,0-0,1-2|0-0,1-1,2-2,1-0|0-0,0-2,0-1,1-1|2-0,1-0,2-1,0-0",
+      "hitRatePercent": 23.81,
+      "qualified": true,
+      "failedGateReasons": [],
+      "source": "production_router_pool",
+      "finalProfile": "进攻型",
+      "finalReason": "覆盖更有想象力的赔率区间或分歧场景，接受更高波动。"
+    }
+  ]
+}

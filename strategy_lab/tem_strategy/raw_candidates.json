@@ -1,0 +1,2767 @@
+{
+  "generatedAt": "2026-06-24T15:03:44.214Z",
+  "count": 200,
+  "candidates": [
+    {
+      "id": "tem_basket_classic_low4",
+      "name": "经典低比分四格",
+      "family": "score_basket",
+      "style": "balanced",
+      "description": "固定覆盖 0-0、0-1、1-0、1-1。",
+      "explanation": "用固定比分篮子测试低比分、平局和小胜的基础形态。",
+      "parameters": {
+        "scores": [
+          "0-0",
+          "0-1",
+          "1-0",
+          "1-1"
+        ]
+      }
+    },
+    {
+      "id": "tem_basket_low3",
+      "name": "低比分三角",
+      "family": "score_basket",
+      "style": "selected",
+      "description": "固定覆盖 0-0、1-0、0-1。",
+      "explanation": "用固定比分篮子测试低比分、平局和小胜的基础形态。",
+      "parameters": {
+        "scores": [
+          "0-0",
+          "1-0",
+          "0-1"
+        ]
+      }
+    },
+    {
+      "id": "tem_basket_draw_low3",
+      "name": "低平局三格",
+      "family": "score_basket",
+      "style": "balanced",
+      "description": "固定覆盖 0-0、1-1、2-2。",
+      "explanation": "用固定比分篮子测试低比分、平局和小胜的基础形态。",
+      "parameters": {
+        "scores": [
+          "0-0",
+          "1-1",
+          "2-2"
+        ]
+      }
+    },
+    {
+      "id": "tem_basket_home_small4",
+      "name": "主队小胜保护",
+      "family": "score_basket",
+      "style": "balanced",
+      "description": "固定覆盖 1-0、2-0、2-1、1-1。",
+      "explanation": "用固定比分篮子测试低比分、平局和小胜的基础形态。",
+      "parameters": {
+        "scores": [
+          "1-0",
+          "2-0",
+          "2-1",
+          "1-1"
+        ]
+      }
+    },
+    {
+      "id": "tem_basket_away_small4",
+      "name": "客队小胜保护",
+      "family": "score_basket",
+      "style": "balanced",
+      "description": "固定覆盖 0-1、0-2、1-2、1-1。",
+      "explanation": "用固定比分篮子测试低比分、平局和小胜的基础形态。",
+      "parameters": {
+        "scores": [
+          "0-1",
+          "0-2",
+          "1-2",
+          "1-1"
+        ]
+      }
+    },
+    {
+      "id": "tem_basket_one_goal5",
+      "name": "一球胜负扩展",
+      "family": "score_basket",
+      "style": "attack",
+      "description": "固定覆盖 1-0、0-1、2-1、1-2、1-1。",
+      "explanation": "用固定比分篮子测试低比分、平局和小胜的基础形态。",
+      "parameters": {
+        "scores": [
+          "1-0",
+          "0-1",
+          "2-1",
+          "1-2",
+          "1-1"
+        ]
+      }
+    },
+    {
+      "id": "tem_basket_home_attack5",
+      "name": "主队进攻包",
+      "family": "score_basket",
+      "style": "attack",
+      "description": "固定覆盖 1-0、2-0、2-1、3-1、3-2。",
+      "explanation": "用固定比分篮子测试低比分、平局和小胜的基础形态。",
+      "parameters": {
+        "scores": [
+          "1-0",
+          "2-0",
+          "2-1",
+          "3-1",
+          "3-2"
+        ]
+      }
+    },
+    {
+      "id": "tem_basket_away_attack5",
+      "name": "客队进攻包",
+      "family": "score_basket",
+      "style": "attack",
+      "description": "固定覆盖 0-1、0-2、1-2、1-3、2-3。",
+      "explanation": "用固定比分篮子测试低比分、平局和小胜的基础形态。",
+      "parameters": {
+        "scores": [
+          "0-1",
+          "0-2",
+          "1-2",
+          "1-3",
+          "2-3"
+        ]
+      }
+    },
+    {
+      "id": "tem_consensus_n2_cap7",
+      "name": "市场共识 2 格",
+      "family": "market_consensus",
+      "style": "selected",
+      "description": "选择赔率最低且不高于 7 的 2 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 2,
+        "maxOdds": 7
+      }
+    },
+    {
+      "id": "tem_consensus_n2_cap8",
+      "name": "市场共识 2 格",
+      "family": "market_consensus",
+      "style": "selected",
+      "description": "选择赔率最低且不高于 8 的 2 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 2,
+        "maxOdds": 8
+      }
+    },
+    {
+      "id": "tem_consensus_n2_cap10",
+      "name": "市场共识 2 格",
+      "family": "market_consensus",
+      "style": "selected",
+      "description": "选择赔率最低且不高于 10 的 2 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 2,
+        "maxOdds": 10
+      }
+    },
+    {
+      "id": "tem_consensus_n2_cap12",
+      "name": "市场共识 2 格",
+      "family": "market_consensus",
+      "style": "selected",
+      "description": "选择赔率最低且不高于 12 的 2 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 2,
+        "maxOdds": 12
+      }
+    },
+    {
+      "id": "tem_consensus_n2_cap15",
+      "name": "市场共识 2 格",
+      "family": "market_consensus",
+      "style": "selected",
+      "description": "选择赔率最低且不高于 15 的 2 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 2,
+        "maxOdds": 15
+      }
+    },
+    {
+      "id": "tem_consensus_n2_cap18",
+      "name": "市场共识 2 格",
+      "family": "market_consensus",
+      "style": "selected",
+      "description": "选择赔率最低且不高于 18 的 2 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 2,
+        "maxOdds": 18
+      }
+    },
+    {
+      "id": "tem_consensus_n2_cap25",
+      "name": "市场共识 2 格",
+      "family": "market_consensus",
+      "style": "selected",
+      "description": "选择赔率最低且不高于 25 的 2 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 2,
+        "maxOdds": 25
+      }
+    },
+    {
+      "id": "tem_consensus_n3_cap7",
+      "name": "市场共识 3 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 7 的 3 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 3,
+        "maxOdds": 7
+      }
+    },
+    {
+      "id": "tem_consensus_n3_cap8",
+      "name": "市场共识 3 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 8 的 3 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 3,
+        "maxOdds": 8
+      }
+    },
+    {
+      "id": "tem_consensus_n3_cap10",
+      "name": "市场共识 3 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 10 的 3 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 3,
+        "maxOdds": 10
+      }
+    },
+    {
+      "id": "tem_consensus_n3_cap12",
+      "name": "市场共识 3 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 12 的 3 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 3,
+        "maxOdds": 12
+      }
+    },
+    {
+      "id": "tem_consensus_n3_cap15",
+      "name": "市场共识 3 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 15 的 3 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 3,
+        "maxOdds": 15
+      }
+    },
+    {
+      "id": "tem_consensus_n3_cap18",
+      "name": "市场共识 3 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 18 的 3 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 3,
+        "maxOdds": 18
+      }
+    },
+    {
+      "id": "tem_consensus_n3_cap25",
+      "name": "市场共识 3 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 25 的 3 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 3,
+        "maxOdds": 25
+      }
+    },
+    {
+      "id": "tem_consensus_n4_cap7",
+      "name": "市场共识 4 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 7 的 4 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 4,
+        "maxOdds": 7
+      }
+    },
+    {
+      "id": "tem_consensus_n4_cap8",
+      "name": "市场共识 4 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 8 的 4 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 4,
+        "maxOdds": 8
+      }
+    },
+    {
+      "id": "tem_consensus_n4_cap10",
+      "name": "市场共识 4 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 10 的 4 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 4,
+        "maxOdds": 10
+      }
+    },
+    {
+      "id": "tem_consensus_n4_cap12",
+      "name": "市场共识 4 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 12 的 4 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 4,
+        "maxOdds": 12
+      }
+    },
+    {
+      "id": "tem_consensus_n4_cap15",
+      "name": "市场共识 4 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 15 的 4 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 4,
+        "maxOdds": 15
+      }
+    },
+    {
+      "id": "tem_consensus_n4_cap18",
+      "name": "市场共识 4 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 18 的 4 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 4,
+        "maxOdds": 18
+      }
+    },
+    {
+      "id": "tem_consensus_n4_cap25",
+      "name": "市场共识 4 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 25 的 4 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 4,
+        "maxOdds": 25
+      }
+    },
+    {
+      "id": "tem_consensus_n5_cap7",
+      "name": "市场共识 5 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 7 的 5 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 5,
+        "maxOdds": 7
+      }
+    },
+    {
+      "id": "tem_consensus_n5_cap8",
+      "name": "市场共识 5 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 8 的 5 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 5,
+        "maxOdds": 8
+      }
+    },
+    {
+      "id": "tem_consensus_n5_cap10",
+      "name": "市场共识 5 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 10 的 5 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 5,
+        "maxOdds": 10
+      }
+    },
+    {
+      "id": "tem_consensus_n5_cap12",
+      "name": "市场共识 5 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 12 的 5 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 5,
+        "maxOdds": 12
+      }
+    },
+    {
+      "id": "tem_consensus_n5_cap15",
+      "name": "市场共识 5 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 15 的 5 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 5,
+        "maxOdds": 15
+      }
+    },
+    {
+      "id": "tem_consensus_n5_cap18",
+      "name": "市场共识 5 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 18 的 5 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 5,
+        "maxOdds": 18
+      }
+    },
+    {
+      "id": "tem_consensus_n5_cap25",
+      "name": "市场共识 5 格",
+      "family": "market_consensus",
+      "style": "balanced",
+      "description": "选择赔率最低且不高于 25 的 5 个比分。",
+      "explanation": "把最低赔率视作市场共识，限制过高赔率噪音。",
+      "parameters": {
+        "maxPicks": 5,
+        "maxOdds": 25
+      }
+    },
+    {
+      "id": "tem_draw_anchor_1_max5_5",
+      "name": "平局锚点 2 格",
+      "family": "draw_anchor",
+      "style": "selected",
+      "description": "以 1-1 为核心，平局最低赔率不高于 5.5 时优先覆盖 1-1、0-0。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0"
+        ],
+        "drawMaxOdds": 5.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_1_max6_5",
+      "name": "平局锚点 2 格",
+      "family": "draw_anchor",
+      "style": "selected",
+      "description": "以 1-1 为核心，平局最低赔率不高于 6.5 时优先覆盖 1-1、0-0。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0"
+        ],
+        "drawMaxOdds": 6.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_1_max7_5",
+      "name": "平局锚点 2 格",
+      "family": "draw_anchor",
+      "style": "selected",
+      "description": "以 1-1 为核心，平局最低赔率不高于 7.5 时优先覆盖 1-1、0-0。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0"
+        ],
+        "drawMaxOdds": 7.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_1_max9",
+      "name": "平局锚点 2 格",
+      "family": "draw_anchor",
+      "style": "selected",
+      "description": "以 1-1 为核心，平局最低赔率不高于 9 时优先覆盖 1-1、0-0。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0"
+        ],
+        "drawMaxOdds": 9
+      }
+    },
+    {
+      "id": "tem_draw_anchor_2_max5_5",
+      "name": "平局锚点 3 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 5.5 时优先覆盖 1-1、0-0、2-2。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "drawMaxOdds": 5.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_2_max6_5",
+      "name": "平局锚点 3 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 6.5 时优先覆盖 1-1、0-0、2-2。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "drawMaxOdds": 6.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_2_max7_5",
+      "name": "平局锚点 3 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 7.5 时优先覆盖 1-1、0-0、2-2。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "drawMaxOdds": 7.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_2_max9",
+      "name": "平局锚点 3 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 9 时优先覆盖 1-1、0-0、2-2。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "drawMaxOdds": 9
+      }
+    },
+    {
+      "id": "tem_draw_anchor_3_max5_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 5.5 时优先覆盖 1-1、2-2、0-0、1-0。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "1-0"
+        ],
+        "drawMaxOdds": 5.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_3_max6_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 6.5 时优先覆盖 1-1、2-2、0-0、1-0。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "1-0"
+        ],
+        "drawMaxOdds": 6.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_3_max7_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 7.5 时优先覆盖 1-1、2-2、0-0、1-0。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "1-0"
+        ],
+        "drawMaxOdds": 7.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_3_max9",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 9 时优先覆盖 1-1、2-2、0-0、1-0。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "1-0"
+        ],
+        "drawMaxOdds": 9
+      }
+    },
+    {
+      "id": "tem_draw_anchor_4_max5_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 5.5 时优先覆盖 1-1、2-2、0-0、0-1。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "0-1"
+        ],
+        "drawMaxOdds": 5.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_4_max6_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 6.5 时优先覆盖 1-1、2-2、0-0、0-1。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "0-1"
+        ],
+        "drawMaxOdds": 6.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_4_max7_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 7.5 时优先覆盖 1-1、2-2、0-0、0-1。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "0-1"
+        ],
+        "drawMaxOdds": 7.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_4_max9",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 9 时优先覆盖 1-1、2-2、0-0、0-1。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "2-2",
+          "0-0",
+          "0-1"
+        ],
+        "drawMaxOdds": 9
+      }
+    },
+    {
+      "id": "tem_draw_anchor_5_max5_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 5.5 时优先覆盖 1-1、0-0、2-2、3-3。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0",
+          "2-2",
+          "3-3"
+        ],
+        "drawMaxOdds": 5.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_5_max6_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 6.5 时优先覆盖 1-1、0-0、2-2、3-3。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0",
+          "2-2",
+          "3-3"
+        ],
+        "drawMaxOdds": 6.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_5_max7_5",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 7.5 时优先覆盖 1-1、0-0、2-2、3-3。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0",
+          "2-2",
+          "3-3"
+        ],
+        "drawMaxOdds": 7.5
+      }
+    },
+    {
+      "id": "tem_draw_anchor_5_max9",
+      "name": "平局锚点 4 格",
+      "family": "draw_anchor",
+      "style": "balanced",
+      "description": "以 1-1 为核心，平局最低赔率不高于 9 时优先覆盖 1-1、0-0、2-2、3-3。",
+      "explanation": "用平局赔率判断比赛是否接近，再围绕 1-1 和低平局展开。",
+      "parameters": {
+        "scores": [
+          "1-1",
+          "0-0",
+          "2-2",
+          "3-3"
+        ],
+        "drawMaxOdds": 9
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o1_cap10_drawfirst",
+      "name": "胜平负均衡 3 格",
+      "family": "outcome_balance",
+      "style": "selected",
+      "description": "每个赛果方向最多取 1 个低赔率比分，赔率上限 10。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 1,
+        "maxOdds": 10,
+        "includeDrawFirst": true
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o1_cap10_oddsfirst",
+      "name": "胜平负均衡 3 格",
+      "family": "outcome_balance",
+      "style": "selected",
+      "description": "每个赛果方向最多取 1 个低赔率比分，赔率上限 10。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 1,
+        "maxOdds": 10,
+        "includeDrawFirst": false
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o1_cap15_drawfirst",
+      "name": "胜平负均衡 3 格",
+      "family": "outcome_balance",
+      "style": "selected",
+      "description": "每个赛果方向最多取 1 个低赔率比分，赔率上限 15。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 1,
+        "maxOdds": 15,
+        "includeDrawFirst": true
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o1_cap15_oddsfirst",
+      "name": "胜平负均衡 3 格",
+      "family": "outcome_balance",
+      "style": "selected",
+      "description": "每个赛果方向最多取 1 个低赔率比分，赔率上限 15。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 1,
+        "maxOdds": 15,
+        "includeDrawFirst": false
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o1_cap25_drawfirst",
+      "name": "胜平负均衡 3 格",
+      "family": "outcome_balance",
+      "style": "selected",
+      "description": "每个赛果方向最多取 1 个低赔率比分，赔率上限 25。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 1,
+        "maxOdds": 25,
+        "includeDrawFirst": true
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o1_cap25_oddsfirst",
+      "name": "胜平负均衡 3 格",
+      "family": "outcome_balance",
+      "style": "selected",
+      "description": "每个赛果方向最多取 1 个低赔率比分，赔率上限 25。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 1,
+        "maxOdds": 25,
+        "includeDrawFirst": false
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o2_cap10_drawfirst",
+      "name": "胜平负均衡 6 格",
+      "family": "outcome_balance",
+      "style": "balanced",
+      "description": "每个赛果方向最多取 2 个低赔率比分，赔率上限 10。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 2,
+        "maxOdds": 10,
+        "includeDrawFirst": true
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o2_cap10_oddsfirst",
+      "name": "胜平负均衡 6 格",
+      "family": "outcome_balance",
+      "style": "balanced",
+      "description": "每个赛果方向最多取 2 个低赔率比分，赔率上限 10。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 2,
+        "maxOdds": 10,
+        "includeDrawFirst": false
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o2_cap15_drawfirst",
+      "name": "胜平负均衡 6 格",
+      "family": "outcome_balance",
+      "style": "balanced",
+      "description": "每个赛果方向最多取 2 个低赔率比分，赔率上限 15。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 2,
+        "maxOdds": 15,
+        "includeDrawFirst": true
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o2_cap15_oddsfirst",
+      "name": "胜平负均衡 6 格",
+      "family": "outcome_balance",
+      "style": "balanced",
+      "description": "每个赛果方向最多取 2 个低赔率比分，赔率上限 15。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 2,
+        "maxOdds": 15,
+        "includeDrawFirst": false
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o2_cap25_drawfirst",
+      "name": "胜平负均衡 6 格",
+      "family": "outcome_balance",
+      "style": "balanced",
+      "description": "每个赛果方向最多取 2 个低赔率比分，赔率上限 25。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 2,
+        "maxOdds": 25,
+        "includeDrawFirst": true
+      }
+    },
+    {
+      "id": "tem_outcome_balance_o2_cap25_oddsfirst",
+      "name": "胜平负均衡 6 格",
+      "family": "outcome_balance",
+      "style": "balanced",
+      "description": "每个赛果方向最多取 2 个低赔率比分，赔率上限 25。",
+      "explanation": "不押单一方向，分别从主胜、平局、客胜中提取市场认可的比分。",
+      "parameters": {
+        "perOutcome": 2,
+        "maxOdds": 25,
+        "includeDrawFirst": false
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d1_n2",
+      "name": "平局泊松混合 2 格",
+      "family": "hybrid",
+      "style": "selected",
+      "description": "先保留 1-1，再用泊松 EV 补足到 2 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v2",
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d1_n3",
+      "name": "平局泊松混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1，再用泊松 EV 补足到 3 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v2",
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d1_n4",
+      "name": "平局泊松混合 4 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1，再用泊松 EV 补足到 4 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v2",
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d1_n5",
+      "name": "平局泊松混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先保留 1-1，再用泊松 EV 补足到 5 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v2",
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d1_n2",
+      "name": "平局泊松混合 2 格",
+      "family": "hybrid",
+      "style": "selected",
+      "description": "先保留 1-1，再用泊松 EV 补足到 2 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v3",
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d1_n3",
+      "name": "平局泊松混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1，再用泊松 EV 补足到 3 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v3",
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d1_n4",
+      "name": "平局泊松混合 4 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1，再用泊松 EV 补足到 4 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v3",
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d1_n5",
+      "name": "平局泊松混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先保留 1-1，再用泊松 EV 补足到 5 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1"
+        ],
+        "poisson": "v3",
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d2_n2",
+      "name": "平局泊松混合 2 格",
+      "family": "hybrid",
+      "style": "selected",
+      "description": "先保留 1-1、0-0，再用泊松 EV 补足到 2 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0"
+        ],
+        "poisson": "v2",
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d2_n3",
+      "name": "平局泊松混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1、0-0，再用泊松 EV 补足到 3 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0"
+        ],
+        "poisson": "v2",
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d2_n4",
+      "name": "平局泊松混合 4 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1、0-0，再用泊松 EV 补足到 4 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0"
+        ],
+        "poisson": "v2",
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d2_n5",
+      "name": "平局泊松混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先保留 1-1、0-0，再用泊松 EV 补足到 5 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0"
+        ],
+        "poisson": "v2",
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d2_n2",
+      "name": "平局泊松混合 2 格",
+      "family": "hybrid",
+      "style": "selected",
+      "description": "先保留 1-1、0-0，再用泊松 EV 补足到 2 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0"
+        ],
+        "poisson": "v3",
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d2_n3",
+      "name": "平局泊松混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1、0-0，再用泊松 EV 补足到 3 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0"
+        ],
+        "poisson": "v3",
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d2_n4",
+      "name": "平局泊松混合 4 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1、0-0，再用泊松 EV 补足到 4 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0"
+        ],
+        "poisson": "v3",
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d2_n5",
+      "name": "平局泊松混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先保留 1-1、0-0，再用泊松 EV 补足到 5 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0"
+        ],
+        "poisson": "v3",
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d3_n2",
+      "name": "平局泊松混合 2 格",
+      "family": "hybrid",
+      "style": "selected",
+      "description": "先保留 1-1、0-0、2-2，再用泊松 EV 补足到 2 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "poisson": "v2",
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d3_n3",
+      "name": "平局泊松混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1、0-0、2-2，再用泊松 EV 补足到 3 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "poisson": "v2",
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d3_n4",
+      "name": "平局泊松混合 4 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1、0-0、2-2，再用泊松 EV 补足到 4 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "poisson": "v2",
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v2_d3_n5",
+      "name": "平局泊松混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先保留 1-1、0-0、2-2，再用泊松 EV 补足到 5 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "poisson": "v2",
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d3_n2",
+      "name": "平局泊松混合 2 格",
+      "family": "hybrid",
+      "style": "selected",
+      "description": "先保留 1-1、0-0、2-2，再用泊松 EV 补足到 2 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "poisson": "v3",
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d3_n3",
+      "name": "平局泊松混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1、0-0、2-2，再用泊松 EV 补足到 3 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "poisson": "v3",
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d3_n4",
+      "name": "平局泊松混合 4 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先保留 1-1、0-0、2-2，再用泊松 EV 补足到 4 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "poisson": "v3",
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_draw_poisson_v3_d3_n5",
+      "name": "平局泊松混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先保留 1-1、0-0、2-2，再用泊松 EV 补足到 5 个比分。",
+      "explanation": "把低平局作为结构锚点，再用泊松 EV 寻找非平局补充项。",
+      "parameters": {
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "poisson": "v3",
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c1_n3",
+      "name": "共识平局混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先取 1 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 1,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c2_n3",
+      "name": "共识平局混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先取 2 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 2,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c3_n3",
+      "name": "共识平局混合 3 格",
+      "family": "hybrid",
+      "style": "balanced",
+      "description": "先取 3 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 3,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c1_n4",
+      "name": "共识平局混合 4 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先取 1 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 1,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c2_n4",
+      "name": "共识平局混合 4 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先取 2 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 2,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c3_n4",
+      "name": "共识平局混合 4 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先取 3 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 3,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c1_n5",
+      "name": "共识平局混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先取 1 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 1,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c2_n5",
+      "name": "共识平局混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先取 2 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 2,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_hybrid_consensus_draw_c3_n5",
+      "name": "共识平局混合 5 格",
+      "family": "hybrid",
+      "style": "attack",
+      "description": "先取 3 个最低赔率比分，再用 1-1/0-0/2-2 补足。",
+      "explanation": "把市场最低赔和低平局保护组合在一起，测试共识与结构保护的折中。",
+      "parameters": {
+        "consensusCount": 3,
+        "drawScores": [
+          "1-1",
+          "0-0",
+          "2-2"
+        ],
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u8_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 8,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u8_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 8,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u8_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 8,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u8_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 8,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u10_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 10,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u10_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 10,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u10_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 10,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u10_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 10,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u12_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 12,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u12_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 12,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u12_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 12,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u12_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 12,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u15_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 15,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u15_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 15,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u15_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 15,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f4_u15_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 4 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "underdogMinOdds": 15,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u8_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 8,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u8_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 8,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u8_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 8,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u8_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 8,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u10_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 10,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u10_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 10,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u10_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 10,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u10_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 10,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u12_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 12,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u12_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 12,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u12_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 12,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u12_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 12,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u15_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 15,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u15_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 15,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u15_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 15,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f5_u15_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 5 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "underdogMinOdds": 15,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u8_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 8,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u8_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 8,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u8_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 8,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u8_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 8,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u10_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 10,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u10_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 10,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u10_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 10,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u10_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 10,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u12_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 12,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u12_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 12,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u12_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 12,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u12_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 12,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u15_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 15,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u15_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 15,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u15_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 15,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f6_u15_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 6 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "underdogMinOdds": 15,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u8_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 8,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u8_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 8,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u8_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 8,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u8_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 8 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 8,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u10_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 10,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u10_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 10,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u10_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 10,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u10_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 10 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 10,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u12_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 12,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u12_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 12,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u12_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 12,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u12_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 12 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 12,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u15_n2",
+      "name": "热门小胜 2 格",
+      "family": "favorite_cover",
+      "style": "selected",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 15,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u15_n3",
+      "name": "热门小胜 3 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 15,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u15_n4",
+      "name": "热门小胜 4 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 15,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_favorite_cover_f7_u15_n5",
+      "name": "热门小胜 5 格",
+      "family": "favorite_cover",
+      "style": "attack",
+      "description": "热门最低赔率 <= 7 且弱势方最低赔率 >= 15 时，覆盖热门方小胜。",
+      "explanation": "强弱分明时押热门一球/两球小胜，并按 pick 数控制成本。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "underdogMinOdds": 15,
+        "maxPicks": 5
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f4_n2",
+      "name": "弱队偷分 2 格",
+      "family": "underdog_protection",
+      "style": "selected",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 2 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f4_n3",
+      "name": "弱队偷分 3 格",
+      "family": "underdog_protection",
+      "style": "balanced",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 3 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f4_n4",
+      "name": "弱队偷分 4 格",
+      "family": "underdog_protection",
+      "style": "balanced",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 4 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 4,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f5_n2",
+      "name": "弱队偷分 2 格",
+      "family": "underdog_protection",
+      "style": "selected",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 2 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f5_n3",
+      "name": "弱队偷分 3 格",
+      "family": "underdog_protection",
+      "style": "balanced",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 3 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f5_n4",
+      "name": "弱队偷分 4 格",
+      "family": "underdog_protection",
+      "style": "balanced",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 4 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 5,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f6_n2",
+      "name": "弱队偷分 2 格",
+      "family": "underdog_protection",
+      "style": "selected",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 2 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f6_n3",
+      "name": "弱队偷分 3 格",
+      "family": "underdog_protection",
+      "style": "balanced",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 3 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f6_n4",
+      "name": "弱队偷分 4 格",
+      "family": "underdog_protection",
+      "style": "balanced",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 4 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 6,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f7_n2",
+      "name": "弱队偷分 2 格",
+      "family": "underdog_protection",
+      "style": "selected",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 2 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f7_n3",
+      "name": "弱队偷分 3 格",
+      "family": "underdog_protection",
+      "style": "balanced",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 3 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_underdog_protect_f7_n4",
+      "name": "弱队偷分 4 格",
+      "family": "underdog_protection",
+      "style": "balanced",
+      "description": "强热门盘下保留弱队小胜和平局保护，共 4 个比分。",
+      "explanation": "市场过度集中热门时，用弱队偷分和 1-1 做保护。",
+      "parameters": {
+        "favoriteMaxOdds": 7,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_mid_value_7_15_n2",
+      "name": "中赔率价值 2 格",
+      "family": "mid_value",
+      "style": "selected",
+      "description": "避开极低赔和超高赔，选择 7-15 区间的 2 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 15,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_mid_value_7_15_n3",
+      "name": "中赔率价值 3 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 7-15 区间的 3 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 15,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_mid_value_7_15_n4",
+      "name": "中赔率价值 4 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 7-15 区间的 4 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 15,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_mid_value_7_18_n2",
+      "name": "中赔率价值 2 格",
+      "family": "mid_value",
+      "style": "selected",
+      "description": "避开极低赔和超高赔，选择 7-18 区间的 2 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 18,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_mid_value_7_18_n3",
+      "name": "中赔率价值 3 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 7-18 区间的 3 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 18,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_mid_value_7_18_n4",
+      "name": "中赔率价值 4 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 7-18 区间的 4 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 18,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_mid_value_7_25_n2",
+      "name": "中赔率价值 2 格",
+      "family": "mid_value",
+      "style": "selected",
+      "description": "避开极低赔和超高赔，选择 7-25 区间的 2 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 25,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_mid_value_7_25_n3",
+      "name": "中赔率价值 3 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 7-25 区间的 3 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 25,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_mid_value_7_25_n4",
+      "name": "中赔率价值 4 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 7-25 区间的 4 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 7,
+        "maxOdds": 25,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_mid_value_8_15_n2",
+      "name": "中赔率价值 2 格",
+      "family": "mid_value",
+      "style": "selected",
+      "description": "避开极低赔和超高赔，选择 8-15 区间的 2 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 15,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_mid_value_8_15_n3",
+      "name": "中赔率价值 3 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 8-15 区间的 3 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 15,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_mid_value_8_15_n4",
+      "name": "中赔率价值 4 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 8-15 区间的 4 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 15,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_mid_value_8_18_n2",
+      "name": "中赔率价值 2 格",
+      "family": "mid_value",
+      "style": "selected",
+      "description": "避开极低赔和超高赔，选择 8-18 区间的 2 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 18,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_mid_value_8_18_n3",
+      "name": "中赔率价值 3 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 8-18 区间的 3 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 18,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_mid_value_8_18_n4",
+      "name": "中赔率价值 4 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 8-18 区间的 4 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 18,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_mid_value_8_25_n2",
+      "name": "中赔率价值 2 格",
+      "family": "mid_value",
+      "style": "selected",
+      "description": "避开极低赔和超高赔，选择 8-25 区间的 2 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 25,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_mid_value_8_25_n3",
+      "name": "中赔率价值 3 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 8-25 区间的 3 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 25,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_mid_value_8_25_n4",
+      "name": "中赔率价值 4 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 8-25 区间的 4 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 8,
+        "maxOdds": 25,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_mid_value_10_15_n2",
+      "name": "中赔率价值 2 格",
+      "family": "mid_value",
+      "style": "selected",
+      "description": "避开极低赔和超高赔，选择 10-15 区间的 2 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 10,
+        "maxOdds": 15,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_mid_value_10_15_n3",
+      "name": "中赔率价值 3 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 10-15 区间的 3 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 10,
+        "maxOdds": 15,
+        "maxPicks": 3
+      }
+    },
+    {
+      "id": "tem_mid_value_10_15_n4",
+      "name": "中赔率价值 4 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 10-15 区间的 4 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 10,
+        "maxOdds": 15,
+        "maxPicks": 4
+      }
+    },
+    {
+      "id": "tem_mid_value_10_18_n2",
+      "name": "中赔率价值 2 格",
+      "family": "mid_value",
+      "style": "selected",
+      "description": "避开极低赔和超高赔，选择 10-18 区间的 2 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 10,
+        "maxOdds": 18,
+        "maxPicks": 2
+      }
+    },
+    {
+      "id": "tem_mid_value_10_18_n3",
+      "name": "中赔率价值 3 格",
+      "family": "mid_value",
+      "style": "attack",
+      "description": "避开极低赔和超高赔，选择 10-18 区间的 3 个最低赔率比分。",
+      "explanation": "寻找市场仍认可但回报更高的中赔率区域。",
+      "parameters": {
+        "minOdds": 10,
+        "maxOdds": 18,
+        "maxPicks": 3
+      }
+    }
+  ]
+}

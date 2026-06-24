@@ -21,6 +21,7 @@
     "backtest:strategies": "node scripts/backtestStrategies.mjs",
     "backtest:candidates": "node scripts/backtestCandidateStrategies.mjs",
     "strategy:lab": "node scripts/runStrategyLab.mjs",
+    "strategy:tem": "node scripts/runTempStrategyResearch.mjs",
     "ai:sync-prediction": "node scripts/syncAiPrediction.mjs",
     "ai:predict-all": "node scripts/predictAllMatchesForAi.mjs",
     "ai:predict-all:dry": "node scripts/predictAllMatchesForAi.mjs --dry-run",
