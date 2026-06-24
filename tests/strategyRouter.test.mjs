@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  buildForcedStrategyAiPredictionEntries,
   buildRoutedAiPredictionEntries,
   buildRollingStrategyStats,
   routeStrategyForMatch,
@@ -107,4 +108,24 @@ test('routeStrategyForMatch can select the market Poisson EV flagship when it ha
 
   assert.equal(route.strategyId, 'market_poisson_ev');
   assert.match(route.reason, /市场泊松EV/);
+});
+
+test('buildForcedStrategyAiPredictionEntries uses one requested strategy for every match', () => {
+  const entries = buildForcedStrategyAiPredictionEntries({
+    strategyId: 'context_poisson_ev',
+    matches: [
+      { id: 'm5', date: '2026-06-25', time: '03:00', home: '波黑', away: '卡塔尔' },
+      { id: 'm6', date: '2026-06-25', time: '06:00', home: '摩洛哥', away: '海地' },
+    ],
+    scoreOddsByMatch: {
+      m5: scoreOptions,
+      m6: scoreOptions,
+    },
+    historicalResults,
+  });
+
+  assert.deepEqual(entries.map((entry) => entry.route.strategyId), ['context_poisson_ev', 'context_poisson_ev']);
+  assert.ok(entries.every((entry) => entry.scores.length > 0));
+  assert.match(entries[0].route.reason, /强制使用/);
+  assert.match(entries[0].route.reason, /赛前泊松EV/);
 });

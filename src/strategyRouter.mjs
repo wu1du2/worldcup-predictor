@@ -109,13 +109,53 @@ export function buildRoutedAiPredictionEntries({
     });
 }
 
+export function buildForcedStrategyAiPredictionEntries({
+  strategyId,
+  matches,
+  scoreOddsByMatch,
+  historicalResults,
+  strategies = candidateStrategies,
+}) {
+  const strategy = findStrategy(strategies, strategyId);
+  if (!strategy || strategy.id !== strategyId) {
+    throw new Error(`Unknown forced strategy: ${strategyId}`);
+  }
+
+  return (matches || [])
+    .filter((match) => match?.id)
+    .map((match) => {
+      const scoreOptions = scoreOddsByMatch?.[match.id] || [];
+      const stats = buildRollingStrategyStats({
+        historicalResults,
+        cutoffDate: match.date,
+        cutoffTime: match.time,
+      })[strategy.id] || emptyStats(strategy.id);
+      const route = buildRoute({
+        match,
+        strategy,
+        stats,
+        confidence: 0.7,
+        reason: [
+          `${formatMatch(match)}：强制使用「${strategy.name}」。`,
+          `滚动历史 ROI ${formatSignedPercent(stats.roiPercent)}，样本 ${stats.settledMatches} 场。`,
+          `当前任务要求用该策略预测全部后续场次。`,
+        ].join(''),
+      });
+      return {
+        matchId: match.id,
+        scores: pickScoresForRoute({ route, scoreOptions, strategies }),
+        route,
+      };
+    });
+}
+
 export function pickScoresForRoute({ route, scoreOptions, strategies = candidateStrategies }) {
   if (route.strategyId === fallbackStrategyId && !normalizeOdds(scoreOptions).length) {
     return defaultAiPredictionScores;
   }
 
   const strategy = findStrategy(strategies, route.strategyId);
-  const picks = uniqueScores(strategy.selectPicks({ odds: normalizeOdds(scoreOptions) }) || []);
+  const picks = uniqueScores(strategy.selectPicks({ odds: normalizeOdds(scoreOptions), context: {} }) || []);
   return picks.length ? picks : defaultAiPredictionScores;
 }
 

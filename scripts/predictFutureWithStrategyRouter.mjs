@@ -5,7 +5,10 @@ import path from 'node:path';
 
 import { buildAiRecommendationRows } from '../src/aiPredictionSync.mjs';
 import { runCandidateStrategyBacktests } from '../src/strategyCandidates.mjs';
-import { buildRoutedAiPredictionEntries } from '../src/strategyRouter.mjs';
+import {
+  buildForcedStrategyAiPredictionEntries,
+  buildRoutedAiPredictionEntries,
+} from '../src/strategyRouter.mjs';
 import {
   ensureAiPlayer,
   getGroupByCode,
@@ -40,11 +43,18 @@ const targetMatches = matches
   .filter((match) => match.status !== 'post')
   .filter((match) => (scoreOddsByMatch[match.id] || []).length > 0)
   .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
-const entries = buildRoutedAiPredictionEntries({
-  matches: targetMatches,
-  scoreOddsByMatch,
-  historicalResults,
-});
+const entries = args.strategy
+  ? buildForcedStrategyAiPredictionEntries({
+    strategyId: args.strategy,
+    matches: targetMatches,
+    scoreOddsByMatch,
+    historicalResults,
+  })
+  : buildRoutedAiPredictionEntries({
+    matches: targetMatches,
+    scoreOddsByMatch,
+    historicalResults,
+  });
 
 if (!groups.length) throw new Error('No groups found.');
 if (!entries.length) throw new Error(`No active matches found on or after ${fromDate}.`);
@@ -64,6 +74,7 @@ console.log(`From date: ${fromDate}`);
 console.log(`Groups: ${groups.length}`);
 console.log(`Target matches: ${targetMatches.length}`);
 console.log(`With odds: ${targetMatches.length}`);
+if (args.strategy) console.log(`Forced strategy: ${args.strategy}`);
 console.log(`Prediction log: ${predictionJsonPath}`);
 const recommendationRows = buildAiRecommendationRows({
   predictionLog,
@@ -117,7 +128,7 @@ function buildPredictionLog({ fromDate, targetMatches, entries, historicalResult
   const entriesByMatchId = new Map(entries.map((entry) => [entry.matchId, entry]));
   return {
     schemaVersion: 1,
-    strategy_router: 'rolling_roi_market_router_v1',
+    strategy_router: args.strategy ? `forced_${args.strategy}` : 'rolling_roi_market_router_v1',
     generatedAt: new Date().toISOString(),
     fromDate,
     historicalSummary: historicalResults.map((result) => ({
