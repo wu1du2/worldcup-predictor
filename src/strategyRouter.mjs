@@ -2,6 +2,12 @@ import { defaultAiPredictionScores } from './aiPredictionBatch.mjs';
 import { candidateStrategies } from './strategyCandidates.mjs';
 
 const fallbackStrategyId = 'low_score_basket_4';
+export const routerCandidateStrategyIds = [
+  'context_poisson_ev_v2',
+  'context_poisson_ev_v3',
+  'draw_anchor_3',
+  'low_score_basket_4',
+];
 
 export function buildRollingStrategyStats({ historicalResults, cutoffDate, cutoffTime = '00:00' }) {
   const cutoffKey = buildDateTimeKey(cutoffDate, cutoffTime);
@@ -33,6 +39,7 @@ export function routeStrategyForMatch({
   historicalResults,
   strategies = candidateStrategies,
 }) {
+  const routerStrategies = getRouterCandidateStrategies(strategies);
   const odds = normalizeOdds(scoreOptions);
   const rollingStats = buildRollingStrategyStats({
     historicalResults,
@@ -44,14 +51,14 @@ export function routeStrategyForMatch({
     const fallbackStats = rollingStats[fallbackStrategyId] || emptyStats(fallbackStrategyId);
     return buildRoute({
       match,
-      strategy: findStrategy(strategies, fallbackStrategyId),
+      strategy: findStrategy(routerStrategies, fallbackStrategyId),
       stats: fallbackStats,
       confidence: 0.35,
       reason: `${formatMatch(match)} 缺少可用赔率，router 不强行判断盘口结构，回退到低比分篮子，保证 AI 推荐仍可覆盖。`,
     });
   }
 
-  const ranked = strategies
+  const ranked = routerStrategies
     .map((strategy) => ({
       strategy,
       stats: rollingStats[strategy.id] || emptyStats(strategy.id),
@@ -69,7 +76,7 @@ export function routeStrategyForMatch({
     ));
 
   const selected = ranked[0] || {
-    strategy: findStrategy(strategies, fallbackStrategyId),
+    strategy: findStrategy(routerStrategies, fallbackStrategyId),
     stats: rollingStats[fallbackStrategyId] || emptyStats(fallbackStrategyId),
     featureScore: 0,
     routerScore: 0,
@@ -221,6 +228,13 @@ function scoreStrategyFeatures({ strategy, odds }) {
   if (strategy.id === 'context_poisson_ev_v2') return market.hasCompleteScoreBoard ? 0.7 : 0.2;
   if (strategy.id === 'context_poisson_ev_v3') return market.hasCompleteScoreBoard ? 0.75 : 0.2;
   return 0;
+}
+
+function getRouterCandidateStrategies(strategies) {
+  const byId = new Map((strategies || []).map((strategy) => [strategy.id, strategy]));
+  return routerCandidateStrategyIds
+    .map((strategyId) => byId.get(strategyId) || candidateStrategies.find((strategy) => strategy.id === strategyId))
+    .filter(Boolean);
 }
 
 function getMarketFeatures(odds) {

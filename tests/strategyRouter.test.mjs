@@ -5,6 +5,7 @@ import {
   buildForcedStrategyAiPredictionEntries,
   buildRoutedAiPredictionEntries,
   buildRollingStrategyStats,
+  routerCandidateStrategyIds,
   routeStrategyForMatch,
 } from '../src/strategyRouter.mjs';
 
@@ -83,7 +84,30 @@ test('buildRoutedAiPredictionEntries falls back to low-score scores when odds ar
   assert.match(entries[1].route.reason, /缺少可用赔率/);
 });
 
-test('routeStrategyForMatch can select the market Poisson EV flagship when it has history and a complete odds board', () => {
+test('buildForcedStrategyAiPredictionEntries can still run market Poisson EV for experiments', () => {
+  const fullScoreOptions = [
+    '1-0', '2-0', '2-1', '3-0', '3-1', '3-2', '4-0', '4-1', '4-2', '5-0',
+    '5-1', '5-2', '胜其他', '0-0', '1-1', '2-2', '3-3', '平其他', '0-1',
+    '0-2', '1-2', '0-3', '1-3', '2-3', '0-4', '1-4', '2-4', '0-5',
+    '1-5', '2-5', '负其他',
+  ].map((score, index) => ({ score, odds: 6 + index }));
+  const entries = buildForcedStrategyAiPredictionEntries({
+    strategyId: 'market_poisson_ev',
+    matches: [
+      { id: 'm4', date: '2026-06-25', time: '03:00', home: '波黑', away: '卡塔尔' },
+    ],
+    scoreOddsByMatch: {
+      m4: fullScoreOptions,
+    },
+    historicalResults,
+  });
+
+  assert.equal(entries[0].route.strategyId, 'market_poisson_ev');
+  assert.match(entries[0].route.reason, /市场泊松EV/);
+  assert.ok(entries[0].scores.length > 0);
+});
+
+test('routeStrategyForMatch only considers the production router candidate pool by default', () => {
   const fullScoreOptions = [
     '1-0', '2-0', '2-1', '3-0', '3-1', '3-2', '4-0', '4-1', '4-2', '5-0',
     '5-1', '5-2', '胜其他', '0-0', '1-1', '2-2', '3-3', '平其他', '0-1',
@@ -94,20 +118,31 @@ test('routeStrategyForMatch can select the market Poisson EV flagship when it ha
     match: { id: 'm4', date: '2026-06-25', time: '03:00', home: '波黑', away: '卡塔尔' },
     scoreOptions: fullScoreOptions,
     historicalResults: [
-      ...historicalResults,
       {
         strategyId: 'market_poisson_ev',
         strategyName: '市场泊松EV',
         rows: [
-          { date: '2026-06-18', time: '03:00', hitScore: '1-1', cost: 2, revenue: 12 },
-          { date: '2026-06-19', time: '03:00', hitScore: '', cost: 2, revenue: 0 },
+          { date: '2026-06-18', time: '03:00', hitScore: '1-1', cost: 2, revenue: 120 },
+        ],
+      },
+      {
+        strategyId: 'context_poisson_ev_v2',
+        strategyName: '赛前泊松EV精选',
+        rows: [
+          { date: '2026-06-18', time: '03:00', hitScore: '1-1', cost: 2, revenue: 8 },
         ],
       },
     ],
   });
 
-  assert.equal(route.strategyId, 'market_poisson_ev');
-  assert.match(route.reason, /市场泊松EV/);
+  assert.deepEqual(routerCandidateStrategyIds, [
+    'context_poisson_ev_v2',
+    'context_poisson_ev_v3',
+    'draw_anchor_3',
+    'low_score_basket_4',
+  ]);
+  assert.ok(routerCandidateStrategyIds.includes(route.strategyId));
+  assert.notEqual(route.strategyId, 'market_poisson_ev');
 });
 
 test('buildForcedStrategyAiPredictionEntries uses one requested strategy for every match', () => {

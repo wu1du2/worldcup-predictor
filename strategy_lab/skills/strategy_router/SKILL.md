@@ -8,6 +8,16 @@ description: Use when selecting one candidate score-prediction strategy for a ma
 ## Core Rule
 The router chooses a `strategy_id`; it does not directly invent score picks.
 
+## Production Candidate Pool
+Production routing is intentionally narrower than the offline experiment catalog. Keep `candidateStrategies` broad for backtests, but default router decisions should use only `routerCandidateStrategyIds`:
+
+- `context_poisson_ev_v2`
+- `context_poisson_ev_v3`
+- `draw_anchor_3`
+- `low_score_basket_4`
+
+Other strategies may still be forced explicitly for experiments, but they should not enter default AI推荐 routing unless the production pool is deliberately revised.
+
 ## Required Inputs
 - Trusted pre-match match data: date, time, teams, and available score odds/trends.
 - Candidate strategy catalog from `src/strategyCandidates.mjs`.
