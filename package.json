@@ -29,6 +29,8 @@
     "ai:predict-router:dry": "node scripts/predictFutureWithStrategyRouter.mjs --dry-run",
     "historical:contexts": "node scripts/buildHistoricalContexts.mjs",
     "historical:verify": "node scripts/verifyHistoricalContexts.mjs",
+    "prematch:sources": "node scripts/backfillPrematchSources.mjs",
+    "prematch:sources:dry": "node scripts/backfillPrematchSources.mjs --dry-run",
     "backfill:odds-trends": "node scripts/backfillScoreOddsTrends.mjs",
     "backfill:odds-trends:dry": "node scripts/backfillScoreOddsTrends.mjs --dry-run"
   },
