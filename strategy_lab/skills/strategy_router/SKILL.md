@@ -19,6 +19,7 @@ Other strategies may still be forced explicitly for experiments, but they should
 
 ## Required Inputs
 - Trusted pre-match match data: date, time, teams, and available score odds/trends.
+- Local pre-match context from `strategy_lab/match_info/<date>_<home>_vs_<away>/context.json` when available. Attach it to each match as `strategyContext` before both backtesting and live prediction so context-aware strategies see the same inputs.
 - Candidate strategy catalog from `src/strategyCandidates.mjs`.
 - Rolling historical ROI computed only from matches before the target kickoff.
 
@@ -35,9 +36,12 @@ For each match, output:
 - Do not use final scores, post-match reports, or ROI from the target match.
 - If odds are missing, fall back to `low_score_basket_4` with `0-0, 0-1, 1-0, 1-1`.
 - Persist router reasoning to `strategy_lab/predictions/strategy_router_<timestamp>_*`.
-- Write only `scores` to Supabase `predictions`; keep strategy metadata in local prediction logs until the DB schema supports it.
+- Write per-group AI score picks to Supabase `predictions`, and write match-level strategy metadata/reasoning to `ai_recommendations` for the frontend detail UI.
+- Do not assume saved context files are used just because they exist. Regression tests must prove `match.strategyContext` reaches the selected strategy's `selectPicks`.
+- Live Supabase writes can hit transient network timeouts; wrap per-group prediction writes, coverage checks, recommendation upserts, and strategy-stat upserts with bounded retry.
 
 ## Verification
 - Run `npm test -- tests/strategyRouter.test.mjs`.
+- Run context-loading tests when router inputs change: `npm test -- tests/strategyContextFiles.test.mjs`.
 - Dry-run first with `npm run ai:predict-router:dry -- --from=YYYY-MM-DD`.
-- After real writes, verify one real group has complete AI coverage for all target matches.
+- After real writes, verify one real group has complete AI coverage for all target matches and verify `ai_recommendations` rows by app match id (`match_code`, not the database UUID).

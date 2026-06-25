@@ -172,3 +172,46 @@ test('buildForcedStrategyAiPredictionEntries uses one requested strategy for eve
   assert.match(entries[0].route.reason, /强制使用/);
   assert.match(entries[0].route.reason, /赛前泊松EV/);
 });
+
+test('buildForcedStrategyAiPredictionEntries passes match strategy context to the selected strategy', () => {
+  let observedContext = null;
+  const contextAwareStrategy = {
+    id: 'context_probe_strategy',
+    name: 'Context Probe',
+    description: 'Reads strategy context in tests.',
+    selectPicks: ({ odds, context }) => {
+      observedContext = context;
+      const wantedScore = context?.publicContext?.teamNews?.includes('主队轮换优势') ? '2-0' : '0-0';
+      return odds.filter((option) => option.score === wantedScore);
+    },
+  };
+
+  const entries = buildForcedStrategyAiPredictionEntries({
+    strategyId: 'context_probe_strategy',
+    matches: [
+      {
+        id: 'm7',
+        date: '2026-06-26',
+        time: '04:00',
+        home: '厄瓜多尔',
+        away: '德国',
+        strategyContext: {
+          publicContext: {
+            teamNews: ['主队轮换优势'],
+          },
+        },
+      },
+    ],
+    scoreOddsByMatch: {
+      m7: [
+        { score: '0-0', odds: 8 },
+        { score: '2-0', odds: 12 },
+      ],
+    },
+    historicalResults: [],
+    strategies: [contextAwareStrategy],
+  });
+
+  assert.equal(observedContext.publicContext.teamNews[0], '主队轮换优势');
+  assert.deepEqual(entries[0].scores, ['2-0']);
+});

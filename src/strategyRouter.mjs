@@ -106,7 +106,7 @@ export function buildRoutedAiPredictionEntries({
         historicalResults,
         strategies,
       });
-      const picks = pickScoresForRoute({ route, scoreOptions, strategies });
+      const picks = pickScoresForRoute({ route, scoreOptions, strategies, match });
       return {
         matchId: match.id,
         scores: picks,
@@ -149,19 +149,23 @@ export function buildForcedStrategyAiPredictionEntries({
       });
       return {
         matchId: match.id,
-        scores: pickScoresForRoute({ route, scoreOptions, strategies }),
+        scores: pickScoresForRoute({ route, scoreOptions, strategies, match }),
         route,
       };
     });
 }
 
-export function pickScoresForRoute({ route, scoreOptions, strategies = candidateStrategies }) {
+export function pickScoresForRoute({ route, scoreOptions, strategies = candidateStrategies, match = null }) {
   if (route.strategyId === fallbackStrategyId && !normalizeOdds(scoreOptions).length) {
     return defaultAiPredictionScores;
   }
 
   const strategy = findStrategy(strategies, route.strategyId);
-  const picks = uniqueScores(strategy.selectPicks({ odds: normalizeOdds(scoreOptions), context: {} }) || []);
+  const picks = uniqueScores(strategy.selectPicks({
+    match,
+    odds: normalizeOdds(scoreOptions),
+    context: match?.strategyContext || {},
+  }) || []);
   return picks.length ? picks : defaultAiPredictionScores;
 }
 

@@ -5,6 +5,7 @@ import path from 'node:path';
 
 import { buildAiRecommendationRows } from '../src/aiPredictionSync.mjs';
 import { runCandidateStrategyBacktests } from '../src/strategyCandidates.mjs';
+import { attachMatchStrategyContexts } from '../src/strategyContextFiles.mjs';
 import {
   buildForcedStrategyAiPredictionEntries,
   buildRoutedAiPredictionEntries,
@@ -35,7 +36,10 @@ const client = createClient(supabaseUrl, supabaseKey);
 const groups = args.group
   ? [await getGroupByCode({ client, groupCode: args.group })]
   : await loadAllGroups(client);
-const matches = await loadMatches({ client });
+const matches = await attachMatchStrategyContexts({
+  matches: await loadMatches({ client }),
+  matchInfoRoot: path.join(repoRoot, 'strategy_lab', 'match_info'),
+});
 const scoreOddsByMatch = await loadScoreOdds({ client, matches });
 const historicalResults = runCandidateStrategyBacktests({ matches, scoreOddsByMatch });
 const targetMatches = matches
@@ -88,20 +92,25 @@ for (const entry of entries) {
 }
 
 for (const group of groups) {
-  const aiPlayer = await ensureAiPlayer({ client, groupId: group.id });
+  const aiPlayer = await withRetry(`ensure AI player for ${group.code}`, () => ensureAiPlayer({ client, groupId: group.id }));
 
   if (!args.dryRun) {
-    await saveGroupPredictions({
+    await withRetry(`save AI predictions for ${group.code}`, () => saveGroupPredictions({
       client,
       groupId: group.id,
       playerId: aiPlayer.id,
       entries,
-    });
+    }));
   }
 
   const coverage = args.dryRun
     ? { written: 0, missing: entries.map((entry) => entry.matchId) }
-    : await verifyAiPredictionCoverage({ client, groupId: group.id, playerId: aiPlayer.id, entries });
+    : await withRetry(`verify AI prediction coverage for ${group.code}`, () => verifyAiPredictionCoverage({
+      client,
+      groupId: group.id,
+      playerId: aiPlayer.id,
+      entries,
+    }));
 
   const label = `${group.code} (${group.id})`;
   if (coverage.missing.length) {
@@ -117,8 +126,8 @@ for (const group of groups) {
 if (args.dryRun) {
   console.log('Dry run only; no predictions were written.');
 } else {
-  await upsertAiRecommendations({ client, rows: recommendationRows });
-  await upsertBuiltInStrategyStats({ client, historicalResults });
+  await withRetry('upsert AI recommendation rows', () => upsertAiRecommendations({ client, rows: recommendationRows }));
+  await withRetry('upsert built-in strategy stats', () => upsertBuiltInStrategyStats({ client, historicalResults }));
   console.log(`AI recommendation detail rows: ${recommendationRows.length}`);
   console.log(`AI strategy stats rows: ${historicalResults.length}`);
   console.log('Strategy-router AI predictions are complete for all selected groups.');
@@ -147,6 +156,11 @@ function buildPredictionLog({ fromDate, targetMatches, entries, historicalResult
         time: match.time,
         home: match.home,
         away: match.away,
+        contextQuality: match.strategyContext?.context_quality || 'none',
+        contextSources: {
+          accepted: match.strategyContext?.sourceGate?.accepted_source_ids?.length || 0,
+          weak: match.strategyContext?.sourceGate?.weak_source_ids?.length || 0,
+        },
         scores: entry.scores,
         route: entry.route,
       };
@@ -167,7 +181,7 @@ function formatPredictionReport(log) {
   ];
 
   for (const item of log.predictions) {
-    lines.push(`- ${item.date} ${item.time} ${item.home} vs ${item.away}: ${item.scores.join(', ')} | ${item.route.strategyName} ${item.route.roiLabel}`);
+    lines.push(`- ${item.date} ${item.time} ${item.home} vs ${item.away}: ${item.scores.join(', ')} | ${item.route.strategyName} ${item.route.roiLabel} | context ${item.contextQuality}`);
     lines.push(`  - ${item.route.reason}`);
   }
 
@@ -250,6 +264,26 @@ async function upsertBuiltInStrategyStats({ client, historicalResults }) {
     .from('ai_strategy_stats')
     .upsert(statsRows, { onConflict: 'strategy_id' });
   if (statsError) throw statsError;
+}
+
+async function withRetry(label, operation, attempts = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      if (attempt === attempts) break;
+      const delayMs = 1000 * attempt;
+      console.warn(`${label} failed on attempt ${attempt}/${attempts}; retrying in ${delayMs}ms: ${formatError(error)}`);
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  throw lastError;
+}
+
+function formatError(error) {
+  return error?.message || error?.details || String(error);
 }
 
 function deterministicUuid(value) {
