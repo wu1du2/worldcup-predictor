@@ -12,10 +12,10 @@ const requiredMarketScores = ['0-0', '0-1', '1-0', '1-1'];
 const forbiddenResultFields = ['homeScore', 'awayScore', 'home_score', 'away_score', 'actualScore', 'result'];
 const effortSlots = [
   { key: 'media', path: ['publicContext', 'media'] },
-  { key: 'team_news', path: ['publicContext', 'teamNews'] },
-  { key: 'form_and_tactics', path: ['publicContext', 'formAndTactics'] },
-  { key: 'external_market', path: ['publicContext', 'marketRead'] },
-  { key: 'weather_and_venue', path: ['publicContext', 'weatherAndVenue'] },
+  { key: 'team_news', path: ['publicContext', 'teamNews'], weakPath: ['weakContext', 'teamNews'] },
+  { key: 'form_and_tactics', path: ['publicContext', 'formAndTactics'], weakPath: ['weakContext', 'formAndTactics'] },
+  { key: 'external_market', path: ['publicContext', 'marketRead'], weakPath: ['weakContext', 'marketRead'] },
+  { key: 'weather_and_venue', path: ['publicContext', 'weatherAndVenue'], weakPath: ['weakContext', 'weatherAndVenue'] },
   { key: 'official', path: ['publicContext', 'official'] },
 ];
 
@@ -23,10 +23,16 @@ export function verifyHistoricalMatchContext({ dirName, files, context, sources 
   const missing = requiredFiles.filter((file) => !files[file]);
   const marketScores = new Set((context?.market?.scoreOptions || []).map((option) => option.score));
   const missingMarketScores = requiredMarketScores.filter((score) => !marketScores.has(score));
-  const effortDetails = effortSlots.map((slot) => ({
-    key: slot.key,
-    present: getByPath(context, slot.path)?.length > 0,
-  }));
+  const effortDetails = effortSlots.map((slot) => {
+    const trustedPresent = getByPath(context, slot.path)?.length > 0;
+    const weakPresent = slot.weakPath ? getByPath(context, slot.weakPath)?.length > 0 : false;
+    return {
+      key: slot.key,
+      present: trustedPresent || weakPresent,
+      trustedPresent,
+      weakPresent,
+    };
+  });
   const covered = effortDetails.filter((slot) => slot.present).length;
   const legality = verifyLegality({ context, sources });
   const requiredOk = missing.length === 0 && missingMarketScores.length === 0;
@@ -138,8 +144,10 @@ function verifyLegality({ context, sources }) {
   }
 
   const acceptedIds = context?.sourceGate?.accepted_source_ids || [];
+  const weakIds = context?.sourceGate?.weak_source_ids || [];
   const sourceById = new Map([
     ...(sources?.trusted_sources || []),
+    ...(sources?.weak_sources || []),
     ...(sources?.audit_only_sources || []),
   ].map((source) => [source.id, source]));
   const kickoff = new Date(context?.match?.kickoff_utc8 || context?.match?.kickoffAt || '');
@@ -168,6 +176,24 @@ function verifyLegality({ context, sources }) {
     }
   }
 
+  for (const id of weakIds) {
+    const source = sourceById.get(id);
+    if (!source) {
+      violations.push(`weak source ${id} is missing from sources.json`);
+      continue;
+    }
+    if (source.enters_context !== 'weak') {
+      violations.push(`weak source ${id} is not marked enters_context=weak`);
+    }
+    if (source.published_at || source.updated_at) {
+      violations.push(`weak source ${id} should not have a precise context timestamp`);
+    }
+    const dateOnly = source.updated_date_only || source.published_date_only;
+    if (!isBeijingDayBeforeKickoff({ dateOnly, kickoff })) {
+      violations.push(`weak source ${id} is not Beijing day before kickoff`);
+    }
+  }
+
   return {
     ok: violations.length === 0,
     violations,
@@ -183,6 +209,32 @@ function classifyContextQuality({ requiredOk, covered }) {
 
 function getByPath(value, path) {
   return path.reduce((current, key) => current?.[key], value);
+}
+
+function isBeijingDayBeforeKickoff({ dateOnly, kickoff }) {
+  const normalized = normalizeDateOnly(dateOnly);
+  if (!normalized || !Number.isFinite(kickoff.getTime())) return false;
+  const kickoffDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(kickoff);
+  const previousDate = new Date(`${kickoffDate}T00:00:00+08:00`);
+  previousDate.setUTCDate(previousDate.getUTCDate() - 1);
+  const previousBeijingDate = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(previousDate);
+  return normalized === previousBeijingDate;
+}
+
+function normalizeDateOnly(value) {
+  const raw = String(value || '').trim();
+  const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return match ? `${match[1]}-${match[2]}-${match[3]}` : '';
 }
 
 function roundPercent(value) {

@@ -34,6 +34,15 @@ const sourceTemplates = [
     searchPage: true,
   },
   {
+    sourceId: 'thestatszone_worldcup_index',
+    module: 'form_and_tactics',
+    publisher: 'The Stats Zone',
+    title: 'The Stats Zone FIFA World Cup previews index',
+    url: () => 'https://www.thestatszone.com/football/fifa-world-cup',
+    discovery: true,
+    searchPage: true,
+  },
+  {
     sourceId: 'espn_search',
     module: 'form_and_tactics',
     publisher: 'ESPN',
@@ -56,6 +65,13 @@ const sourceTemplates = [
     title: 'Local Sporttery correct-score odds',
     url: () => null,
     internal: true,
+  },
+  {
+    sourceId: 'foxsports_odds_direct',
+    module: 'market_context',
+    publisher: 'FOX Sports',
+    title: 'FOX Sports World Cup odds and prediction',
+    url: (match) => `https://www.foxsports.com/stories/soccer/2026-world-cup-${slugTeam(match.home)}-${slugTeam(match.away)}-odds-prediction-picks`,
   },
   {
     sourceId: 'oddschecker_search',
@@ -112,26 +128,40 @@ export function buildPrematchSourceCandidates(match) {
 export function gateSourceByKickoff({ source, kickoffUtc8 }) {
   const publishedAt = hasPreciseTime(source?.publishedAt) ? parseDate(source?.publishedAt) : null;
   const updatedAt = hasPreciseTime(source?.updatedAt) ? parseDate(source?.updatedAt) : null;
+  const dateOnly = source?.updatedDateOnly || source?.publishedDateOnly || source?.publishedAt || source?.updatedAt;
   const kickoff = parseDate(kickoffUtc8);
 
   if (!kickoff) {
-    return { accepted: false, reason: 'invalid kickoff timestamp' };
+    return { accepted: false, weak: false, reason: 'invalid kickoff timestamp' };
   }
 
   if (!publishedAt && !updatedAt) {
-    return { accepted: false, reason: 'missing timestamp' };
+    if (isBeijingDateBeforeKickoff({ dateOnly, kickoffUtc8 })) {
+      return {
+        accepted: false,
+        weak: true,
+        reason: 'date-only source is Beijing date before kickoff; enters weak_context only',
+      };
+    }
+    return {
+      accepted: false,
+      weak: false,
+      reason: dateOnly
+        ? 'date-only source is not Beijing day before kickoff'
+        : 'missing timestamp',
+    };
   }
 
   if (updatedAt && updatedAt >= kickoff) {
-    return { accepted: false, reason: 'known updated after kickoff' };
+    return { accepted: false, weak: false, reason: 'known updated after kickoff' };
   }
 
   const gateDate = publishedAt || updatedAt;
   if (!gateDate || gateDate >= kickoff) {
-    return { accepted: false, reason: 'source timestamp is not before kickoff' };
+    return { accepted: false, weak: false, reason: 'source timestamp is not before kickoff' };
   }
 
-  return { accepted: true, reason: 'source timestamp is before kickoff' };
+  return { accepted: true, weak: false, reason: 'source timestamp is before kickoff' };
 }
 
 export function buildPrematchCollectedFiles({
@@ -147,15 +177,18 @@ export function buildPrematchCollectedFiles({
   const kickoffUtc8 = context.match.kickoff_utc8;
 
   const acceptedSources = [];
+  const weakSources = [];
   const rejectedSources = [];
   for (const source of collectedSources || []) {
     const gate = gateSourceByKickoff({ source, kickoffUtc8 });
     const normalized = normalizeCollectedSource({ source, gate });
     if (gate.accepted) acceptedSources.push(normalized);
+    else if (gate.weak) weakSources.push(normalized);
     else rejectedSources.push(normalized);
   }
 
   sources.trusted_sources = acceptedSources.map(toSourceRow);
+  sources.weak_sources = weakSources.map(toSourceRow);
   sources.audit_only_sources = [
     ...(sources.audit_only_sources || []),
     ...rejectedSources.map(toSourceRow),
@@ -163,11 +196,16 @@ export function buildPrematchCollectedFiles({
 
   raw.extracts = [
     ...(raw.extracts || []),
-    ...[...acceptedSources, ...rejectedSources].map(toRawExtract),
+    ...[...acceptedSources, ...weakSources, ...rejectedSources].map(toRawExtract),
   ];
 
-  context.context_quality = acceptedSources.length ? 'external_prematch' : 'market_only';
+  context.context_quality = acceptedSources.length
+    ? 'external_prematch'
+    : weakSources.length
+      ? 'weak_external_prematch'
+      : 'market_only';
   context.sourceGate.accepted_source_ids = acceptedSources.map((source) => source.id);
+  context.sourceGate.weak_source_ids = weakSources.map((source) => source.id);
   context.sourceGate.excluded_source_ids = [
     'local_supabase_market',
     ...rejectedSources.map((source) => source.id),
@@ -178,23 +216,33 @@ export function buildPrematchCollectedFiles({
       type: 'team_news',
       match,
       sources: acceptedSources.filter((source) => source.module === 'team_news'),
+      weakSources: weakSources.filter((source) => source.module === 'team_news'),
     }),
     'processed/form_and_tactics.json': buildProcessedModule({
       type: 'form_and_tactics',
       match,
       sources: acceptedSources.filter((source) => source.module === 'form_and_tactics'),
+      weakSources: weakSources.filter((source) => source.module === 'form_and_tactics'),
     }),
     'processed/weather_and_venue.json': buildProcessedModule({
       type: 'weather_and_venue',
       match,
       sources: acceptedSources.filter((source) => source.module === 'weather_and_venue'),
+      weakSources: weakSources.filter((source) => source.module === 'weather_and_venue'),
     }),
   };
 
   const market = JSON.parse(files['processed/market.json']);
   const marketSources = acceptedSources.filter((source) => source.module === 'market_context');
+  const weakMarketSources = weakSources.filter((source) => source.module === 'market_context');
   market.trusted_source_ids = marketSources.map((source) => source.id);
+  market.weak_source_ids = weakMarketSources.map((source) => source.id);
   market.external_market_context = marketSources.flatMap((source) => source.facts.map((fact) => ({
+    source_id: source.id,
+    claim: fact,
+    evidence_quality: source.evidenceQuality,
+  })));
+  market.weak_market_context = weakMarketSources.flatMap((source) => source.facts.map((fact) => ({
     source_id: source.id,
     claim: fact,
     evidence_quality: source.evidenceQuality,
@@ -211,6 +259,13 @@ export function buildPrematchCollectedFiles({
     ...(context.publicContext.marketRead || []),
     ...market.external_market_context.map((fact) => fact.claim),
   ];
+  context.weakContext = {
+    rule: 'Date-only sources enter here only when their Beijing calendar date is exactly one day before kickoff_utc8.',
+    teamNews: processedByFile['processed/team_news.json'].weak_prediction_signal,
+    formAndTactics: processedByFile['processed/form_and_tactics.json'].weak_prediction_signal,
+    marketRead: market.weak_market_context.map((fact) => fact.claim),
+    weatherAndVenue: processedByFile['processed/weather_and_venue.json'].weak_prediction_signal,
+  };
   context.publicContext.media = acceptedSources.map((source) => ({
     source_id: source.id,
     title: source.title,
@@ -311,20 +366,28 @@ export async function collectPrematchSourcesForMatch({
 export function extractSourceMetadata({ html, url = '' }) {
   const text = String(html || '');
   const jsonLdDates = extractJsonLdDates(text);
-  const publishedAt = firstDate([
+  const publishedCandidates = [
     jsonLdDates.datePublished,
     extractMeta(text, ['article:published_time', 'datePublished', 'pubdate', 'publishdate']),
     extractTimeDatetime(text),
     extractLooseDate(text),
-  ]);
-  const updatedAt = firstDate([
+  ];
+  const updatedCandidates = [
     jsonLdDates.dateModified,
     extractMeta(text, ['article:modified_time', 'dateModified', 'lastmod']),
+  ];
+  const publishedAt = firstDate([
+    ...publishedCandidates,
+  ]);
+  const updatedAt = firstDate([
+    ...updatedCandidates,
   ]);
   return {
     title: cleanText(extractMeta(text, ['og:title', 'twitter:title']) || extractTitle(text) || url),
     publishedAt,
     updatedAt,
+    publishedDateOnly: publishedAt ? null : firstDateOnly(publishedCandidates),
+    updatedDateOnly: updatedAt ? null : firstDateOnly(updatedCandidates),
   };
 }
 
@@ -339,6 +402,8 @@ function sourceFromHtml({ candidate, html, url, match, now }) {
     url,
     publishedAt: candidate.searchPage ? null : metadata.publishedAt,
     updatedAt: candidate.searchPage ? null : metadata.updatedAt,
+    publishedDateOnly: candidate.searchPage ? null : metadata.publishedDateOnly,
+    updatedDateOnly: candidate.searchPage ? null : metadata.updatedDateOnly,
     fetchedAt: now,
     facts: extractedText ? [extractedText] : [],
     extractedText,
@@ -379,11 +444,17 @@ function normalizeCollectedSource({ source, gate }) {
     url: source.url || null,
     publishedAt: source.publishedAt || null,
     updatedAt: source.updatedAt || null,
+    publishedDateOnly: source.publishedDateOnly || null,
+    updatedDateOnly: source.updatedDateOnly || null,
     fetchedAt: source.fetchedAt || null,
     facts: (source.facts || []).filter(Boolean).slice(0, 5),
     extractedText: source.extractedText || '',
-    entersContext: gate.accepted,
-    evidenceQuality: gate.accepted ? 'timestamped_pre_kickoff_extract' : 'audit_only',
+    entersContext: gate.accepted ? true : gate.weak ? 'weak' : false,
+    evidenceQuality: gate.accepted
+      ? 'timestamped_pre_kickoff_extract'
+      : gate.weak
+        ? 'date_only_beijing_day_before_kickoff'
+        : 'audit_only',
     reason: gate.reason,
     fetchStatus: source.fetchStatus || 'ok',
     failure: source.failure || '',
@@ -398,6 +469,8 @@ function toSourceRow(source) {
     url: source.url,
     published_at: source.publishedAt,
     updated_at: source.updatedAt,
+    published_date_only: source.publishedDateOnly,
+    updated_date_only: source.updatedDateOnly,
     fetched_at: source.fetchedAt,
     enters_context: source.entersContext,
     evidence_quality: source.evidenceQuality,
@@ -416,6 +489,8 @@ function toRawExtract(source) {
     url: source.url,
     published_at: source.publishedAt,
     updated_at: source.updatedAt,
+    published_date_only: source.publishedDateOnly,
+    updated_date_only: source.updatedDateOnly,
     enters_context: source.entersContext,
     facts: source.facts,
     extract: source.extractedText,
@@ -423,8 +498,13 @@ function toRawExtract(source) {
   };
 }
 
-function buildProcessedModule({ type, match, sources }) {
+function buildProcessedModule({ type, match, sources, weakSources = [] }) {
   const facts = sources.flatMap((source) => source.facts.map((fact) => ({
+    source_id: source.id,
+    claim: fact,
+    evidence_quality: source.evidenceQuality,
+  })));
+  const weakFacts = weakSources.flatMap((source) => source.facts.map((fact) => ({
     source_id: source.id,
     claim: fact,
     evidence_quality: source.evidenceQuality,
@@ -433,10 +513,13 @@ function buildProcessedModule({ type, match, sources }) {
     type,
     match: `${match.home} vs ${match.away}`,
     trusted_source_ids: sources.map((source) => source.id),
-    status: facts.length ? 'collected' : 'not_collected',
+    weak_source_ids: weakSources.map((source) => source.id),
+    status: facts.length ? 'collected' : weakFacts.length ? 'weak_collected' : 'not_collected',
     coverage: Math.min(1, sources.length / 3),
     facts,
+    weak_facts: weakFacts,
     prediction_signal: facts.map((fact) => fact.claim),
+    weak_prediction_signal: weakFacts.map((fact) => fact.claim),
   };
 }
 
@@ -451,14 +534,18 @@ function discoverLinks({ html, baseUrl, match }) {
       }
     })
     .filter(Boolean);
-  const tokens = [match.home, match.away, romanizeTeam(match.home), romanizeTeam(match.away)]
+  const homeTokens = [match.home, romanizeTeam(match.home), slugTeam(match.home)]
+    .map((value) => String(value || '').toLowerCase())
+    .filter(Boolean);
+  const awayTokens = [match.away, romanizeTeam(match.away), slugTeam(match.away)]
     .map((value) => String(value || '').toLowerCase())
     .filter(Boolean);
   return [...new Set(anchors)].filter((url) => {
     const lower = decodeURIComponent(url).toLowerCase();
     return url !== base.toString()
       && !lower.includes('/search')
-      && tokens.some((token) => lower.includes(token))
+      && homeTokens.some((token) => lower.includes(token))
+      && awayTokens.some((token) => lower.includes(token))
       && !lower.includes('/video/')
       && !lower.includes('/watch/');
   });
@@ -533,6 +620,36 @@ function firstDate(values) {
   return null;
 }
 
+function firstDateOnly(values) {
+  for (const value of values) {
+    const normalized = normalizeDateOnly(value);
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
+function normalizeDateOnly(value) {
+  const raw = String(value || '').trim();
+  if (!raw || hasPreciseTime(raw)) return null;
+  const isoMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+  const textMatch = raw.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(2026)$/);
+  if (textMatch) {
+    const month = monthNumber(textMatch[2]);
+    if (!month) return null;
+    return `${textMatch[3]}-${String(month).padStart(2, '0')}-${String(Number(textMatch[1])).padStart(2, '0')}`;
+  }
+  return null;
+}
+
+function isBeijingDateBeforeKickoff({ dateOnly, kickoffUtc8 }) {
+  const normalized = normalizeDateOnly(dateOnly);
+  if (!normalized) return false;
+  const kickoffDate = getBeijingDate(kickoffUtc8);
+  const previousDate = addDays(kickoffDate, -1);
+  return normalized === previousDate;
+}
+
 function parseDate(value) {
   if (!value) return null;
   const normalized = normalizeDateString(value);
@@ -551,6 +668,57 @@ function hasPreciseTime(value) {
   return /T\d{2}:\d{2}/.test(raw)
     || /\b\d{1,2}:\d{2}\b/.test(raw)
     || /(?:GMT|UTC|[+-]\d{2}:?\d{2}|Z)$/i.test(raw);
+}
+
+function getBeijingDate(value) {
+  const date = parseDate(value);
+  if (!date) return '';
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
+function addDays(dateOnly, days) {
+  const date = new Date(`${dateOnly}T00:00:00+08:00`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
+function monthNumber(value) {
+  return {
+    jan: 1,
+    january: 1,
+    feb: 2,
+    february: 2,
+    mar: 3,
+    march: 3,
+    apr: 4,
+    april: 4,
+    may: 5,
+    jun: 6,
+    june: 6,
+    jul: 7,
+    july: 7,
+    aug: 8,
+    august: 8,
+    sep: 9,
+    sept: 9,
+    september: 9,
+    oct: 10,
+    october: 10,
+    nov: 11,
+    november: 11,
+    dec: 12,
+    december: 12,
+  }[String(value || '').toLowerCase()] || 0;
 }
 
 function stripHtml(html) {
@@ -629,6 +797,31 @@ function romanizeTeam(name) {
 
 function queryTeam(name) {
   return romanizeTeam(name) || String(name || '');
+}
+
+function slugTeam(name) {
+  const special = {
+    波黑: 'bosnia-and-herzegovina',
+    沙特阿拉伯: 'saudi-arabia',
+    南非: 'south-africa',
+    韩国: 'south-korea',
+    佛得角: 'cape-verde',
+    科特迪瓦: 'cote-divoire',
+    刚果民主共和国: 'dr-congo',
+    新西兰: 'new-zealand',
+    乌兹别克斯坦: 'uzbekistan',
+    美国: 'usa',
+    土耳其: 'turkiye',
+  };
+  const romanized = special[name] || romanizeTeam(name);
+  return String(romanized || name || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/&/g, ' and ')
+    .replace(/['’]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
 }
 
 function stringifyJson(value) {

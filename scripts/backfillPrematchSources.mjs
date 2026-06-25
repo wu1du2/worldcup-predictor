@@ -101,6 +101,7 @@ for (let index = 0; index < targetMatches.length; index += 1) {
     match: `${match.date} ${match.time} ${match.home} vs ${match.away}`,
     contextQuality: context.context_quality,
     acceptedSources: context.sourceGate.accepted_source_ids.length,
+    weakSources: context.sourceGate.weak_source_ids?.length || 0,
     excludedSources: context.sourceGate.excluded_source_ids.length,
     moduleCoverage,
   };
@@ -116,7 +117,7 @@ for (let index = 0; index < targetMatches.length; index += 1) {
   }
 
   report.matches.push(matchReport);
-  console.log(`${index + 1}/${targetMatches.length} ${matchReport.match}: accepted ${matchReport.acceptedSources}, excluded ${matchReport.excludedSources}`);
+  console.log(`${index + 1}/${targetMatches.length} ${matchReport.match}: accepted ${matchReport.acceptedSources}, weak ${matchReport.weakSources}, excluded ${matchReport.excludedSources}`);
 }
 
 await writeReport(report);
@@ -162,7 +163,9 @@ function summarizeModuleCoverage(files) {
     return [key, {
       status: parsed.status || (parsed.external_market_context?.length ? 'collected' : 'market_only'),
       trustedSources: parsed.trusted_source_ids?.length || 0,
+      weakSources: parsed.weak_source_ids?.length || 0,
       facts: parsed.facts?.length || parsed.external_market_context?.length || 0,
+      weakFacts: parsed.weak_facts?.length || parsed.weak_market_context?.length || 0,
     }];
   }));
 }
@@ -190,11 +193,11 @@ function formatTextReport(report) {
       lines.push(`${match.match}: skipped (${match.skipped}), accepted ${match.acceptedSources}`);
       continue;
     }
-    lines.push(`${match.match}: accepted ${match.acceptedSources}, excluded ${match.excludedSources}, quality ${match.contextQuality}`);
-    lines.push(`  team_news ${match.moduleCoverage.team_news.status}/${match.moduleCoverage.team_news.facts}`);
-    lines.push(`  form_and_tactics ${match.moduleCoverage.form_and_tactics.status}/${match.moduleCoverage.form_and_tactics.facts}`);
-    lines.push(`  market ${match.moduleCoverage.market.status}/${match.moduleCoverage.market.facts}`);
-    lines.push(`  weather_and_venue ${match.moduleCoverage.weather_and_venue.status}/${match.moduleCoverage.weather_and_venue.facts}`);
+    lines.push(`${match.match}: accepted ${match.acceptedSources}, weak ${match.weakSources}, excluded ${match.excludedSources}, quality ${match.contextQuality}`);
+    lines.push(`  team_news ${match.moduleCoverage.team_news.status}/${match.moduleCoverage.team_news.facts}+weak${match.moduleCoverage.team_news.weakFacts}`);
+    lines.push(`  form_and_tactics ${match.moduleCoverage.form_and_tactics.status}/${match.moduleCoverage.form_and_tactics.facts}+weak${match.moduleCoverage.form_and_tactics.weakFacts}`);
+    lines.push(`  market ${match.moduleCoverage.market.status}/${match.moduleCoverage.market.facts}+weak${match.moduleCoverage.market.weakFacts}`);
+    lines.push(`  weather_and_venue ${match.moduleCoverage.weather_and_venue.status}/${match.moduleCoverage.weather_and_venue.facts}+weak${match.moduleCoverage.weather_and_venue.weakFacts}`);
   }
   return `${lines.join('\n')}\n`;
 }
