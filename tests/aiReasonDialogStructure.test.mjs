@@ -36,13 +36,33 @@ test('AI recommended scores render a star inside score options', () => {
   assert.ok(scoreGridIndex < starIndex);
 });
 
-test('AI strategy collection and leaderboard have mobile menu entries', () => {
-  assert.match(mainSource, /预测结果/);
-  assert.match(mainSource, /AI策略/);
+test('AI leaderboard is a topbar action and strategy submission lives in the more menu', () => {
+  const topbarSource = mainSource.slice(
+    mainSource.indexOf('<header className="topbar">'),
+    mainSource.indexOf('<section className="date-panel"'),
+  );
+  const moreMenuSource = componentSource('MoreMenuDialog', 'MatchCard');
+
+  assert.match(topbarSource, /预测结果/);
+  assert.match(topbarSource, /AI排行榜/);
+  assert.match(topbarSource, /data-action="ai-strategy-leaderboard"/);
+  assert.doesNotMatch(topbarSource, /data-action="open-ai-strategy"/);
+  assert.match(moreMenuSource, /AI策略/);
+  assert.match(moreMenuSource, /data-action="open-ai-strategy"/);
+  assert.doesNotMatch(moreMenuSource, /AI预测排行榜/);
   assert.match(mainSource, /function AiStrategyDialog/);
   assert.match(mainSource, /data-action="submit-ai-strategy"/);
   assert.match(mainSource, /function AiStrategyLeaderboardDialog/);
-  assert.match(mainSource, /data-action="ai-strategy-leaderboard"/);
   assert.match(stylesSource, /\.strategy-dialog/);
   assert.match(stylesSource, /\.strategy-rank-dialog/);
+});
+
+test('AI leaderboard highlights the top three strategies', () => {
+  const leaderboardSource = componentSource('AiStrategyLeaderboardDialog', 'ExportDialog');
+
+  assert.match(leaderboardSource, /getAiStrategyRankMeta/);
+  assert.match(leaderboardSource, /rankMeta\.top \? 'top-rank'/);
+  assert.match(leaderboardSource, /strategy-rank-medal/);
+  assert.match(stylesSource, /\.strategy-rank-item\.top-rank/);
+  assert.match(stylesSource, /\.strategy-rank-medal/);
 });

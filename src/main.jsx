@@ -384,8 +384,8 @@ function App() {
           <button className="ghost-button" data-action="export" onClick={showExport}>
             预测结果
           </button>
-          <button className="ghost-button ai-strategy-button" data-action="open-ai-strategy" onClick={() => setAiStrategyOpen(true)}>
-            AI策略
+          <button className="ghost-button ai-strategy-button" data-action="ai-strategy-leaderboard" onClick={() => showAiStrategyLeaderboard(0)}>
+            AI排行榜
           </button>
           <button className="icon-button topbar-menu-button" data-action="more-menu" aria-label="更多" onClick={() => setMoreMenuOpen(true)}>
             ...
@@ -490,7 +490,10 @@ function App() {
           onClose={() => setMoreMenuOpen(false)}
           onShowAllTimeStats={showAllTimeStats}
           onShowBackendReports={showBackendReports}
-          onShowAiStrategyLeaderboard={() => showAiStrategyLeaderboard(0)}
+          onOpenAiStrategy={() => {
+            setMoreMenuOpen(false);
+            setAiStrategyOpen(true);
+          }}
         />
       ) : null}
 
@@ -580,7 +583,7 @@ function InfoDialog({ title, message, onClose }) {
   );
 }
 
-function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onShowAiStrategyLeaderboard }) {
+function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onOpenAiStrategy }) {
   return (
     <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="更多">
       <div className="dialog compact-dialog more-menu-dialog" data-more-menu-dialog>
@@ -597,8 +600,8 @@ function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onS
           <button className="menu-action-button" data-action="backend-report" onClick={onShowBackendReports}>
             后台报告
           </button>
-          <button className="menu-action-button" data-action="ai-strategy-leaderboard" onClick={onShowAiStrategyLeaderboard}>
-            AI预测排行榜
+          <button className="menu-action-button" data-action="open-ai-strategy" onClick={onOpenAiStrategy}>
+            AI策略
           </button>
         </div>
       </div>
@@ -824,22 +827,29 @@ function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
 
         {dialog.status === 'ready' && dialog.rows.length > 0 ? (
           <div className="strategy-rank-list">
-            {dialog.rows.map((row, index) => (
-              <article className="strategy-rank-item" key={row.strategyId}>
-                <div className="strategy-rank-header">
-                  <strong>{dialog.page * 6 + index + 1}. {row.strategyName}</strong>
-                  <span>{formatPercent(row.roi)}</span>
-                </div>
-                <p>
-                  净收益 {formatSignedNumber(row.profit)}
-                  {' · '}
-                  成本 {formatNumber(row.cost)}
-                  {' · '}
-                  返还 {formatNumber(row.revenue)}
-                </p>
-                <small>{row.matchesCount} 场比赛</small>
-              </article>
-            ))}
+            {dialog.rows.map((row, index) => {
+              const rank = dialog.page * 6 + index + 1;
+              const rankMeta = getAiStrategyRankMeta(rank);
+              return (
+                <article className={`strategy-rank-item ${rankMeta.top ? 'top-rank' : ''} ${rankMeta.className}`} key={row.strategyId}>
+                  <div className="strategy-rank-header">
+                    <strong>
+                      {rankMeta.top ? <span className="strategy-rank-medal">{rankMeta.label}</span> : `${rank}.`}
+                      {row.strategyName}
+                    </strong>
+                    <span>{formatPercent(row.roi)}</span>
+                  </div>
+                  <p>
+                    净收益 {formatSignedNumber(row.profit)}
+                    {' · '}
+                    成本 {formatNumber(row.cost)}
+                    {' · '}
+                    返还 {formatNumber(row.revenue)}
+                  </p>
+                  <small>{row.matchesCount} 场比赛</small>
+                </article>
+              );
+            })}
           </div>
         ) : null}
 
@@ -855,6 +865,13 @@ function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
       </div>
     </div>
   );
+}
+
+function getAiStrategyRankMeta(rank) {
+  if (rank === 1) return { top: true, label: 'TOP 1', className: 'rank-first' };
+  if (rank === 2) return { top: true, label: 'TOP 2', className: 'rank-second' };
+  if (rank === 3) return { top: true, label: 'TOP 3', className: 'rank-third' };
+  return { top: false, label: String(rank), className: '' };
 }
 
 function ExportDialog({ text, onClose }) {
