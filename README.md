@@ -1,83 +1,135 @@
 # 世界杯比分预测
 
-一个给微信群用的移动端比分预测工具。群友通过同一个 `?group=` 链接进入各自群空间，选择用户名，为每天比赛多选比分并保存。页面支持导出微信群文本、查看群内统计、查看 AI 推荐和 AI 策略排行榜。
+一个给微信群玩的世界杯比分预测工具。
 
-## 核心能力
+每天把群链接发到微信群，大家点开网页，选择自己的名字，给每场比赛选一个或多个比分。比赛结束后，网页可以导出一段适合直接发回微信群的文本：谁命中了、收益多少、下一天还有哪些比赛可以继续预测。
 
-- 群隔离：不同 `group` URL 完全隔离玩家和预测。
-- 赛程真实化：GitHub Actions / 外部 cron 定时拉取比赛状态和赛果。
-- 比分赔率：抓取并解析竞彩比分赔率，写入 Supabase。
-- 预测收集：每个用户每场可以选多个比分，再次提交会覆盖自己的旧预测。
-- 文本传播：一键导出微信群可读的预测结果、今日战报和欢迎预测链接。
-- AI 推荐：离线策略、回测、router 共同生成推荐，前端以蓝色星标展示推荐比分。
-- 策略实验：本地 strategy lab 支持策略迭代、历史回测、ROI 榜单和赛前 context 管理。
+这个项目的乐趣不只是收集比分，还包括赔率、ROI、排行榜，以及一个会不断回测和迭代的 AI 推荐玩家。
 
-## 架构
+## 这东西怎么玩
+
+1. 创建或打开一个群链接，例如 `https://.../?group=abc123`。
+2. 群友选择自己的用户名；没有名字就点 `+` 新增。
+3. 在当天比赛卡片里选择比分，可以多选。
+4. 点 `确定录入` 保存预测。
+5. 点 `预测结果` 导出微信群文本。
+6. 点 `AI排行榜` 查看当前 AI 策略回测表现；点 `... -> AI策略` 可以提交自己的策略想法。
+
+不同群链接的数据完全隔离。你可以给两个微信群发两个不同链接，它们互不影响。
+
+## 当前功能
+
+- 移动端预测 board，优先适配 iPhone 13 及之后的宽度。
+- 用户名和预测持久化到 Supabase。
+- 赛程、赛果、比分赔率持续更新。
+- 比分选项展示赔率和赔率变化。
+- 正确比分、命中结果、ROI、净收益、成本都会进入导出文本。
+- AI 推荐以蓝色星标出现在比分选项右上角。
+- AI 策略排行榜展示历史 ROI，前三名有明显标记。
+- 本地 strategy lab 支持赛前信息收集、策略回测、router 选择和榜单刷新。
+
+## 工程视角
+
+这个项目可以分成三层：
+
+- **前端应用**：让群友预测、保存、导出和查看 AI 信息。
+- **数据更新**：把赛程、赛果、赔率、后台报告写入 Supabase。
+- **模型工程**：离线收集赛前 context，回测策略，选择 AI 推荐并刷回数据库。
+
+### 1. 前端交互层
+
+这张图只看用户打开网页后发生什么。
 
 ```mermaid
 flowchart TD
-  subgraph Client["移动端前端 Render Static Site"]
-    UI["React 预测 board"]
-    Export["导出预测结果"]
-    Rank["AI排行榜 / 总榜 / 后台报告"]
-  end
+  User["微信群用户"] --> Link["打开 group 链接"]
+  Link --> Board["React 移动端预测 board"]
 
-  subgraph DB["Supabase"]
-    Groups["groups / players / predictions"]
-    Matches["matches / teams"]
-    Odds["score_odds / score_odds_trends"]
-    AI["ai_recommendations / ai_strategy_stats / ai_user_strategies"]
-    Reports["import_reports / odds_import_snapshots"]
-  end
+  Board --> Player["选择 / 新增用户名"]
+  Board --> Scores["选择比分"]
+  Board --> Submit["确定录入"]
+  Board --> Export["导出预测结果"]
+  Board --> AiRank["AI排行榜"]
 
-  subgraph Sources["数据来源"]
-    ESPN["ESPN 赛程与赛果"]
-    Sporttery["500.com 竞彩比分赔率"]
-    WebSources["赛前新闻 / 盘口文章 / 天气等网页来源"]
-  end
+  Submit --> Predictions["Supabase predictions"]
+  Player --> Players["Supabase players"]
+  Export --> GroupText["微信群成品文本"]
+  AiRank --> StrategyStats["Supabase ai_strategy_stats"]
 
-  subgraph Jobs["后台任务"]
-    GHA["GitHub Actions"]
-    Cron["cron-job.org workflow_dispatch"]
-    Importers["matches / odds importers"]
-    ReportsWriter["后台报告写入"]
-  end
-
-  subgraph Model["模型工程"]
-    Context["strategy_lab/match_info 赛前 context"]
-    Strategies["candidateStrategies / Poisson EV / temp strategies"]
-    Backtest["历史回测与结算"]
-    Router["strategy router"]
-    Sync["AI 推荐与榜单刷库"]
-  end
-
-  UI --> Groups
-  UI --> Matches
-  UI --> Odds
-  UI --> AI
-  Export --> Groups
-  Rank --> AI
-  Rank --> Reports
-
-  ESPN --> Importers
-  Sporttery --> Importers
-  WebSources --> Context
-  Cron --> GHA
-  GHA --> Importers
-  Importers --> Matches
-  Importers --> Odds
-  Importers --> ReportsWriter
-  ReportsWriter --> Reports
-
-  Context --> Strategies
-  Odds --> Backtest
-  Matches --> Backtest
-  Strategies --> Backtest
-  Backtest --> Router
-  Router --> Sync
-  Sync --> Groups
-  Sync --> AI
+  Board --> Matches["Supabase matches"]
+  Board --> Odds["Supabase score_odds"]
+  Board --> AiReco["Supabase ai_recommendations"]
 ```
+
+前端没有自己的业务数据库。它只负责交互和展示，最终状态以 Supabase 为准。
+
+### 2. 数据更新层
+
+这张图只看“真实比赛数据和赔率怎么进入数据库”。
+
+```mermaid
+flowchart LR
+  Cron["cron-job.org<br/>5 分钟触发"] --> Dispatch["GitHub workflow_dispatch"]
+  Schedule["GitHub Actions schedule<br/>兜底"] --> Actions["GitHub Actions"]
+  Dispatch --> Actions
+
+  Actions --> MatchImporter["importMatchesFromEspn"]
+  Actions --> OddsImporter["importSportteryOdds"]
+  Actions --> TrendBackfill["backfillScoreOddsTrends"]
+
+  ESPN["ESPN 赛程 / 赛果"] --> MatchImporter
+  Sporttery["500.com 竞彩比分赔率"] --> OddsImporter
+  Snapshots["odds_import_snapshots"] --> TrendBackfill
+
+  MatchImporter --> Matches["matches / teams"]
+  OddsImporter --> Odds["score_odds"]
+  OddsImporter --> Snapshots
+  TrendBackfill --> Trends["score_odds_trends"]
+
+  MatchImporter --> Reports["import_reports"]
+  OddsImporter --> Reports
+```
+
+GitHub Actions 不被当成严格定时器使用；准点更新靠 cron-job.org 调 GitHub 的手动触发接口。Actions 自带 schedule 只是兜底。
+
+### 3. AI 与策略工程层
+
+这张图只看“AI 推荐怎么产生、怎么变强”。
+
+```mermaid
+flowchart TD
+  PrematchSources["赛前网页来源<br/>新闻 / 盘口 / 统计"] --> Collector["prematch source collector"]
+  Collector --> MatchInfo["strategy_lab/match_info<br/>赛前 context"]
+
+  MatchInfo --> Strategies["candidateStrategies<br/>固定策略 / 泊松 EV / 临时策略"]
+  Odds["score_odds + trends"] --> Strategies
+  Matches["matches 赛果"] --> Settlement["赛后结算"]
+
+  Strategies --> Backtest["runCandidateStrategyBacktests"]
+  Settlement --> Backtest
+  Backtest --> Stats["策略 ROI / 命中率 / 成本收益"]
+
+  Stats --> Router["strategy router"]
+  MatchInfo --> Router
+  Odds --> Router
+
+  Router --> AiPrediction["AI 推荐比分"]
+  AiPrediction --> AiPlayer["Supabase AI推荐 player predictions"]
+  AiPrediction --> AiDetails["Supabase ai_recommendations"]
+  Stats --> Leaderboard["Supabase ai_strategy_stats"]
+```
+
+策略研发是离线的。前端不运行模型，只读取已经写入 Supabase 的推荐结果、理由和榜单。
+
+## 关键约束
+
+- 每个 `group` 完全隔离。
+- Supabase 是前端状态的唯一权威源。
+- 比赛时间和展示日期统一使用北京时间。
+- 每个比分按 1 注计算成本。
+- ROI = `(返还 - 成本) / 成本`。
+- 赛前 context 不能偷看结果；赛后字段只能在结算阶段使用。
+- date-only 来源只有在“北京时间赛前一天”才允许进入 `weakContext`。
 
 ## 常用命令
 
@@ -85,15 +137,10 @@ flowchart TD
 npm install
 npm test
 npm run build
-```
-
-本地开发：
-
-```bash
 npm run dev
 ```
 
-数据导入：
+数据更新：
 
 ```bash
 npm run import:matches
@@ -101,11 +148,11 @@ npm run import:odds
 npm run backfill:odds-trends
 ```
 
-AI 策略与榜单：
+AI 策略：
 
 ```bash
-npm run strategy:tem
 npm run backtest:candidates
+npm run strategy:tem
 npm run ai:predict-router -- --from=2026-06-26
 ```
 
@@ -130,12 +177,4 @@ GitHub Actions 使用 repository secrets：
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
-近实时更新通过 cron-job.org 调 GitHub `workflow_dispatch`，GitHub Actions 自带 schedule 只作为兜底。
-
-## 数据与策略原则
-
-- Supabase 是前端读写的唯一权威状态源。
-- 赛前 context 只能包含开赛前可验证的信息；带赛后结果或更新时间晚于开赛的来源只能进入 audit。
-- date-only 来源只能在“北京时间赛前一天”进入 `weakContext`。
-- 回测和实盘使用同一种策略接口：输入赛前 context 和赔率，输出 `{ score, stake }`。
-- ROI 口径：每个比分 1 注，命中返还为该比分赔率，`ROI = (返还 - 成本) / 成本`。
+Render 只负责托管静态前端，不负责定时任务；定时数据更新由 cron-job.org + GitHub Actions 完成。
