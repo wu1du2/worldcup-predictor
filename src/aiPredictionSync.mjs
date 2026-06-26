@@ -44,20 +44,21 @@ export function buildAiRecommendationRows({
 
     const route = item.route || {};
     const reason = route.reason || item.reason || item.prediction?.reason || '';
-    const summary = summarizeReason(reason);
+    const scoreLabels = buildScoreLabels(scores, scoreOddsByMatch[matchId] || []);
+    const reasonParts = buildRecommendationReasonParts({ reason, scores, scoreLabels });
 
     return {
       match_id: matchId,
       scores,
-      score_labels: buildScoreLabels(scores, scoreOddsByMatch[matchId] || []),
+      score_labels: scoreLabels,
       strategy_id: route.strategyId || predictionLog.strategy_router || 'main_strategy',
       strategy_name: route.strategyName || item.strategyName || 'AI推荐',
       strategy_roi: Number.isFinite(Number(route.historicalRoiPercent)) ? Number(route.historicalRoiPercent) : null,
       strategy_roi_label: route.roiLabel || '',
       strategy_feature: route.strategyDescription || item.strategyFeature || '',
-      router_reason: reason,
-      match_reason_summary: summary,
-      match_reason_detail: reason || summary,
+      router_reason: reasonParts.routerReason,
+      match_reason_summary: reasonParts.summary,
+      match_reason_detail: reasonParts.detail,
       prediction_summary: `推荐 ${scores.join('、')}。`,
       context_version: predictionLog.strategy_router || '',
       prediction_run_id: predictionRunId || '',
@@ -65,6 +66,48 @@ export function buildAiRecommendationRows({
       source_file: sourceFile || '',
     };
   });
+}
+
+function buildRecommendationReasonParts({ reason, scores, scoreLabels }) {
+  const normalized = normalizeText(reason);
+  const [routerText, scoreText = ''] = splitScoreSelection(normalized);
+  const scoreDetails = buildScoreDetailLines({ scoreText, scores, scoreLabels });
+  const routerReason = summarizeRouterReason(routerText) || trimSentence(routerText) || normalized;
+  const summary = buildSummary({ scoreText, scores });
+
+  return {
+    routerReason,
+    summary,
+    detail: [
+      `本场推荐：${scores.join('、')}`,
+      ...scoreDetails,
+    ].join('\n'),
+  };
+}
+
+function summarizeRouterReason(routerText) {
+  const text = normalizeText(routerText);
+  if (!text) return '';
+
+  const firstSentence = text.split('。').find(Boolean) || '';
+  const candidateType = text.match(/本策略来自([^。；]+)/)?.[1] || '';
+  const roi = text.match(/滚动历史 ROI ([^，；。]+)/)?.[1] || '';
+  const sample = text.match(/样本 ([^；。]+)/)?.[1] || '';
+  const totalScore = text.match(/综合 ([^；。]+)/)?.[1] || '';
+  const market = text.match(/盘口：([^。]+)/)?.[1] || '';
+  const marketShort = market.split('，').slice(0, 2).join('，');
+  const metricParts = [
+    roi ? `历史${roi}` : '',
+    sample ? `样本${sample}` : '',
+    totalScore ? `综合${totalScore}` : '',
+  ].filter(Boolean).join('，');
+
+  return trimSentence([
+    firstSentence,
+    candidateType ? `${candidateType}` : '',
+    metricParts,
+    marketShort,
+  ].filter(Boolean).join('；'));
 }
 
 function normalizePredictionScores(item) {
@@ -82,12 +125,73 @@ function buildScoreLabels(scores, scoreOptions) {
   });
 }
 
-function summarizeReason(reason) {
+function buildSummary({ scoreText, scores }) {
+  const normalized = normalizeText(scoreText);
+  if (!normalized) return `推荐 ${scores.join('、')}。`;
+  const sentence = normalized
+    .replace(/^标准是[^。]*。?/, '')
+    .split(/[。；]/)
+    .find((part) => scores.some((score) => part.includes(score)))
+    || normalized;
+  return `推荐 ${scores.join('、')}：${trimSentence(sentence)}`;
+}
+
+function buildScoreDetailLines({ scoreText, scores, scoreLabels }) {
+  const normalized = normalizeText(scoreText);
+  const labelsByScore = new Map((scoreLabels || []).map((label, index) => [scores[index], label]));
+
+  return scores.map((score) => {
+    const extractedDetail = extractDetailForScore(normalized, score, scores);
+    const detail = extractedDetail
+      ? stripLeadingScore(extractedDetail, score)
+      : `${labelsByScore.get(score) || score} 按当前策略进入推荐。`;
+    return `- ${score}：${trimSentence(detail)}`;
+  });
+}
+
+function extractDetailForScore(text, score, scores) {
+  if (!text) return '';
+  const start = text.indexOf(score);
+  if (start < 0) return '';
+
+  const nextStarts = scores
+    .filter((candidate) => candidate !== score)
+    .map((candidate) => text.indexOf(candidate, start + score.length))
+    .filter((index) => index > start);
+  const end = nextStarts.length ? Math.min(...nextStarts) : text.length;
+  return cleanDetail(text.slice(start, end));
+}
+
+function splitScoreSelection(reason) {
+  const marker = '比分选择：';
+  const index = reason.indexOf(marker);
+  if (index < 0) return [reason, ''];
+  return [
+    reason.slice(0, index),
+    reason.slice(index + marker.length),
+  ];
+}
+
+function stripLeadingScore(detail, score) {
+  const escapedScore = score.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return cleanDetail(detail.replace(new RegExp(`^${escapedScore}\\s*`), ''));
+}
+
+function cleanDetail(text) {
+  return normalizeText(text)
+    .replace(/^标准是[^。]*。/, '')
+    .replace(/^[，,；;。.\s]+/, '')
+    .replace(/[；;。.\s]+$/, '');
+}
+
+function trimSentence(text) {
+  const cleaned = normalizeText(text).replace(/^。+/, '');
+  return cleaned.endsWith('。') ? cleaned : `${cleaned}。`;
+}
+
+function normalizeText(reason) {
   const normalized = String(reason || '').replace(/\s+/g, ' ').trim();
-  const marketIndex = normalized.indexOf('当前盘口特征：');
-  const summary = marketIndex >= 0 ? normalized.slice(marketIndex) : normalized;
-  const sentence = summary.split(/[。；]/).find(Boolean) || summary;
-  return `${sentence.replace(/^。+/, '')}。`;
+  return normalized;
 }
 
 function formatMetric(value) {

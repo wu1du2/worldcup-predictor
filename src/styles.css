@@ -529,6 +529,7 @@ h1 {
   font-size: 15px;
   font-weight: 720;
   line-height: 1.55;
+  white-space: pre-wrap;
 }
 
 .compact-dialog {

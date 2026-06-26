@@ -47,7 +47,11 @@ For each match, output:
 - Dynamic candidates must be selected from rolling stats before the target kickoff only. Do not let matches after the target match improve a candidate's eligibility.
 - Persist router reasoning to `strategy_lab/predictions/strategy_router_<timestamp>_*`.
 - Write per-group AI score picks to Supabase `predictions`, and write match-level strategy metadata/reasoning to `ai_recommendations` for the frontend detail UI.
-- Recommendation reasons must not be generic. They should explicitly include `选择标准` and `比分选择`, mention historical ROI plus market-fit scoring, and explain each score with its current odds. Keep the full reason under 400 Chinese characters so the mobile modal does not truncate the important part.
+- Recommendation reasons must not be generic. The generated route reason may include both `选择标准` and `比分选择`, but the persisted fields must be split for the frontend:
+  - `router_reason`: concise macro reason for choosing the strategy, without `比分选择`
+  - `match_reason_summary`: short one-line preview that names the recommended scores
+  - `match_reason_detail`: readable per-score lines, one line per score, explaining why each score was picked
+  Mention historical ROI plus market-fit scoring, and explain each score with its current odds. Keep the full reason under 400 Chinese characters so the mobile modal does not truncate the important part.
 - Do not assume saved context files are used just because they exist. Regression tests must prove `match.strategyContext` reaches the selected strategy's `selectPicks`.
 - Live Supabase writes can hit transient network timeouts; wrap per-group prediction writes, coverage checks, recommendation upserts, and strategy-stat upserts with bounded retry.
 

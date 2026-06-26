@@ -24,6 +24,7 @@ test('AI recommendation is a score badge and reason entry, not a selectable user
   assert.match(mainSource, /aria-hidden="true">›/);
   assert.match(stylesSource, /\.ai-summary-button/);
   assert.match(stylesSource, /\.ai-detail-dialog/);
+  assert.match(stylesSource, /\.ai-detail-section p[\s\S]*white-space: pre-wrap/);
 });
 
 test('AI recommended scores render a star inside score options', () => {
