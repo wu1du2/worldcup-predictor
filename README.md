@@ -1,180 +1,242 @@
-# 世界杯比分预测
+# World Cup Predictor
 
-一个给微信群玩的世界杯比分预测工具。
+一个给微信群用的世界杯比分预测与 AI 推荐工具。
 
-每天把群链接发到微信群，大家点开网页，选择自己的名字，给每场比赛选一个或多个比分。比赛结束后，网页可以导出一段适合直接发回微信群的文本：谁命中了、收益多少、下一天还有哪些比赛可以继续预测。
+群主每天把同一个群链接发到群里，群友打开网页、选择自己的名字、给每场比赛选比分。赛后，工具会自动汇总命中、赔率收益、ROI，并导出一段可以直接发回微信群的文本。项目还内置一个持续回测和迭代的 `AI推荐` 玩家，用赔率、泊松模型和赛前信息生成推荐比分。
 
-这个项目的乐趣不只是收集比分，还包括赔率、ROI、排行榜，以及一个会不断回测和迭代的 AI 推荐玩家。
+| 入口 | 说明 |
+| --- | --- |
+| `/?group=<group_id>` | 进入一个完全隔离的群预测房间 |
+| `预测结果` | 导出微信群成品文本 |
+| `AI排行榜` | 查看所有 AI 策略的历史 ROI |
+| `... -> AI策略` | 提交新的策略想法，后续可回测和纳入候选 |
 
-## 这东西怎么玩
+## Highlights
 
-1. 创建或打开一个群链接，例如 `https://.../?group=abc123`。
-2. 群友选择自己的用户名；没有名字就点 `+` 新增。
-3. 在当天比赛卡片里选择比分，可以多选。
-4. 点 `确定录入` 保存预测。
-5. 点 `预测结果` 导出微信群文本。
-6. 点 `AI排行榜` 查看当前 AI 策略回测表现；点 `... -> AI策略` 可以提交自己的策略想法。
+- **微信群优先**：移动端第一屏就是比赛 board，适合每天转发、快速填写、快速导出。
+- **群数据隔离**：不同 `group_id` 的用户、预测和导出结果互不影响。
+- **真实赛程与赔率**：GitHub Actions 拉取赛程、赛果、竞彩比分赔率，并写入 Supabase。
+- **波胆玩法完整**：比分选项展示赔率、赔率涨跌、赛果高亮和命中收益。
+- **AI 推荐玩家**：AI 推荐以蓝色星标出现在比分选项上，并像普通用户一样进入导出文本。
+- **策略实验室**：支持赛前 context 收集、策略回测、router 选择、排行榜刷新和赛后结算。
+- **可复现工程流**：测试、构建、截图验收、数据导入和策略预测都有独立脚本。
 
-不同群链接的数据完全隔离。你可以给两个微信群发两个不同链接，它们互不影响。
-
-## 当前功能
-
-- 移动端预测 board，优先适配 iPhone 13 及之后的宽度。
-- 用户名和预测持久化到 Supabase。
-- 赛程、赛果、比分赔率持续更新。
-- 比分选项展示赔率和赔率变化。
-- 正确比分、命中结果、ROI、净收益、成本都会进入导出文本。
-- AI 推荐以蓝色星标出现在比分选项右上角。
-- AI 策略排行榜展示历史 ROI，前三名有明显标记。
-- 本地 strategy lab 支持赛前信息收集、策略回测、router 选择和榜单刷新。
-
-## 工程视角
-
-这个项目可以分成三层：
-
-- **前端应用**：让群友预测、保存、导出和查看 AI 信息。
-- **数据更新**：把赛程、赛果、赔率、后台报告写入 Supabase。
-- **模型工程**：离线收集赛前 context，回测策略，选择 AI 推荐并刷回数据库。
-
-### 1. 前端交互层
-
-这张图只看用户打开网页后发生什么。
-
-```mermaid
-flowchart TD
-  User["微信群用户"] --> Link["打开 group 链接"]
-  Link --> Board["React 移动端预测 board"]
-
-  Board --> Player["选择 / 新增用户名"]
-  Board --> Scores["选择比分"]
-  Board --> Submit["确定录入"]
-  Board --> Export["导出预测结果"]
-  Board --> AiRank["AI排行榜"]
-
-  Submit --> Predictions["Supabase predictions"]
-  Player --> Players["Supabase players"]
-  Export --> GroupText["微信群成品文本"]
-  AiRank --> StrategyStats["Supabase ai_strategy_stats"]
-
-  Board --> Matches["Supabase matches"]
-  Board --> Odds["Supabase score_odds"]
-  Board --> AiReco["Supabase ai_recommendations"]
-```
-
-前端没有自己的业务数据库。它只负责交互和展示，最终状态以 Supabase 为准。
-
-### 2. 数据更新层
-
-这张图只看“真实比赛数据和赔率怎么进入数据库”。
+## How It Works
 
 ```mermaid
 flowchart LR
-  Cron["cron-job.org<br/>5 分钟触发"] --> Dispatch["GitHub workflow_dispatch"]
-  Schedule["GitHub Actions schedule<br/>兜底"] --> Actions["GitHub Actions"]
-  Dispatch --> Actions
+  User["微信群用户"] --> Web["React mobile web app"]
+  Web --> Supabase["Supabase<br/>groups / players / predictions"]
+  Web --> Export["微信群预测文本"]
 
-  Actions --> MatchImporter["importMatchesFromEspn"]
-  Actions --> OddsImporter["importSportteryOdds"]
-  Actions --> TrendBackfill["backfillScoreOddsTrends"]
+  Sources["ESPN / 500.com / 赛前网页"] --> Jobs["GitHub Actions<br/>import & backfill jobs"]
+  Jobs --> Supabase
 
-  ESPN["ESPN 赛程 / 赛果"] --> MatchImporter
-  Sporttery["500.com 竞彩比分赔率"] --> OddsImporter
-  Snapshots["odds_import_snapshots"] --> TrendBackfill
-
-  MatchImporter --> Matches["matches / teams"]
-  OddsImporter --> Odds["score_odds"]
-  OddsImporter --> Snapshots
-  TrendBackfill --> Trends["score_odds_trends"]
-
-  MatchImporter --> Reports["import_reports"]
-  OddsImporter --> Reports
+  Supabase --> Lab["Strategy Lab<br/>backtest / router / AI推荐"]
+  Lab --> Supabase
 ```
 
-GitHub Actions 不被当成严格定时器使用；准点更新靠 cron-job.org 调 GitHub 的手动触发接口。Actions 自带 schedule 只是兜底。
+The frontend is a static React app. It does not own business state; Supabase is the source of truth. Scheduled jobs and local strategy scripts enrich the database with matches, odds, results, AI recommendations, and strategy leaderboard stats.
 
-### 3. AI 与策略工程层
+## User Flow
 
-这张图只看“AI 推荐怎么产生、怎么变强”。
+1. Open a group link, for example `https://worldcup-predictor.example.com/?group=abc123`.
+2. Select a username, or add a new one with `+`.
+3. Pick one or more exact scores for each match.
+4. Submit predictions.
+5. After matches finish, open `预测结果` and copy the WeChat-ready result text.
+6. Open `AI排行榜` to see which AI strategies have performed best historically.
 
-```mermaid
-flowchart TD
-  PrematchSources["赛前网页来源<br/>新闻 / 盘口 / 统计"] --> Collector["prematch source collector"]
-  Collector --> MatchInfo["strategy_lab/match_info<br/>赛前 context"]
+If the URL does not include `group`, the app shows a simple home page that can generate a new six-character group link.
 
-  MatchInfo --> Strategies["candidateStrategies<br/>固定策略 / 泊松 EV / 临时策略"]
-  Odds["score_odds + trends"] --> Strategies
-  Matches["matches 赛果"] --> Settlement["赛后结算"]
+## AI Recommendation
 
-  Strategies --> Backtest["runCandidateStrategyBacktests"]
-  Settlement --> Backtest
-  Backtest --> Stats["策略 ROI / 命中率 / 成本收益"]
+`AI推荐` is a special system player. It is not selected from the normal user list; instead, its picks are rendered as blue stars on score options.
 
-  Stats --> Router["strategy router"]
-  MatchInfo --> Router
-  Odds --> Router
+For each match, the AI detail panel includes:
 
-  Router --> AiPrediction["AI 推荐比分"]
-  AiPrediction --> AiPlayer["Supabase AI推荐 player predictions"]
-  AiPrediction --> AiDetails["Supabase ai_recommendations"]
-  Stats --> Leaderboard["Supabase ai_strategy_stats"]
+- **本场摘要**: a short preview under the match title.
+- **策略特点**: what kind of strategy was used.
+- **Router 选择理由**: why the router selected this strategy for this match.
+- **完整说明**: one line per recommended score.
+
+For Poisson/EV strategies, the score explanation uses model numbers instead of vague text:
+
+```text
+本场推荐：0-1、0-0
+- 0-1：预计概率 10.45%，EV +2.03，赔率 29。
+- 0-0：预计概率 10.63%，EV +1.55，赔率 24。
 ```
 
-策略研发是离线的。前端不运行模型，只读取已经写入 Supabase 的推荐结果、理由和榜单。
+`EV = 预计概率 * 赔率 - 1`.
 
-## 关键约束
+## System Components
 
-- 每个 `group` 完全隔离。
-- Supabase 是前端状态的唯一权威源。
-- 比赛时间和展示日期统一使用北京时间。
-- 每个比分按 1 注计算成本。
-- ROI = `(返还 - 成本) / 成本`。
-- 赛前 context 不能偷看结果；赛后字段只能在结算阶段使用。
-- date-only 来源只有在“北京时间赛前一天”才允许进入 `weakContext`。
+### Frontend
 
-## 常用命令
+- `src/main.jsx`: mobile board, dialogs, export flow, AI detail UI.
+- `src/supabaseData.mjs`: Supabase reads/writes and app-shape mapping.
+- `src/predictionState.mjs`: local prediction state helpers.
+- `src/predictionExport.mjs`: WeChat-ready export text.
+
+### Data Import
+
+- `scripts/importMatchesFromEspn.mjs`: imports schedule, kickoff time, status, and final scores.
+- `scripts/importSportteryOdds.mjs`: imports correct-score odds.
+- `scripts/backfillScoreOddsTrends.mjs`: computes first-to-latest odds movement.
+- `scripts/reportActionFailure.mjs`: writes backend report rows when scheduled jobs fail.
+
+### Strategy Lab
+
+- `src/strategyCandidates.mjs`: deterministic candidate strategies and backtest runner.
+- `src/poissonEvStrategy.mjs`: Poisson / Dixon-Coles probability table and EV selection.
+- `src/strategyRouter.mjs`: chooses the production AI strategy per match.
+- `strategy_lab/match_info/`: collected pre-match context.
+- `strategy_lab/predictions/`: generated prediction logs and reports.
+- `strategy_lab/skills/`: project-specific operating rules for context, routing, and strategy work.
+
+## Data Model
+
+The app depends on these Supabase tables:
+
+| Table | Purpose |
+| --- | --- |
+| `groups` | group rooms keyed by URL code |
+| `players` | group-local usernames plus `AI推荐` |
+| `predictions` | score picks per group, player, and match |
+| `matches` | schedule, status, scores, team snapshots |
+| `teams` | canonical English/Chinese team names |
+| `score_odds` | latest correct-score odds |
+| `score_odds_trends` | odds movement from first snapshot to latest snapshot |
+| `odds_import_snapshots` | raw odds import audit snapshots |
+| `ai_recommendations` | AI strategy, score details, router reason, score explanations |
+| `ai_strategy_stats` | leaderboard rows for AI strategies |
+| `import_reports` | backend job status shown in the app |
+
+## Getting Started
+
+Requirements:
+
+- Node.js 22+
+- Supabase project with the project schema applied
+- Optional: GitHub Actions secrets for scheduled imports
+
+Install and run the app:
 
 ```bash
 npm install
-npm test
-npm run build
 npm run dev
 ```
 
-数据更新：
+Run verification:
 
 ```bash
+npm test
+npm run build
+```
+
+Create `.env.local` for local data scripts:
+
+```bash
+VITE_SUPABASE_URL=https://<project>.supabase.co
+VITE_SUPABASE_ANON_KEY=<publishable-key>
+SUPABASE_URL=https://<project>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+```
+
+The frontend only needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Import and AI scripts need `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`.
+
+## Common Commands
+
+### App
+
+```bash
+npm run dev
+npm test
+npm run build
+```
+
+### Match And Odds Jobs
+
+```bash
+npm run import:matches:dry
 npm run import:matches
+
+npm run import:odds:dry
 npm run import:odds
 npm run backfill:odds-trends
 ```
 
-AI 策略：
+### AI And Strategy Lab
 
 ```bash
 npm run backtest:candidates
 npm run strategy:tem
-npm run ai:predict-router -- --from=2026-06-26
+
+npm run ai:predict-router:dry -- --from=2026-06-27
+npm run ai:predict-router -- --from=2026-06-27
 ```
 
-历史 context：
+### Prematch Context
 
 ```bash
-npm run historical:contexts
+npm run prematch:sources:dry
 npm run prematch:sources
+npm run historical:contexts
 npm run historical:verify
 ```
 
-## 部署
+## Scheduled Jobs
 
-Render 使用 Static Site：
+GitHub Actions has two workflows:
 
-- Build Command: `npm run build`
-- Publish Directory: `dist`
-- 环境变量：`VITE_SUPABASE_URL`、`VITE_SUPABASE_ANON_KEY`
+- `Import World Cup Matches`: updates schedule, status, and final scores.
+- `Import Sporttery Odds`: updates score odds and odds trends.
 
-GitHub Actions 使用 repository secrets：
+The repository also supports external triggering through GitHub `workflow_dispatch`, which lets a service such as cron-job.org call the workflows more regularly than GitHub's native schedule. GitHub's own cron schedule remains a fallback.
 
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
+Required GitHub repository secrets:
 
-Render 只负责托管静态前端，不负责定时任务；定时数据更新由 cron-job.org + GitHub Actions 完成。
+```text
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+```
+
+## Deployment
+
+Render can host the frontend as a Static Site:
+
+```text
+Build Command: npm run build
+Publish Directory: dist
+```
+
+Render environment variables:
+
+```text
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+```
+
+Render only serves the static frontend. Data imports, odds refreshes, and AI prediction refreshes run through GitHub Actions or local scripts.
+
+## Engineering Rules
+
+- Supabase is the single source of truth for app state.
+- Every `group` is fully isolated.
+- Match dates and labels are displayed in UTC+8 / Beijing time.
+- Each selected score costs 1 unit.
+- ROI is `(return - cost) / cost`.
+- Pre-match context must not contain post-match result leakage.
+- For AI recommendations, router reasons and per-score explanations are separate fields.
+- Before shipping meaningful changes, run `npm test` and `npm run build`.
+
+## Project Status
+
+This is a small, real-use product built for a live friend group workflow. It intentionally favors:
+
+- fast mobile input over desktop-heavy dashboards,
+- readable WeChat export text over complex reports,
+- deterministic scripts over hidden backend services,
+- local strategy experimentation before productionizing AI recommendations.
+
