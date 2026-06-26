@@ -173,6 +173,81 @@ test('routeStrategyForMatch only considers the production router candidate pool 
   assert.notEqual(route.strategyId, 'market_poisson_ev');
 });
 
+test('routeStrategyForMatch adds qualified rolling leaderboard strategies to the router pool', () => {
+  const fullScoreOptions = [
+    '1-0', '2-0', '2-1', '3-0', '3-1', '3-2', '4-0', '4-1', '4-2', '5-0',
+    '5-1', '5-2', '胜其他', '0-0', '1-1', '2-2', '3-3', '平其他', '0-1',
+    '0-2', '1-2', '0-3', '1-3', '2-3', '0-4', '1-4', '2-4', '0-5',
+    '1-5', '2-5', '负其他',
+  ].map((score, index) => ({ score, odds: 6 + index }));
+  const qualifiedRows = Array.from({ length: 40 }, (_, index) => ({
+    date: '2026-06-13',
+    time: `${String(index % 23).padStart(2, '0')}:00`,
+    hitScore: index < 8 ? '1-0' : '',
+    cost: 4,
+    revenue: 16,
+  }));
+
+  const route = routeStrategyForMatch({
+    match: { id: 'dynamic-1', date: '2026-06-25', time: '03:00', home: '波黑', away: '卡塔尔' },
+    scoreOptions: fullScoreOptions,
+    historicalResults: [
+      {
+        strategyId: 'market_consensus_4',
+        strategyName: '市场共识四项',
+        rows: qualifiedRows,
+      },
+      {
+        strategyId: 'tem_hybrid_draw_poisson_v2_d1_n2',
+        strategyName: '平局泊松混合 2 格',
+        rows: [
+          { date: '2026-06-13', time: '03:00', hitScore: '', cost: 2, revenue: 0 },
+        ],
+      },
+    ],
+  });
+
+  assert.equal(route.strategyId, 'market_consensus_4');
+  assert.match(route.reason, /流动候选/);
+});
+
+test('routeStrategyForMatch does not qualify dynamic strategies using matches after the target kickoff', () => {
+  const fullScoreOptions = [
+    '1-0', '2-0', '2-1', '3-0', '3-1', '3-2', '4-0', '4-1', '4-2', '5-0',
+    '5-1', '5-2', '胜其他', '0-0', '1-1', '2-2', '3-3', '平其他', '0-1',
+    '0-2', '1-2', '0-3', '1-3', '2-3', '0-4', '1-4', '2-4', '0-5',
+    '1-5', '2-5', '负其他',
+  ].map((score, index) => ({ score, odds: 6 + index }));
+  const afterCutoffRows = Array.from({ length: 40 }, (_, index) => ({
+    date: '2026-06-26',
+    time: `${String(index % 23).padStart(2, '0')}:00`,
+    hitScore: '1-0',
+    cost: 4,
+    revenue: 20,
+  }));
+
+  const route = routeStrategyForMatch({
+    match: { id: 'dynamic-2', date: '2026-06-25', time: '03:00', home: '波黑', away: '卡塔尔' },
+    scoreOptions: fullScoreOptions,
+    historicalResults: [
+      {
+        strategyId: 'market_consensus_4',
+        strategyName: '市场共识四项',
+        rows: afterCutoffRows,
+      },
+      {
+        strategyId: 'tem_hybrid_draw_poisson_v2_d1_n2',
+        strategyName: '平局泊松混合 2 格',
+        rows: [
+          { date: '2026-06-13', time: '03:00', hitScore: '1-1', cost: 2, revenue: 8 },
+        ],
+      },
+    ],
+  });
+
+  assert.notEqual(route.strategyId, 'market_consensus_4');
+});
+
 test('buildForcedStrategyAiPredictionEntries uses one requested strategy for every match', () => {
   const entries = buildForcedStrategyAiPredictionEntries({
     strategyId: 'context_poisson_ev',

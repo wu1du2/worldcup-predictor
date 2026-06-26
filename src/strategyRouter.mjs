@@ -2,6 +2,11 @@ import { defaultAiPredictionScores } from './aiPredictionBatch.mjs';
 import { candidateStrategies } from './strategyCandidates.mjs';
 
 const fallbackStrategyId = 'low_score_basket_4';
+const dynamicRouterCandidateLimit = 4;
+const dynamicCandidateMinSettledMatches = 40;
+const dynamicCandidateMinHitMatches = 3;
+const dynamicCandidateMinRoiPercent = 0;
+const dynamicCandidateMaxAveragePicks = 4.5;
 export const routerCandidateStrategyIds = [
   'tem_hybrid_draw_poisson_v2_d1_n2',
   'tem_draw_anchor_3_max5_5',
@@ -38,13 +43,14 @@ export function routeStrategyForMatch({
   historicalResults,
   strategies = candidateStrategies,
 }) {
-  const routerStrategies = getRouterCandidateStrategies(strategies);
   const odds = normalizeOdds(scoreOptions);
   const rollingStats = buildRollingStrategyStats({
     historicalResults,
     cutoffDate: match.date,
     cutoffTime: match.time,
   });
+  const dynamicCandidateIds = getDynamicRouterCandidateIds({ strategies, rollingStats });
+  const routerStrategies = getRouterCandidateStrategies(strategies, dynamicCandidateIds);
 
   if (!odds.length) {
     const fallbackStats = rollingStats[fallbackStrategyId] || emptyStats(fallbackStrategyId);
@@ -66,6 +72,7 @@ export function routeStrategyForMatch({
     .filter((item) => strategyCanPick(item.strategy, odds))
     .map((item) => ({
       ...item,
+      isDynamicCandidate: dynamicCandidateIds.includes(item.strategy.id),
       routerScore: roundMetric((item.stats.roiPercent / 250) + item.featureScore),
     }))
     .sort((a, b) => (
@@ -191,9 +198,10 @@ function buildRoute({ match, strategy, stats, confidence, reason }) {
 
 function buildReason({ match, selected, odds }) {
   const market = describeMarket(odds);
+  const candidateType = selected.isDynamicCandidate ? '流动候选' : '核心候选';
   return [
     `${formatMatch(match)}：选「${selected.strategy.name}」。`,
-    '选择标准：候选策略按历史 ROI/250 + 盘口适配分排序。',
+    `选择标准：核心候选固定保留，榜单达标策略可作为流动候选；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自${candidateType}。`,
     `本场：滚动历史 ROI ${formatSignedPercent(selected.stats.roiPercent)}，样本 ${selected.stats.settledMatches}；适配 ${formatMetric(selected.featureScore)}，综合 ${formatMetric(selected.routerScore)}。`,
     `盘口：${market}。`,
   ].join('');
@@ -303,11 +311,37 @@ function scoreStrategyFeatures({ strategy, odds }) {
   return 0;
 }
 
-function getRouterCandidateStrategies(strategies) {
+function getRouterCandidateStrategies(strategies, dynamicCandidateIds = []) {
   const byId = new Map((strategies || []).map((strategy) => [strategy.id, strategy]));
-  return routerCandidateStrategyIds
+  return uniqueValues([...routerCandidateStrategyIds, ...dynamicCandidateIds])
     .map((strategyId) => byId.get(strategyId) || candidateStrategies.find((strategy) => strategy.id === strategyId))
     .filter(Boolean);
+}
+
+function getDynamicRouterCandidateIds({ strategies, rollingStats }) {
+  const strategyIds = new Set((strategies || []).map((strategy) => strategy.id));
+
+  return Object.values(rollingStats || {})
+    .filter((stats) => isQualifiedDynamicCandidate({ stats, strategyIds }))
+    .sort((a, b) => (
+      b.roiPercent - a.roiPercent
+      || b.netProfit - a.netProfit
+      || b.hitMatches - a.hitMatches
+      || a.strategyId.localeCompare(b.strategyId)
+    ))
+    .slice(0, dynamicRouterCandidateLimit)
+    .map((stats) => stats.strategyId);
+}
+
+function isQualifiedDynamicCandidate({ stats, strategyIds }) {
+  if (!stats || !strategyIds.has(stats.strategyId)) return false;
+  if (routerCandidateStrategyIds.includes(stats.strategyId)) return false;
+  if (stats.strategyId === fallbackStrategyId) return false;
+  if (stats.settledMatches < dynamicCandidateMinSettledMatches) return false;
+  if (stats.hitMatches < dynamicCandidateMinHitMatches) return false;
+  if (stats.roiPercent < dynamicCandidateMinRoiPercent) return false;
+  const averagePicks = stats.settledMatches > 0 ? stats.cost / stats.settledMatches : Number.POSITIVE_INFINITY;
+  return averagePicks <= dynamicCandidateMaxAveragePicks;
 }
 
 function getMarketFeatures(odds) {
@@ -374,6 +408,10 @@ function normalizeOdds(options) {
 
 function uniqueScores(picks) {
   return [...new Set((picks || []).map((pick) => pick.score).filter(Boolean))];
+}
+
+function uniqueValues(values) {
+  return [...new Set((values || []).filter(Boolean))];
 }
 
 function minOddsForOutcome(odds, outcome) {

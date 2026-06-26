@@ -9,13 +9,22 @@ description: Use when selecting one candidate score-prediction strategy for a ma
 The router chooses a `strategy_id`; it does not directly invent score picks.
 
 ## Production Candidate Pool
-Production routing is intentionally narrower than the offline experiment catalog. Keep `candidateStrategies` broad for backtests, but default router decisions should use only `routerCandidateStrategyIds`:
+Production routing is intentionally narrower than the offline experiment catalog. Keep `candidateStrategies` broad for backtests, but default router decisions start from the core `routerCandidateStrategyIds`:
 
 - `tem_hybrid_draw_poisson_v2_d1_n2`
 - `tem_draw_anchor_3_max5_5`
 - `context_poisson_ev_v3`
 
-Other strategies may still be forced explicitly for experiments, but they should not enter default AI推荐 routing unless the production pool is deliberately revised.
+Other strategies may still be forced explicitly for experiments. A strategy can also enter default AI推荐 routing as a rolling leaderboard candidate when it passes all dynamic gates before the target kickoff:
+
+- settled matches >= 40
+- hit matches >= 3
+- ROI >= 0%
+- average picks per match <= 4.5
+- not the fallback strategy
+- max 4 dynamic candidates
+
+Router reasons should clearly say whether the winning strategy came from `核心候选` or `流动候选`.
 
 ## Required Inputs
 - Trusted pre-match match data: date, time, teams, and available score odds/trends.
@@ -35,6 +44,7 @@ For each match, output:
 - Do not modify `strategy_lab/strategies/main_strategy.md`.
 - Do not use final scores, post-match reports, or ROI from the target match.
 - If odds are missing, fall back to `low_score_basket_4` with `0-0, 0-1, 1-0, 1-1`.
+- Dynamic candidates must be selected from rolling stats before the target kickoff only. Do not let matches after the target match improve a candidate's eligibility.
 - Persist router reasoning to `strategy_lab/predictions/strategy_router_<timestamp>_*`.
 - Write per-group AI score picks to Supabase `predictions`, and write match-level strategy metadata/reasoning to `ai_recommendations` for the frontend detail UI.
 - Recommendation reasons must not be generic. They should explicitly include `选择标准` and `比分选择`, mention historical ROI plus market-fit scoring, and explain each score with its current odds. Keep the full reason under 400 Chinese characters so the mobile modal does not truncate the important part.
