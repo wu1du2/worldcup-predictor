@@ -110,7 +110,7 @@ export function buildRoutedAiPredictionEntries({
       return {
         matchId: match.id,
         scores: picks,
-        route,
+        route: withScoreSelectionReason({ route, picks, scoreOptions }),
       };
     });
 }
@@ -147,10 +147,15 @@ export function buildForcedStrategyAiPredictionEntries({
           `当前任务要求用该策略预测全部后续场次。`,
         ].join(''),
       });
+      const picks = pickScoresForRoute({ route, scoreOptions, strategies, match });
       return {
         matchId: match.id,
-        scores: pickScoresForRoute({ route, scoreOptions, strategies, match }),
-        route,
+        scores: picks,
+        route: withScoreSelectionReason({
+          route,
+          picks,
+          scoreOptions,
+        }),
       };
     });
 }
@@ -187,11 +192,74 @@ function buildRoute({ match, strategy, stats, confidence, reason }) {
 function buildReason({ match, selected, odds }) {
   const market = describeMarket(odds);
   return [
-    `${formatMatch(match)}：router 选择「${selected.strategy.name}」。`,
-    `滚动历史 ROI ${formatSignedPercent(selected.stats.roiPercent)}，样本 ${selected.stats.settledMatches} 场。`,
-    `当前盘口特征：${market}。`,
-    `综合分=${formatMetric(selected.routerScore)}，其中历史表现和策略适配度共同参与排序。`,
+    `${formatMatch(match)}：选「${selected.strategy.name}」。`,
+    '选择标准：候选策略按历史 ROI/250 + 盘口适配分排序。',
+    `本场：滚动历史 ROI ${formatSignedPercent(selected.stats.roiPercent)}，样本 ${selected.stats.settledMatches}；适配 ${formatMetric(selected.featureScore)}，综合 ${formatMetric(selected.routerScore)}。`,
+    `盘口：${market}。`,
   ].join('');
+}
+
+function withScoreSelectionReason({ route, picks, scoreOptions }) {
+  const scoreReason = buildScoreSelectionReason({
+    strategyId: route.strategyId,
+    picks,
+    scoreOptions: normalizeOdds(scoreOptions),
+  });
+  return {
+    ...route,
+    reason: `${route.reason}${scoreReason}`,
+  };
+}
+
+function buildScoreSelectionReason({ strategyId, picks, scoreOptions }) {
+  const scores = picks || [];
+  if (!scores.length) return '比分选择：没有可用比分，使用默认低比分覆盖。';
+
+  const scoreDetails = scores.map((score) => describePickedScore({ strategyId, score, scoreOptions }));
+  return `比分选择：${getStrategyPickStandard(strategyId)}${scoreDetails.join('；')}。`;
+}
+
+function getStrategyPickStandard(strategyId) {
+  if (strategyId === 'tem_draw_anchor_3_max5_5') {
+    return '标准是平局赔率低时围绕平局，并加一个低比分保护。';
+  }
+  if (strategyId === 'tem_hybrid_draw_poisson_v2_d1_n2') {
+    return '标准是先保 1-1，再用赛前泊松 EV 补位。';
+  }
+  if (strategyId === 'context_poisson_ev_v3') {
+    return '标准是用赛前 context 估进球，做低比分/平局修正后按 EV 取前列。';
+  }
+  if (strategyId === fallbackStrategyId) {
+    return '标准是缺赔率时覆盖最常见低比分。';
+  }
+  return '标准是按当前策略规则和赔率排序。';
+}
+
+function describePickedScore({ strategyId, score, scoreOptions }) {
+  const option = scoreOptions.find((item) => item.score === score);
+  const oddsText = option ? `赔率 ${formatMetric(option.odds)}` : '赔率缺失';
+
+  if (strategyId === 'tem_draw_anchor_3_max5_5') {
+    if (score === '1-1') return `${score} 核心平局，${oddsText}`;
+    if (score === '2-2') return `${score} 高进球平局扩展，${oddsText}`;
+    if (score === '0-0') return `${score} 低节奏平局，${oddsText}`;
+    return `${score} 低比分保护，${oddsText}`;
+  }
+
+  if (strategyId === 'tem_hybrid_draw_poisson_v2_d1_n2') {
+    if (score === '1-1') return `${score} 固定平局锚点，${oddsText}`;
+    return `${score} 泊松 EV 补位，${oddsText}`;
+  }
+
+  if (strategyId === 'context_poisson_ev_v3') {
+    return `${score} EV 靠前，${oddsText}`;
+  }
+
+  if (strategyId === fallbackStrategyId) {
+    return `${score} 低比分默认覆盖，${oddsText}`;
+  }
+
+  return `${score} 符合策略规则，${oddsText}`;
 }
 
 function scoreStrategyFeatures({ strategy, odds }) {

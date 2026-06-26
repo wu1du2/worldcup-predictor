@@ -93,6 +93,26 @@ test('buildRoutedAiPredictionEntries falls back to low-score scores when odds ar
   assert.match(entries[1].route.reason, /缺少可用赔率/);
 });
 
+test('buildRoutedAiPredictionEntries explains routing standard and selected score reasons', () => {
+  const entries = buildRoutedAiPredictionEntries({
+    matches: [
+      { id: 'explain-odds', date: '2026-06-24', time: '01:00', home: '葡萄牙', away: '乌兹别克斯坦' },
+    ],
+    scoreOddsByMatch: {
+      'explain-odds': scoreOptions,
+    },
+    historicalResults,
+  });
+
+  assert.match(entries[0].route.reason, /选择标准/);
+  assert.match(entries[0].route.reason, /历史 ROI/);
+  assert.match(entries[0].route.reason, /盘口适配/);
+  assert.match(entries[0].route.reason, /比分选择/);
+  assert.match(entries[0].route.reason, /1-1/);
+  assert.match(entries[0].route.reason, /赔率/);
+  assert.ok(entries[0].route.reason.length <= 400);
+});
+
 test('buildForcedStrategyAiPredictionEntries can still run market Poisson EV for experiments', () => {
   const fullScoreOptions = [
     '1-0', '2-0', '2-1', '3-0', '3-1', '3-2', '4-0', '4-1', '4-2', '5-0',
