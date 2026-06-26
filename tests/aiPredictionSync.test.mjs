@@ -119,6 +119,10 @@ test('buildAiRecommendationRows separates router reason from per-score predictio
       {
         matchId: 'espn-760474',
         scores: ['0-1', '0-0'],
+        pickDetails: [
+          { score: '0-1', odds: 29, probability: 0.049, ev: 0.421 },
+          { score: '0-0', odds: 24, probability: 0.047, ev: 0.128 },
+        ],
         route: {
           strategyId: 'market_poisson_ev',
           strategyName: '赛前泊松EV精选',
@@ -147,8 +151,6 @@ test('buildAiRecommendationRows separates router reason from per-score predictio
   assert.match(row.match_reason_summary, /0-0/);
   assert.notEqual(row.router_reason, row.match_reason_detail);
   assert.match(row.match_reason_detail, /本场推荐：0-1、0-0/);
-  assert.match(row.match_reason_detail, /- 0-1：/);
-  assert.match(row.match_reason_detail, /- 0-0：/);
-  assert.match(row.match_reason_detail, /赔率 8/);
-  assert.match(row.match_reason_detail, /赔率 6/);
+  assert.match(row.match_reason_detail, /- 0-1：预计概率 4\.9%，EV \+0\.42，赔率 29/);
+  assert.match(row.match_reason_detail, /- 0-0：预计概率 4\.7%，EV \+0\.13，赔率 24/);
 });

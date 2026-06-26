@@ -113,11 +113,13 @@ export function buildRoutedAiPredictionEntries({
         historicalResults,
         strategies,
       });
-      const picks = pickScoresForRoute({ route, scoreOptions, strategies, match });
+      const pickDetails = pickDetailsForRoute({ route, scoreOptions, strategies, match });
+      const picks = pickDetails.map((pick) => pick.score);
       return {
         matchId: match.id,
         scores: picks,
-        route: withScoreSelectionReason({ route, picks, scoreOptions }),
+        pickDetails,
+        route: withScoreSelectionReason({ route, picks: pickDetails, scoreOptions }),
       };
     });
 }
@@ -154,13 +156,15 @@ export function buildForcedStrategyAiPredictionEntries({
           `当前任务要求用该策略预测全部后续场次。`,
         ].join(''),
       });
-      const picks = pickScoresForRoute({ route, scoreOptions, strategies, match });
+      const pickDetails = pickDetailsForRoute({ route, scoreOptions, strategies, match });
+      const picks = pickDetails.map((pick) => pick.score);
       return {
         matchId: match.id,
         scores: picks,
+        pickDetails,
         route: withScoreSelectionReason({
           route,
-          picks,
+          picks: pickDetails,
           scoreOptions,
         }),
       };
@@ -168,17 +172,21 @@ export function buildForcedStrategyAiPredictionEntries({
 }
 
 export function pickScoresForRoute({ route, scoreOptions, strategies = candidateStrategies, match = null }) {
+  return pickDetailsForRoute({ route, scoreOptions, strategies, match }).map((pick) => pick.score);
+}
+
+function pickDetailsForRoute({ route, scoreOptions, strategies = candidateStrategies, match = null }) {
   if (route.strategyId === fallbackStrategyId && !normalizeOdds(scoreOptions).length) {
-    return defaultAiPredictionScores;
+    return defaultAiPredictionScores.map((score) => ({ score }));
   }
 
   const strategy = findStrategy(strategies, route.strategyId);
-  const picks = uniqueScores(strategy.selectPicks({
+  const picks = uniquePicks(strategy.selectPicks({
     match,
     odds: normalizeOdds(scoreOptions),
     context: match?.strategyContext || {},
   }) || []);
-  return picks.length ? picks : defaultAiPredictionScores;
+  return picks.length ? picks : defaultAiPredictionScores.map((score) => ({ score }));
 }
 
 function buildRoute({ match, strategy, stats, confidence, reason }) {
@@ -220,10 +228,10 @@ function withScoreSelectionReason({ route, picks, scoreOptions }) {
 }
 
 function buildScoreSelectionReason({ strategyId, picks, scoreOptions }) {
-  const scores = picks || [];
-  if (!scores.length) return '比分选择：没有可用比分，使用默认低比分覆盖。';
+  const pickDetails = normalizePickDetails(picks);
+  if (!pickDetails.length) return '比分选择：没有可用比分，使用默认低比分覆盖。';
 
-  const scoreDetails = scores.map((score) => describePickedScore({ strategyId, score, scoreOptions }));
+  const scoreDetails = pickDetails.map((pick) => describePickedScore({ strategyId, pick, scoreOptions }));
   return `比分选择：${getStrategyPickStandard(strategyId)}${scoreDetails.join('；')}。`;
 }
 
@@ -243,9 +251,13 @@ function getStrategyPickStandard(strategyId) {
   return '标准是按当前策略规则和赔率排序。';
 }
 
-function describePickedScore({ strategyId, score, scoreOptions }) {
+function describePickedScore({ strategyId, pick, scoreOptions }) {
+  const score = typeof pick === 'string' ? pick : pick.score;
   const option = scoreOptions.find((item) => item.score === score);
   const oddsText = option ? `赔率 ${formatMetric(option.odds)}` : '赔率缺失';
+  const valueText = formatProbabilityEvText(pick);
+
+  if (valueText) return `${score} ${valueText}，${oddsText}`;
 
   if (strategyId === 'tem_draw_anchor_3_max5_5') {
     if (score === '1-1') return `${score} 核心平局，${oddsText}`;
@@ -410,8 +422,48 @@ function uniqueScores(picks) {
   return [...new Set((picks || []).map((pick) => pick.score).filter(Boolean))];
 }
 
+function uniquePicks(picks) {
+  const seen = new Set();
+  const unique = [];
+  for (const pick of picks || []) {
+    const score = typeof pick === 'string' ? pick : pick?.score;
+    if (!score || seen.has(score)) continue;
+    seen.add(score);
+    unique.push({
+      score,
+      ...(Number.isFinite(Number(pick?.odds)) ? { odds: Number(pick.odds) } : {}),
+      ...(Number.isFinite(Number(pick?.probability)) ? { probability: Number(pick.probability) } : {}),
+      ...(Number.isFinite(Number(pick?.ev)) ? { ev: Number(pick.ev) } : {}),
+    });
+  }
+  return unique;
+}
+
+function normalizePickDetails(picks) {
+  return (picks || [])
+    .map((pick) => (typeof pick === 'string' ? { score: pick } : pick))
+    .filter((pick) => pick?.score);
+}
+
+function formatProbabilityEvText(pick) {
+  if (!Number.isFinite(Number(pick?.probability))) return '';
+  const probability = Number(pick.probability);
+  const ev = Number.isFinite(Number(pick?.ev)) ? Number(pick.ev) : null;
+  const evText = ev === null ? '' : `，EV ${formatSignedMetric(ev)}`;
+  return `预计概率 ${formatPercent(probability)}${evText}`;
+}
+
 function uniqueValues(values) {
   return [...new Set((values || []).filter(Boolean))];
+}
+
+function formatPercent(value) {
+  return `${formatMetric(Number(value) * 100)}%`;
+}
+
+function formatSignedMetric(value) {
+  const formatted = formatMetric(value);
+  return Number(value) > 0 ? `+${formatted}` : formatted;
 }
 
 function minOddsForOutcome(odds, outcome) {

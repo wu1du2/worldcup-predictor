@@ -51,6 +51,7 @@ For each match, output:
   - `router_reason`: concise macro reason for choosing the strategy, without `比分选择`
   - `match_reason_summary`: short one-line preview that names the recommended scores
   - `match_reason_detail`: readable per-score lines, one line per score, explaining why each score was picked
+  For Poisson/EV strategies, keep `pickDetails` in the prediction log and prefer `预计概率 x%，EV +y，赔率 z` in `match_reason_detail`. Do not replace real model numbers with generic text like `符合策略规则`.
   Mention historical ROI plus market-fit scoring, and explain each score with its current odds. Keep the full reason under 400 Chinese characters so the mobile modal does not truncate the important part.
 - Do not assume saved context files are used just because they exist. Regression tests must prove `match.strategyContext` reaches the selected strategy's `selectPicks`.
 - Live Supabase writes can hit transient network timeouts; wrap per-group prediction writes, coverage checks, recommendation upserts, and strategy-stat upserts with bounded retry.

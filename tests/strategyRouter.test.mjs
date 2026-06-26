@@ -134,6 +134,9 @@ test('buildForcedStrategyAiPredictionEntries can still run market Poisson EV for
   assert.equal(entries[0].route.strategyId, 'market_poisson_ev');
   assert.match(entries[0].route.reason, /市场泊松EV/);
   assert.ok(entries[0].scores.length > 0);
+  assert.equal(entries[0].pickDetails.length, entries[0].scores.length);
+  assert.ok(entries[0].pickDetails.every((pick) => Number.isFinite(Number(pick.probability))));
+  assert.ok(entries[0].pickDetails.every((pick) => Number.isFinite(Number(pick.ev))));
 });
 
 test('routeStrategyForMatch only considers the production router candidate pool by default', () => {

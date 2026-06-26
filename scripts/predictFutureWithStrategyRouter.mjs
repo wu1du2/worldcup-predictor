@@ -162,6 +162,7 @@ function buildPredictionLog({ fromDate, targetMatches, entries, historicalResult
           weak: match.strategyContext?.sourceGate?.weak_source_ids?.length || 0,
         },
         scores: entry.scores,
+        pickDetails: entry.pickDetails || [],
         route: entry.route,
       };
     }),

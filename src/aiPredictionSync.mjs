@@ -45,7 +45,13 @@ export function buildAiRecommendationRows({
     const route = item.route || {};
     const reason = route.reason || item.reason || item.prediction?.reason || '';
     const scoreLabels = buildScoreLabels(scores, scoreOddsByMatch[matchId] || []);
-    const reasonParts = buildRecommendationReasonParts({ reason, scores, scoreLabels });
+    const pickDetails = normalizePickDetails(item.pickDetails, scoreOddsByMatch[matchId] || []);
+    const reasonParts = buildRecommendationReasonParts({
+      reason,
+      scores,
+      scoreLabels,
+      pickDetails,
+    });
 
     return {
       match_id: matchId,
@@ -68,10 +74,10 @@ export function buildAiRecommendationRows({
   });
 }
 
-function buildRecommendationReasonParts({ reason, scores, scoreLabels }) {
+function buildRecommendationReasonParts({ reason, scores, scoreLabels, pickDetails = [] }) {
   const normalized = normalizeText(reason);
   const [routerText, scoreText = ''] = splitScoreSelection(normalized);
-  const scoreDetails = buildScoreDetailLines({ scoreText, scores, scoreLabels });
+  const scoreDetails = buildScoreDetailLines({ scoreText, scores, scoreLabels, pickDetails });
   const routerReason = summarizeRouterReason(routerText) || trimSentence(routerText) || normalized;
   const summary = buildSummary({ scoreText, scores });
 
@@ -117,6 +123,27 @@ function normalizePredictionScores(item) {
     .map((stake) => stake.score);
 }
 
+function normalizePickDetails(pickDetails, scoreOptions) {
+  const oddsByScore = new Map((scoreOptions || []).map((option) => [option.score, Number(option.odds)]));
+  return (pickDetails || [])
+    .filter((pick) => pick?.score)
+    .map((pick) => {
+      const odds = Number.isFinite(Number(pick.odds)) ? Number(pick.odds) : oddsByScore.get(pick.score);
+      const probability = Number.isFinite(Number(pick.probability)) ? Number(pick.probability) : null;
+      const ev = Number.isFinite(Number(pick.ev))
+        ? Number(pick.ev)
+        : probability !== null && Number.isFinite(odds)
+          ? roundMetric((probability * odds) - 1)
+          : null;
+      return {
+        score: pick.score,
+        ...(Number.isFinite(odds) ? { odds } : {}),
+        ...(probability !== null ? { probability } : {}),
+        ...(ev !== null ? { ev } : {}),
+      };
+    });
+}
+
 function buildScoreLabels(scores, scoreOptions) {
   const oddsByScore = new Map((scoreOptions || []).map((option) => [option.score, option.odds]));
   return scores.map((score) => {
@@ -136,17 +163,36 @@ function buildSummary({ scoreText, scores }) {
   return `推荐 ${scores.join('、')}：${trimSentence(sentence)}`;
 }
 
-function buildScoreDetailLines({ scoreText, scores, scoreLabels }) {
+function buildScoreDetailLines({ scoreText, scores, scoreLabels, pickDetails }) {
   const normalized = normalizeText(scoreText);
   const labelsByScore = new Map((scoreLabels || []).map((label, index) => [scores[index], label]));
+  const detailsByScore = new Map((pickDetails || []).map((pick) => [pick.score, pick]));
 
   return scores.map((score) => {
+    const pickDetail = detailsByScore.get(score);
+    if (hasProbabilityEv(pickDetail)) {
+      return `- ${score}：${formatProbabilityEvDetail(pickDetail)}`;
+    }
+
     const extractedDetail = extractDetailForScore(normalized, score, scores);
     const detail = extractedDetail
       ? stripLeadingScore(extractedDetail, score)
       : `${labelsByScore.get(score) || score} 按当前策略进入推荐。`;
     return `- ${score}：${trimSentence(detail)}`;
   });
+}
+
+function hasProbabilityEv(pick) {
+  return Number.isFinite(Number(pick?.probability)) && Number.isFinite(Number(pick?.ev));
+}
+
+function formatProbabilityEvDetail(pick) {
+  const parts = [
+    `预计概率 ${formatPercent(Number(pick.probability))}`,
+    `EV ${formatSignedMetric(Number(pick.ev))}`,
+    Number.isFinite(Number(pick.odds)) ? `赔率 ${formatMetric(Number(pick.odds))}` : '',
+  ].filter(Boolean);
+  return `${parts.join('，')}。`;
 }
 
 function extractDetailForScore(text, score, scores) {
@@ -197,4 +243,17 @@ function normalizeText(reason) {
 function formatMetric(value) {
   const rounded = Math.round((Number(value) + Number.EPSILON) * 100) / 100;
   return Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/0+$/, '').replace(/\.$/, '');
+}
+
+function roundMetric(value) {
+  return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+}
+
+function formatPercent(value) {
+  return `${formatMetric(Number(value) * 100)}%`;
+}
+
+function formatSignedMetric(value) {
+  const formatted = formatMetric(value);
+  return Number(value) > 0 ? `+${formatted}` : formatted;
 }
