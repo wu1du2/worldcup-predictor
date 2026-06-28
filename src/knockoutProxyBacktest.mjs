@@ -69,12 +69,14 @@ export function scoreKnockoutBacktestSummary({
   averagePicks = 0,
   explanationScore = 70,
   proxyMatches = settledMatches,
+  maxHitOdds = 0,
 }) {
+  const roiScore = clamp(Number(roiPercent) + 60);
   const metrics = {
-    roi: clamp(Number(roiPercent) + 60),
+    roi: Math.min(roiScore, getTailAdjustedRoiCap(maxHitOdds)),
     hitRate: settledMatches > 0 ? clamp((Number(hitMatches) / Number(settledMatches)) * 100) : 0,
     coverage: proxyMatches > 0 ? clamp((Number(settledMatches) / Number(proxyMatches)) * 100) : 0,
-    shapeHealth: getShapeHealth(averagePicks),
+    shapeHealth: Math.min(getShapeHealth(averagePicks), getTailShapeCap(maxHitOdds)),
     explainability: clamp(explanationScore),
   };
   const total = Object.entries(scoreWeights).reduce((sum, [key, weight]) => sum + metrics[key] * weight, 0);
@@ -91,6 +93,7 @@ export function enrichKnockoutProxyBacktestResult(result, {
 } = {}) {
   const rows = result?.rows || [];
   const pickCounts = rows.map((row) => row.picks?.length || 0);
+  const maxHitOdds = Math.max(0, ...rows.map((row) => Number(row.hitOdds) || 0));
   const averagePicks = pickCounts.length
     ? roundMetric(pickCounts.reduce((sum, count) => sum + count, 0) / pickCounts.length)
     : 0;
@@ -101,11 +104,13 @@ export function enrichKnockoutProxyBacktestResult(result, {
     averagePicks,
     explanationScore,
     proxyMatches,
+    maxHitOdds,
   });
 
   return {
     ...result,
     averagePicks,
+    maxHitOdds,
     knockoutProxyScore: score.total,
     knockoutProxyMetrics: score.metrics,
   };
@@ -224,6 +229,22 @@ function getShapeHealth(averagePicks) {
   if (!Number.isFinite(Number(averagePicks)) || Number(averagePicks) <= 0) return 0;
   const distanceFromTarget = Math.abs(Number(averagePicks) - 2.5);
   return clamp(100 - distanceFromTarget * 20);
+}
+
+function getTailAdjustedRoiCap(maxHitOdds) {
+  const odds = Number(maxHitOdds) || 0;
+  if (odds >= 60) return 80;
+  if (odds >= 40) return 88;
+  if (odds >= 30) return 94;
+  return 100;
+}
+
+function getTailShapeCap(maxHitOdds) {
+  const odds = Number(maxHitOdds) || 0;
+  if (odds >= 60) return 65;
+  if (odds >= 40) return 75;
+  if (odds >= 30) return 85;
+  return 100;
 }
 
 function clamp(value) {

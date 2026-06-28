@@ -102,12 +102,36 @@ test('scoreKnockoutBacktestSummary combines ROI, hit rate, coverage, shape, and 
   assert.equal(score.metrics.shapeHealth, 90);
 });
 
+test('scoreKnockoutBacktestSummary caps lottery-like tail wins in proxy score', () => {
+  const uncapped = scoreKnockoutBacktestSummary({
+    roiPercent: 40,
+    hitMatches: 16,
+    settledMatches: 56,
+    averagePicks: 3.2,
+    explanationScore: 78,
+  });
+  const capped = scoreKnockoutBacktestSummary({
+    roiPercent: 40,
+    hitMatches: 16,
+    settledMatches: 56,
+    averagePicks: 3.2,
+    explanationScore: 78,
+    maxHitOdds: 75,
+  });
+
+  assert.equal(uncapped.metrics.roi, 100);
+  assert.equal(uncapped.metrics.shapeHealth, 86);
+  assert.equal(capped.metrics.roi, 80);
+  assert.equal(capped.metrics.shapeHealth, 65);
+  assert.ok(capped.total < uncapped.total);
+});
+
 test('enrichKnockoutProxyBacktestResult adds proxy score and metric breakdown', () => {
   const enriched = enrichKnockoutProxyBacktestResult({
     strategyId: 'stable-v1',
     rows: [
-      { picks: [{ score: '1-0' }, { score: '1-1' }] },
-      { picks: [{ score: '0-0' }, { score: '0-1' }, { score: '1-1' }] },
+      { picks: [{ score: '1-0' }, { score: '1-1' }], hitOdds: 6 },
+      { picks: [{ score: '0-0' }, { score: '0-1' }, { score: '1-1' }], hitOdds: 0 },
     ],
     roiPercent: 12,
     hitMatches: 1,
@@ -118,6 +142,7 @@ test('enrichKnockoutProxyBacktestResult adds proxy score and metric breakdown', 
   });
 
   assert.equal(enriched.averagePicks, 2.5);
+  assert.equal(enriched.maxHitOdds, 6);
   assert.equal(enriched.knockoutProxyMetrics.roi, 72);
   assert.equal(enriched.knockoutProxyMetrics.coverage, 66.7);
   assert.ok(enriched.knockoutProxyScore > 50);
