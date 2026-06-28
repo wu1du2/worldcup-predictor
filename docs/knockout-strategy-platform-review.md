@@ -1,30 +1,30 @@
-# Knockout Strategy Platform Review
+# 淘汰赛策略平台期记录
 
-Updated: 2026-06-28 21:22 UTC+8
+更新时间：2026-06-28 21:22（UTC+8）
 
-## Current Active Flagships
+## 当前三条旗舰策略
 
-| Family | Strategy | Proxy score | ROI | Hits | Avg picks | Notes |
+| 策略族 | 策略 | 代理评分 | ROI | 命中 | 平均下注数 | 说明 |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| Stable | `tem_draw_anchor_capped_1_draw5_5_cap35` | 72.4 | +14.37% | 18/56 | 3.1 | Keeps the draw anchor but filters >35x tail scores. |
-| Value | `tem_poisson_context_v1_n3_cap35_p0_006` | 74.1 | +20.42% | 11/56 | 2.7 | Uses context Poisson probability plus EV, capped at 35x. |
-| Consensus | `tem_consensus_poisson_context_v1_c1_n4_cap7` | 68.2 | +3.54% | 17/56 | 3.7 | Starts from a low-odds consensus anchor and fills with Poisson EV. |
+| 稳定型 | `tem_draw_anchor_capped_1_draw5_5_cap35` | 72.4 | +14.37% | 18/56 | 3.1 | 保留平局锚点，但过滤 35 倍以上的长尾比分。 |
+| 价值型 | `tem_poisson_context_v1_n3_cap35_p0_006` | 74.1 | +20.42% | 11/56 | 2.7 | 使用赛前 context 泊松概率 + EV，赔率上限 35 倍。 |
+| 共识型 | `tem_consensus_poisson_context_v1_c1_n4_cap7` | 68.2 | +3.54% | 17/56 | 3.7 | 先用低赔共识做锚点，再用泊松 EV 补足候选比分。 |
 
-## What Changed This Round
+## 本轮改动
 
-- The temporary search pool now samples by family instead of taking the first N strategies. This prevents late families such as Poisson EV and trend from being hidden by earlier generators.
-- Stable upgraded from plain draw anchor to capped draw anchor. The old high-ROI draw variants were rejected when they depended on very high-odds tail hits.
-- Consensus upgraded from pure low-odds consensus to consensus plus Poisson EV. It gives a small positive ROI while improving explanation quality.
-- Value kept the healthy 3-pick Poisson EV variant. The higher-scoring 1-pick variants remain rejected because average picks below 1.5 are too fragile for a user-facing recommendation.
+- 临时策略搜索池改为按策略族均衡采样，而不是直接取前 N 个策略。这样可以避免泊松 EV、trend 等后置策略被前面的生成器遮住。
+- 稳定型从普通平局锚点升级为限赔平局锚点。旧的高 ROI 平局变体如果依赖超高赔率长尾命中，会被拒绝。
+- 共识型从纯低赔共识升级为“共识 + 泊松 EV”。它带来小幅正 ROI，同时提升了推荐解释质量。
+- 价值型保留健康的 3 注泊松 EV 变体。分数更高的 1 注变体仍被拒绝，因为平均下注数低于 1.5，对面向用户的推荐来说波动过大。
 
-## Current Platform Cases
+## 当前平台期 case
 
-- Stable: the best safe challenger is already the active capped draw anchor. Wider draw thresholds add hits but lower ROI or shape score.
-- Value: one-pick Poisson variants score slightly higher, but they are rejected as unhealthy single-point strategies. Among 2-4 pick variants, the active 3-pick cap-35 set is still best.
-- Consensus: cap-8/cap-10 variants tie the active shape but do not improve score. Pure low-odds consensus hits more often but stays less explainable and less profitable.
+- 稳定型：当前最好的安全挑战者已经是 active 的限赔平局锚点。放宽平局阈值会增加命中数，但会降低 ROI 或形态评分。
+- 价值型：1 注泊松变体评分略高，但它们属于不健康的单点策略，因此被拒绝。在 2-4 注变体里，当前 active 的 3 注、35 倍上限组合仍然最好。
+- 共识型：cap-8 / cap-10 变体和 active 形态接近，但没有提升总分。纯低赔共识命中更多，但解释性和收益都更弱。
 
-## Next Search Hypotheses
+## 下一轮搜索假设
 
-- Stable: try draw-anchor variants that adapt the fourth score by favorite direction while still capping all odds.
-- Value: add calibrated 2-3 pick Poisson variants with explicit diversity constraints so picks are not all adjacent low draws.
-- Consensus: combine external-source score picks with Poisson EV fills, not only low-odds market consensus.
+- 稳定型：尝试“第四个比分根据热门方向自适应”的平局锚点变体，同时继续限制所有候选赔率。
+- 价值型：增加校准后的 2-3 注泊松变体，并加入明确的多样性约束，避免候选全是相邻低比分平局。
+- 共识型：把外部来源的比分预测和泊松 EV 补位结合起来，而不仅仅依赖低赔市场共识。
