@@ -33,6 +33,16 @@ export const candidateStrategies = [
     selectPicks: ({ odds }) => sortByOdds(odds).filter((pick) => pick.odds <= 18).slice(0, 4),
   },
   {
+    id: 'tem_consensus_n3_cap7',
+    name: '市场共识 3 格',
+    family: 'market_consensus',
+    style: 'balanced',
+    parameters: { maxPicks: 3, maxOdds: 7 },
+    description: '共识型 v3：选择赔率最低且不高于 7 的 3 个比分，优先控制成本和赔率噪音。',
+    explanation: '把最低赔率视作市场共识，限制过高赔率噪音。',
+    selectPicks: ({ odds }) => sortByOdds(odds).filter((pick) => pick.odds <= 7).slice(0, 3),
+  },
+  {
     id: 'market_consensus_sources',
     name: '市场来源共识',
     description: '综合机构明确比分、方向型预测和比分赔率低位，优先给出可解释的市场主线比分。',

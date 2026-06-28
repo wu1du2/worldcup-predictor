@@ -11,7 +11,7 @@ const dynamicCandidateMaxAveragePicks = 4.5;
 export const routerCandidateStrategyIds = [
   'tem_draw_anchor_3_max5_5',
   'context_poisson_ev_v2',
-  'market_consensus_sources',
+  'tem_consensus_n3_cap7',
 ];
 
 export function buildRollingStrategyStats({ historicalResults, cutoffDate, cutoffTime = '00:00' }) {
@@ -208,8 +208,9 @@ function buildRoute({ match, strategy, stats, confidence, reason }) {
 function buildReason({ match, selected, odds }) {
   const market = describeMarket(odds);
   const candidateType = selected.isDynamicCandidate ? '流动候选' : '三旗舰候选';
-  const sourceText = selected.strategy.id === 'market_consensus_sources'
-    ? `外部来源 ${getExternalPredictionStrength(match?.strategyContext || {})} 条；${isKnockoutMatch(match) ? '淘汰赛优先信市场主线。' : '非淘汰赛按普通权重处理。'}`
+  const externalPredictionStrength = getExternalPredictionStrength(match?.strategyContext || {});
+  const sourceText = isConsensusStrategy(selected.strategy.id) && externalPredictionStrength > 0
+    ? `外部来源 ${externalPredictionStrength} 条；${isKnockoutMatch(match) ? '淘汰赛优先信市场主线。' : '非淘汰赛按普通权重处理。'}`
     : '';
   return [
     `${formatMatch(match)}：选「${selected.strategy.name}」。`,
@@ -218,6 +219,10 @@ function buildReason({ match, selected, odds }) {
     sourceText,
     `盘口：${market}。`,
   ].filter(Boolean).join('');
+}
+
+function isConsensusStrategy(strategyId) {
+  return strategyId === 'market_consensus_sources' || strategyId === 'tem_consensus_n3_cap7';
 }
 
 function withScoreSelectionReason({ route, picks, scoreOptions }) {
@@ -256,6 +261,9 @@ function getStrategyPickStandard(strategyId) {
   if (strategyId === 'market_consensus_sources') {
     return '标准是优先采纳机构明确比分，再用方向预测和赔率低位补足。';
   }
+  if (strategyId === 'tem_consensus_n3_cap7') {
+    return '标准是选择赔率最低且不高于 7 的三个市场共识比分。';
+  }
   if (strategyId === fallbackStrategyId) {
     return '标准是缺赔率时覆盖最常见低比分。';
   }
@@ -289,6 +297,10 @@ function describePickedScore({ strategyId, pick, scoreOptions }) {
     return `${score} EV 靠前，${oddsText}`;
   }
 
+  if (strategyId === 'tem_consensus_n3_cap7') {
+    return `${score} 市场低赔共识，${oddsText}`;
+  }
+
   if (strategyId === fallbackStrategyId) {
     return `${score} 低比分默认覆盖，${oddsText}`;
   }
@@ -316,6 +328,11 @@ function scoreStrategyFeatures({ strategy, odds, match = null }) {
   }
   if (strategy.id === 'market_consensus_4') {
     return market.heavyFavorite ? 0.85 : 0.2;
+  }
+  if (strategy.id === 'tem_consensus_n3_cap7') {
+    if (externalPredictionStrength >= 3) return 1.25 + knockoutBonus;
+    if (externalPredictionStrength >= 1) return 0.95 + knockoutBonus / 2;
+    return market.lowOddsScores >= 3 ? 0.88 : 0.15;
   }
   if (strategy.id === 'favorite_narrow_win_3') {
     return market.heavyFavorite ? 0.75 : 0.1;
@@ -398,6 +415,7 @@ function getMarketFeatures(odds) {
     hasStrongNegativeTrend: topNegativeTrend <= -15,
     hasHealthyMidOdds: odds.filter((pick) => pick.odds >= 8 && pick.odds <= 18).length >= 3,
     hasCompleteScoreBoard: odds.length >= 28,
+    lowOddsScores: odds.filter((pick) => pick.odds <= 7).length,
   };
 }
 

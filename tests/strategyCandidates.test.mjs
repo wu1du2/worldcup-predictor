@@ -52,13 +52,14 @@ const sampleOdds = {
 };
 
 test('candidate strategy set contains final3 production candidates and offline strategies', () => {
-  assert.equal(candidateStrategies.length, 21);
-  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 21);
+  assert.equal(candidateStrategies.length, 22);
+  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 22);
   assert.deepEqual(candidateStrategies.map((strategy) => strategy.id), [
     'low_score_basket_4',
     'lowest_odds_2',
     'lowest_odds_3',
     'market_consensus_4',
+    'tem_consensus_n3_cap7',
     'market_consensus_sources',
     'favorite_narrow_win_3',
     'draw_anchor_3',
@@ -77,6 +78,10 @@ test('candidate strategy set contains final3 production candidates and offline s
     'tem_hybrid_draw_poisson_v2_d1_n2',
     'tem_draw_anchor_3_max5_5',
   ]);
+  const consensusV3 = candidateStrategies.find((strategy) => strategy.id === 'tem_consensus_n3_cap7');
+  assert.equal(consensusV3.family, 'market_consensus');
+  assert.equal(consensusV3.style, 'balanced');
+  assert.deepEqual(consensusV3.parameters, { maxPicks: 3, maxOdds: 7 });
 });
 
 test('runCandidateStrategyBacktests settles every candidate with consistent ROI accounting', () => {
@@ -85,7 +90,7 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
     scoreOddsByMatch: sampleOdds,
   });
 
-  assert.equal(results.length, 21);
+  assert.equal(results.length, 22);
 
   const lowScore = results.find((result) => result.strategyId === 'low_score_basket_4');
   assert.equal(lowScore.cost, 8);
@@ -96,6 +101,10 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   const trendRisers = results.find((result) => result.strategyId === 'trend_risers_2');
   assert.deepEqual(trendRisers.rows[0].picks.map((pick) => pick.score), ['0-1', '1-0']);
   assert.deepEqual(trendRisers.rows[1].picks.map((pick) => pick.score), ['1-2', '2-1']);
+
+  const consensusV3 = results.find((result) => result.strategyId === 'tem_consensus_n3_cap7');
+  assert.deepEqual(consensusV3.rows[0].picks.map((pick) => pick.score), ['2-1', '1-1', '1-0']);
+  assert.deepEqual(consensusV3.rows[1].picks.map((pick) => pick.score), ['1-1', '1-0']);
 
   const lowDutch = results.find((result) => result.strategyId === 'low_score_dutch_3');
   assert.deepEqual(lowDutch.rows[0].picks.map((pick) => pick.score), ['0-0', '1-0', '0-1']);
@@ -136,6 +145,7 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.match(summary, /候选策略回测/);
   assert.match(summary, /low_score_basket_4/);
   assert.match(summary, /trend_risers_2/);
+  assert.match(summary, /tem_consensus_n3_cap7/);
   assert.match(summary, /market_poisson_ev/);
   assert.match(summary, /context_poisson_ev_v2/);
   assert.match(summary, /context_poisson_ev_v3/);

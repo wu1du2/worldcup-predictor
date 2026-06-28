@@ -74,7 +74,7 @@ test('routeStrategyForMatch chooses an available positive-history strategy and r
   assert.match(route.reason, /葡萄牙 vs 乌兹别克斯坦/);
 });
 
-test('routeStrategyForMatch prefers source consensus for knockout matches with explicit external picks', () => {
+test('routeStrategyForMatch prefers the consensus flagship for knockout matches with explicit external picks', () => {
   const route = routeStrategyForMatch({
     match: {
       id: 'brazil-japan',
@@ -104,12 +104,12 @@ test('routeStrategyForMatch prefers source consensus for knockout matches with e
     historicalResults,
   });
 
-  assert.equal(route.strategyId, 'market_consensus_sources');
+  assert.equal(route.strategyId, 'tem_consensus_n3_cap7');
   assert.match(route.reason, /外部来源/);
   assert.match(route.reason, /淘汰赛/);
 });
 
-test('buildRoutedAiPredictionEntries explains source-backed score choices', () => {
+test('buildRoutedAiPredictionEntries explains consensus-flagship score choices', () => {
   const entries = buildRoutedAiPredictionEntries({
     matches: [
       {
@@ -143,9 +143,9 @@ test('buildRoutedAiPredictionEntries explains source-backed score choices', () =
     historicalResults,
   });
 
-  assert.deepEqual(entries[0].scores, ['2-1', '3-1', '1-0']);
-  assert.match(entries[0].route.reason, /CBS/);
-  assert.match(entries[0].route.reason, /Ladbrokes/);
+  assert.deepEqual(entries[0].scores, ['1-0', '1-1', '2-1']);
+  assert.match(entries[0].route.reason, /市场低赔共识/);
+  assert.match(entries[0].route.reason, /外部来源 4 条/);
 });
 
 test('buildRoutedAiPredictionEntries falls back to low-score scores when odds are missing', () => {
@@ -244,7 +244,7 @@ test('routeStrategyForMatch only considers the production router candidate pool 
   assert.deepEqual(routerCandidateStrategyIds, [
     'tem_draw_anchor_3_max5_5',
     'context_poisson_ev_v2',
-    'market_consensus_sources',
+    'tem_consensus_n3_cap7',
   ]);
   assert.ok(routerCandidateStrategyIds.includes(route.strategyId));
   assert.notEqual(route.strategyId, 'market_poisson_ev');

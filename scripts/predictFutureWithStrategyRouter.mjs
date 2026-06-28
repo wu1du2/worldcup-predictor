@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 import { buildAiRecommendationRows } from '../src/aiPredictionSync.mjs';
+import { deterministicUuid } from '../src/stableUuid.mjs';
 import { runCandidateStrategyBacktests } from '../src/strategyCandidates.mjs';
 import { attachMatchStrategyContexts } from '../src/strategyContextFiles.mjs';
 import {
@@ -285,30 +286,6 @@ async function withRetry(label, operation, attempts = 3) {
 
 function formatError(error) {
   return error?.message || error?.details || String(error);
-}
-
-function deterministicUuid(value) {
-  const hex = simpleHashHex(value).padEnd(32, '0').slice(0, 32);
-  return [
-    hex.slice(0, 8),
-    hex.slice(8, 12),
-    `4${hex.slice(13, 16)}`,
-    `8${hex.slice(17, 20)}`,
-    hex.slice(20, 32),
-  ].join('-');
-}
-
-function simpleHashHex(value) {
-  let hashA = 0x811c9dc5;
-  let hashB = 0x01000193;
-  for (const char of String(value)) {
-    hashA ^= char.charCodeAt(0);
-    hashA = Math.imul(hashA, 0x01000193) >>> 0;
-    hashB ^= hashA;
-    hashB = Math.imul(hashB, 0x85ebca6b) >>> 0;
-  }
-  const chunks = [hashA, hashB, hashA ^ hashB, Math.imul(hashA + hashB, 0xc2b2ae35) >>> 0];
-  return chunks.map((chunk) => chunk.toString(16).padStart(8, '0')).join('');
 }
 
 function parseArgs(argv) {

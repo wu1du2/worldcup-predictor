@@ -21,6 +21,7 @@
     "backtest:strategies": "node scripts/backtestStrategies.mjs",
     "backtest:candidates": "node scripts/backtestCandidateStrategies.mjs",
     "backtest:knockout-proxy": "node scripts/backtestKnockoutProxyStrategies.mjs",
+    "strategy:knockout-loop": "node scripts/backtestKnockoutProxyStrategies.mjs",
     "strategy:lab": "node scripts/runStrategyLab.mjs",
     "strategy:tem": "node scripts/runTempStrategyResearch.mjs",
     "ai:sync-prediction": "node scripts/syncAiPrediction.mjs",

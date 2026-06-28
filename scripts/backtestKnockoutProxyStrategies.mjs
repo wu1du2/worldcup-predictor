@@ -8,12 +8,17 @@ import {
   enrichKnockoutProxyBacktestResult,
   filterKnockoutProxyMatches,
 } from '../src/knockoutProxyBacktest.mjs';
+import {
+  buildKnockoutStrategyEvolutionData,
+  formatKnockoutStrategyEvolutionDataModule,
+} from '../src/knockoutStrategyEvolutionBuilder.mjs';
 import { toAppMatch } from '../src/matchSchedule.mjs';
 import { mapScoreOddsByMatch } from '../src/supabaseData.mjs';
 import {
   candidateStrategies,
   runCandidateStrategyBacktests,
 } from '../src/strategyCandidates.mjs';
+import { generateTempStrategyCandidates } from '../src/tempStrategyLab.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -50,10 +55,14 @@ const matchedContexts = matches.filter((match) => contextsByMatchId.has(match.id
 const scoreOddsByMatch = mapScoreOddsByMatch(matches, oddsRows, trendRows);
 const proxyMatches = filterKnockoutProxyMatches({ matches, scoreOddsByMatch });
 const proxyMatchList = proxyMatches.map((item) => item.match);
+const productionStrategyIds = new Set(candidateStrategies.map((strategy) => strategy.id));
+const tempStrategies = generateTempStrategyCandidates({ maxCandidates: 200 })
+  .filter((strategy) => !productionStrategyIds.has(strategy.id));
+const strategies = [...candidateStrategies, ...tempStrategies];
 const backtestResults = runCandidateStrategyBacktests({
   matches: proxyMatchList,
   scoreOddsByMatch,
-  strategies: candidateStrategies,
+  strategies,
 });
 const results = backtestResults
   .map((result) => enrichKnockoutProxyBacktestResult(result, {
@@ -65,14 +74,24 @@ const results = backtestResults
 const runId = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
 const artifactDir = path.join(repoRoot, 'docs', 'artifacts', 'knockout-strategy-loop', runId);
 await mkdir(artifactDir, { recursive: true });
+const generatedAt = new Date().toISOString();
+const evolutionData = buildKnockoutStrategyEvolutionData({
+  results,
+  strategies,
+  generatedAt,
+  proxyMatches: proxyMatches.length,
+});
+const evolutionDataModule = formatKnockoutStrategyEvolutionDataModule(evolutionData);
 
 const dataset = {
-  generatedAt: new Date().toISOString(),
+  generatedAt,
   contextFiles: contexts.length,
   contextsMatchedToDb: matchedContexts.length,
   matches: matches.length,
   proxyMatches: proxyMatches.length,
-  strategies: candidateStrategies.length,
+  strategies: strategies.length,
+  productionStrategies: candidateStrategies.length,
+  tempStrategies: tempStrategies.length,
   filter: {
     minScoreOptions: 5,
     rules: [
@@ -89,6 +108,9 @@ await Promise.all([
   writeJson(path.join(artifactDir, 'dataset.json'), dataset),
   writeJson(path.join(artifactDir, 'proxy_matches.json'), proxyMatches.map(serializeProxyMatch)),
   writeJson(path.join(artifactDir, 'results.json'), results),
+  writeJson(path.join(artifactDir, 'evolution_data.json'), evolutionData),
+  writeFile(path.join(artifactDir, 'knockoutStrategyEvolutionData.mjs'), evolutionDataModule, 'utf8'),
+  writeFile(path.join(repoRoot, 'src', 'knockoutStrategyEvolutionData.mjs'), evolutionDataModule, 'utf8'),
   writeFile(path.join(artifactDir, 'report.md'), buildKnockoutProxyBacktestReport({
     dataset,
     proxyMatches,
@@ -98,6 +120,8 @@ await Promise.all([
 
 console.log(`Wrote knockout proxy backtest artifacts to ${artifactDir}`);
 console.log(`Proxy matches: ${proxyMatches.length}`);
+console.log(`Strategies: ${strategies.length} (${candidateStrategies.length} production + ${tempStrategies.length} temp)`);
+console.log('Updated src/knockoutStrategyEvolutionData.mjs');
 for (const result of results.slice(0, 10)) {
   console.log(`${result.strategyId}: score ${formatMetric(result.knockoutProxyScore)}, ROI ${formatSigned(result.roiPercent)}%, hit ${result.hitMatches}/${result.settledMatches}, avg picks ${formatMetric(result.averagePicks)}`);
 }
