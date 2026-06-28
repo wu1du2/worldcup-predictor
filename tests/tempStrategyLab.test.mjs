@@ -133,7 +133,7 @@ test('generateTempStrategyCandidates includes poisson draw-guard experiments', (
   assert.ok(drawGuard.every((strategy) => strategy.family === 'poisson_ev'));
   assert.ok(drawGuard.every((strategy) => strategy.parameters.drawGuardScore === '1-1'));
 
-  const picks = drawGuard.find((strategy) => strategy.parameters.drawMaxOdds === 7).selectPicks({
+  const picks = drawGuard.find((strategy) => strategy.parameters.drawMaxOdds === 7.5).selectPicks({
     odds: makeOdds({
       '0-0': 8,
       '1-1': 6.8,

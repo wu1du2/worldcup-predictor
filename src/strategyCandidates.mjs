@@ -150,7 +150,7 @@ export const candidateStrategies = [
     selectPicks: ({ odds, context }) => buildContextPoissonEvV2Selection({ odds, context }).picks,
   },
   {
-    id: 'tem_poisson_drawguard_context_v3_n2_draw7_cap35_p0_006',
+    id: 'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006',
     name: '赛前泊松EV平局保护',
     family: 'poisson_ev',
     style: 'selected',
@@ -161,9 +161,9 @@ export const candidateStrategies = [
       minSelectableProbability: 0.006,
       diversity: 'outcome',
       drawGuardScore: '1-1',
-      drawMaxOdds: 7,
+      drawMaxOdds: 7.5,
     },
-    description: '价值型 v5：用赛前泊松均衡模型生成多样性 EV 候选；若 1-1 赔率不高于 7，加入 1-1 平局保护。',
+    description: '价值型 v6：用赛前泊松均衡模型生成多样性 EV 候选；若 1-1 赔率不高于 7.5，加入 1-1 平局保护。',
     explanation: '保留概率*赔率的 EV 解释，同时用低赔 1-1 保护接近比赛，提高命中和可读性。',
     selectPicks: ({ odds, context }) => pickPoissonDrawGuardContextV3(odds, context),
   },
@@ -345,7 +345,7 @@ function pickPoissonDrawGuardContextV3(odds, context) {
       minSelectableProbability: 0.006,
     },
   });
-  const oddsOneOne = odds.find((pick) => pick.score === '1-1' && pick.odds <= 7);
+  const oddsOneOne = odds.find((pick) => pick.score === '1-1' && pick.odds <= 7.5);
   const modelOneOne = modelSelection.evTable?.find((pick) => pick.score === '1-1');
   return uniquePicks([
     ...(oddsOneOne ? [modelOneOne || oddsOneOne] : []),

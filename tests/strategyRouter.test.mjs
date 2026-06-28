@@ -260,7 +260,7 @@ test('routeStrategyForMatch only considers the production router candidate pool 
 
   assert.deepEqual(routerCandidateStrategyIds, [
     'tem_draw_anchor_capped_1_draw5_5_cap35',
-    'tem_poisson_drawguard_context_v3_n2_draw7_cap35_p0_006',
+    'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006',
     'tem_consensus_poisson_context_v1_c1_n4_cap7',
   ]);
   assert.ok(routerCandidateStrategyIds.includes(route.strategyId));

@@ -10,7 +10,7 @@ const dynamicCandidateMinRoiPercent = 0;
 const dynamicCandidateMaxAveragePicks = 4.5;
 export const routerCandidateStrategyIds = [
   'tem_draw_anchor_capped_1_draw5_5_cap35',
-  'tem_poisson_drawguard_context_v3_n2_draw7_cap35_p0_006',
+  'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006',
   'tem_consensus_poisson_context_v1_c1_n4_cap7',
 ];
 
@@ -260,8 +260,8 @@ function getStrategyPickStandard(strategyId) {
   if (strategyId === 'context_poisson_ev_v3') {
     return '标准是用赛前 context 估进球，做低比分/平局修正后按 EV 取前列。';
   }
-  if (strategyId === 'tem_poisson_drawguard_context_v3_n2_draw7_cap35_p0_006') {
-    return '标准是用赛前泊松均衡模型先取多样性 EV 候选；若 1-1 低于 7 倍，再加入平局保护。';
+  if (strategyId === 'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006') {
+    return '标准是用赛前泊松均衡模型先取多样性 EV 候选；若 1-1 不高于 7.5 倍，再加入平局保护。';
   }
   if (strategyId === 'context_poisson_ev_v2') {
     return '标准是用赛前 context 估进球，提高概率门槛后按 EV 精选。';
@@ -313,7 +313,7 @@ function describePickedScore({ strategyId, pick, scoreOptions }) {
 
   if (strategyId === 'context_poisson_ev_v2'
     || strategyId === 'context_poisson_ev_v3'
-    || strategyId === 'tem_poisson_drawguard_context_v3_n2_draw7_cap35_p0_006') {
+    || strategyId === 'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006') {
     return `${score} EV 靠前，${oddsText}`;
   }
 
@@ -384,7 +384,7 @@ function scoreStrategyFeatures({ strategy, odds, match = null }) {
   if (strategy.id === 'market_poisson_ev') return market.hasCompleteScoreBoard ? 1.05 : 0.35;
   if (strategy.id === 'context_poisson_ev') return market.hasCompleteScoreBoard ? 0.65 : 0.2;
   if (strategy.id === 'context_poisson_ev_v2') return market.hasCompleteScoreBoard ? 0.7 : 0.2;
-  if (strategy.id === 'tem_poisson_drawguard_context_v3_n2_draw7_cap35_p0_006') return market.hasCompleteScoreBoard ? 1.18 : 0.35;
+  if (strategy.id === 'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006') return market.hasCompleteScoreBoard ? 1.2 : 0.35;
   if (strategy.id === 'context_poisson_ev_v3') return market.hasCompleteScoreBoard ? 0.75 : 0.2;
   if (strategy.id === 'tem_hybrid_draw_poisson_v2_d1_n2') return market.hasCompleteScoreBoard && market.drawLean ? 0.95 : 0.35;
   if (strategy.id === 'tem_draw_anchor_3_max5_5') return market.drawLean ? 1 : 0.2;

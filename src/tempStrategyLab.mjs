@@ -641,7 +641,7 @@ function addPoissonEvStrategies(add) {
     { key: 'context_v3', name: '赛前泊松EV均衡', builder: buildContextPoissonEvV3Selection },
   ]) {
     for (const basePicks of [2, 3]) {
-      for (const drawMaxOdds of [5.5, 6.5, 7]) {
+      for (const drawMaxOdds of [5.5, 6.5, 7, 7.5]) {
         add({
           id: `poisson_drawguard_${variant.key}_n${basePicks}_draw${String(drawMaxOdds).replace('.', '_')}_cap35_p0_006`,
           name: `${variant.name} 平局保护`,
