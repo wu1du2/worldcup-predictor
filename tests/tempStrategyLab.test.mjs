@@ -125,6 +125,35 @@ test('generateTempStrategyCandidates includes diverse poisson EV experiments', (
   assert.ok(new Set(picks.map((pick) => getScoreOutcome(pick.score))).size >= 2);
 });
 
+test('generateTempStrategyCandidates includes poisson draw-guard experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 700 });
+  const drawGuard = candidates.filter((strategy) => strategy.id.includes('poisson_drawguard'));
+
+  assert.ok(drawGuard.length > 0);
+  assert.ok(drawGuard.every((strategy) => strategy.family === 'poisson_ev'));
+  assert.ok(drawGuard.every((strategy) => strategy.parameters.drawGuardScore === '1-1'));
+
+  const picks = drawGuard.find((strategy) => strategy.parameters.drawMaxOdds === 7).selectPicks({
+    odds: makeOdds({
+      '0-0': 8,
+      '1-1': 6.8,
+      '2-2': 13,
+      '1-0': 7,
+      '0-1': 9,
+      '2-1': 10,
+      '1-2': 11,
+    }),
+    context: {
+      model: {
+        expectedGoals: { home: 1.3, away: 1.1 },
+      },
+    },
+  });
+
+  assert.ok(picks.some((pick) => pick.score === '1-1'));
+  assert.ok(picks.length <= 3);
+});
+
 test('enrichBacktestResult computes information richness metrics and gate status', () => {
   const enriched = enrichBacktestResult({
     strategyId: 'tem_sample',

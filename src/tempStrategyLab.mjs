@@ -635,6 +635,42 @@ function addPoissonEvStrategies(add) {
       }
     }
   }
+
+  for (const variant of [
+    { key: 'context_v1', name: '赛前泊松EV基础', builder: buildContextPoissonEvSelection },
+    { key: 'context_v3', name: '赛前泊松EV均衡', builder: buildContextPoissonEvV3Selection },
+  ]) {
+    for (const basePicks of [2, 3]) {
+      for (const drawMaxOdds of [5.5, 6.5, 7]) {
+        add({
+          id: `poisson_drawguard_${variant.key}_n${basePicks}_draw${String(drawMaxOdds).replace('.', '_')}_cap35_p0_006`,
+          name: `${variant.name} 平局保护`,
+          family: 'poisson_ev',
+          style: basePicks <= 2 ? 'selected' : 'balanced',
+          parameters: {
+            variant: variant.key,
+            basePicks,
+            maxSelectableOdds: 35,
+            minSelectableProbability: 0.006,
+            diversity: 'outcome',
+            drawGuardScore: '1-1',
+            drawMaxOdds,
+          },
+          description: `${variant.name} 先取 ${basePicks} 个多样性 EV 候选；若 1-1 不高于 ${drawMaxOdds}，额外加入 1-1。`,
+          explanation: '用平局低赔识别接近比赛，把 1-1 作为低成本保护，同时保留泊松 EV 的方向多样性。',
+          selectPicks: ({ odds, context }) => pickPoissonDrawGuard({
+            odds,
+            context,
+            builder: variant.builder,
+            basePicks,
+            drawMaxOdds,
+            maxSelectableOdds: 35,
+            minSelectableProbability: 0.006,
+          }),
+        });
+      }
+    }
+  }
 }
 
 function pickSourceConsensusPoisson({
@@ -715,6 +751,39 @@ function pickDiversePoissonEv({
   }
 
   return uniquePicks([...selected, ...pool]).slice(0, maxPicks);
+}
+
+function pickPoissonDrawGuard({
+  odds,
+  context,
+  builder,
+  basePicks,
+  drawMaxOdds,
+  maxSelectableOdds,
+  minSelectableProbability,
+}) {
+  const base = pickDiversePoissonEv({
+    odds,
+    context,
+    builder,
+    maxPicks: basePicks,
+    maxSelectableOdds,
+    minSelectableProbability,
+  });
+  const modelSelection = builder({
+    odds,
+    context,
+    options: {
+      maxPicks: 12,
+      minPicks: 2,
+      maxSelectableOdds,
+      minSelectableProbability,
+    },
+  });
+  const oddsOneOne = (odds || []).find((pick) => pick.score === '1-1' && Number(pick.odds) <= drawMaxOdds);
+  const modelOneOne = modelSelection.evTable?.find((pick) => pick.score === '1-1');
+  const drawGuard = oddsOneOne ? [modelOneOne || oddsOneOne] : [];
+  return uniquePicks([...drawGuard, ...base]).slice(0, oddsOneOne ? Math.max(basePicks, 3) : basePicks);
 }
 
 function pickFavoriteCover({ odds, favoriteMaxOdds, underdogMinOdds, maxPicks }) {

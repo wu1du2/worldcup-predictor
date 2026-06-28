@@ -150,20 +150,22 @@ export const candidateStrategies = [
     selectPicks: ({ odds, context }) => buildContextPoissonEvV2Selection({ odds, context }).picks,
   },
   {
-    id: 'tem_poisson_diverse_context_v1_n2_cap35_p0_006',
-    name: '赛前泊松EV多样性 2 格',
+    id: 'tem_poisson_drawguard_context_v3_n2_draw7_cap35_p0_006',
+    name: '赛前泊松EV平局保护',
     family: 'poisson_ev',
     style: 'selected',
     parameters: {
-      variant: 'context_v1',
-      maxPicks: 2,
+      variant: 'context_v3',
+      basePicks: 2,
       maxSelectableOdds: 35,
       minSelectableProbability: 0.006,
       diversity: 'outcome',
+      drawGuardScore: '1-1',
+      drawMaxOdds: 7,
     },
-    description: '价值型 v4：用赛前泊松基础模型生成 EV 候选池，再优先选择不同赛果方向的 2 个比分。',
-    explanation: '保留概率*赔率的 EV 解释，同时避免推荐全部集中在相邻低平局。',
-    selectPicks: ({ odds, context }) => pickDiverseContextPoissonV1(odds, context),
+    description: '价值型 v5：用赛前泊松均衡模型生成多样性 EV 候选；若 1-1 赔率不高于 7，加入 1-1 平局保护。',
+    explanation: '保留概率*赔率的 EV 解释，同时用低赔 1-1 保护接近比赛，提高命中和可读性。',
+    selectPicks: ({ odds, context }) => pickPoissonDrawGuardContextV3(odds, context),
   },
   {
     id: 'context_poisson_ev_v3',
@@ -324,15 +326,49 @@ function pickConsensusPoissonContextV1(odds, context) {
   ]).slice(0, 4);
 }
 
-function pickDiverseContextPoissonV1(odds, context) {
-  const pool = buildContextPoissonEvSelection({
+function pickPoissonDrawGuardContextV3(odds, context) {
+  const base = pickDiversePoissonEv({
+    odds,
+    context,
+    builder: buildContextPoissonEvV3Selection,
+    maxPicks: 2,
+    maxSelectableOdds: 35,
+    minSelectableProbability: 0.006,
+  });
+  const modelSelection = buildContextPoissonEvV3Selection({
     odds,
     context,
     options: {
-      maxPicks: 8,
+      maxPicks: 12,
       minPicks: 2,
       maxSelectableOdds: 35,
       minSelectableProbability: 0.006,
+    },
+  });
+  const oddsOneOne = odds.find((pick) => pick.score === '1-1' && pick.odds <= 7);
+  const modelOneOne = modelSelection.evTable?.find((pick) => pick.score === '1-1');
+  return uniquePicks([
+    ...(oddsOneOne ? [modelOneOne || oddsOneOne] : []),
+    ...base,
+  ]).slice(0, oddsOneOne ? 3 : 2);
+}
+
+function pickDiversePoissonEv({
+  odds,
+  context,
+  builder,
+  maxPicks,
+  maxSelectableOdds,
+  minSelectableProbability,
+}) {
+  const pool = builder({
+    odds,
+    context,
+    options: {
+      maxPicks: Math.max(maxPicks * 3, 8),
+      minPicks: Math.min(2, maxPicks),
+      maxSelectableOdds,
+      minSelectableProbability,
     },
   }).picks;
   const selected = [];
@@ -342,9 +378,9 @@ function pickDiverseContextPoissonV1(odds, context) {
     if (usedOutcomes.has(outcome)) continue;
     selected.push(pick);
     usedOutcomes.add(outcome);
-    if (selected.length >= 2) return selected;
+    if (selected.length >= maxPicks) return selected;
   }
-  return uniquePicks(pool).slice(0, 2);
+  return uniquePicks(pool).slice(0, maxPicks);
 }
 
 function pickFavoriteNarrowWin(odds) {

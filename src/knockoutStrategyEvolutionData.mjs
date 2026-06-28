@@ -1,4 +1,4 @@
-export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T14:04:17.631Z";
+export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T14:17:39.198Z";
 export const knockoutStrategyEvolutionProxyMatches = 56;
 
 export const knockoutStrategyEvolutionFamilies = [
@@ -119,14 +119,14 @@ export const knockoutStrategyEvolutionFamilies = [
       {
         "version": "v3",
         "status": "active",
-        "label": "赛前泊松EV多样性 2 格",
-        "changed": "代理样本 56 场：本轮自动实验 tem_poisson_diverse_context_v1_n2_cap35_p0_006，平均 2 注，最大命中赔率 28。",
-        "verdict": "升级为当前候选：总分 74.6，ROI +27.46%，命中 8/56。",
+        "label": "赛前泊松EV平局保护",
+        "changed": "代理样本 56 场：本轮自动实验 tem_poisson_drawguard_context_v3_n2_draw7_cap35_p0_006，平均 2.5 注，最大命中赔率 28。",
+        "verdict": "升级为当前候选：总分 76.2，ROI +22.68%，命中 13/56。",
         "metrics": {
-          "roi": 87.5,
-          "hitRate": 14.3,
+          "roi": 82.7,
+          "hitRate": 23.2,
           "coverage": 100,
-          "shapeHealth": 90,
+          "shapeHealth": 100,
           "explainability": 84
         }
       }
