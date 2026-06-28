@@ -59,6 +59,7 @@ const productionStrategyIds = new Set(candidateStrategies.map((strategy) => stra
 const tempStrategies = generateTempStrategyCandidates({ maxCandidates: 200 })
   .filter((strategy) => !productionStrategyIds.has(strategy.id));
 const strategies = [...candidateStrategies, ...tempStrategies];
+const strategyMetadataById = new Map(strategies.map((strategy) => [strategy.id, serializeStrategyDefinition(strategy)]));
 const backtestResults = runCandidateStrategyBacktests({
   matches: proxyMatchList,
   scoreOddsByMatch,
@@ -68,6 +69,7 @@ const results = backtestResults
   .map((result) => enrichKnockoutProxyBacktestResult(result, {
     explanationScore: getExplanationScore(result.strategyId),
     proxyMatches: proxyMatches.length,
+    metadata: strategyMetadataById.get(result.strategyId),
   }))
   .sort((a, b) => b.knockoutProxyScore - a.knockoutProxyScore || b.roiPercent - a.roiPercent);
 
@@ -92,6 +94,7 @@ const dataset = {
   strategies: strategies.length,
   productionStrategies: candidateStrategies.length,
   tempStrategies: tempStrategies.length,
+  strategyDefinitions: strategies.map(serializeStrategyDefinition),
   filter: {
     minScoreOptions: 5,
     rules: [
@@ -198,6 +201,18 @@ function getExplanationScore(strategyId) {
   if (/poisson|hybrid/.test(strategyId)) return 84;
   if (/favorite|underdog|draw|outcome|trend/.test(strategyId)) return 78;
   return 70;
+}
+
+function serializeStrategyDefinition(strategy) {
+  return {
+    id: strategy.id,
+    name: strategy.name,
+    family: strategy.family || 'unknown',
+    style: strategy.style || 'unknown',
+    parameters: strategy.parameters || {},
+    description: strategy.description || '',
+    explanation: strategy.explanation || '',
+  };
 }
 
 function writeJson(filePath, value) {

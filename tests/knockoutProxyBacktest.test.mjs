@@ -139,8 +139,18 @@ test('enrichKnockoutProxyBacktestResult adds proxy score and metric breakdown', 
   }, {
     explanationScore: 85,
     proxyMatches: 3,
+    metadata: {
+      family: 'draw_anchor',
+      style: 'balanced',
+      parameters: { maxPicks: 3 },
+      explanation: '围绕平局锚点。',
+    },
   });
 
+  assert.equal(enriched.family, 'draw_anchor');
+  assert.equal(enriched.style, 'balanced');
+  assert.deepEqual(enriched.parameters, { maxPicks: 3 });
+  assert.equal(enriched.explanation, '围绕平局锚点。');
   assert.equal(enriched.averagePicks, 2.5);
   assert.equal(enriched.maxHitOdds, 6);
   assert.equal(enriched.knockoutProxyMetrics.roi, 72);

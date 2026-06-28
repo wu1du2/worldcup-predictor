@@ -90,6 +90,7 @@ export function scoreKnockoutBacktestSummary({
 export function enrichKnockoutProxyBacktestResult(result, {
   explanationScore = 70,
   proxyMatches = result?.settledMatches || 0,
+  metadata = {},
 } = {}) {
   const rows = result?.rows || [];
   const pickCounts = rows.map((row) => row.picks?.length || 0);
@@ -109,6 +110,10 @@ export function enrichKnockoutProxyBacktestResult(result, {
 
   return {
     ...result,
+    family: metadata.family,
+    style: metadata.style,
+    parameters: metadata.parameters,
+    explanation: metadata.explanation,
     averagePicks,
     maxHitOdds,
     knockoutProxyScore: score.total,
