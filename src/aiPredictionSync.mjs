@@ -100,6 +100,7 @@ function summarizeRouterReason(routerText) {
   const roi = text.match(/滚动历史 ROI ([^，；。]+)/)?.[1] || '';
   const sample = text.match(/样本 ([^；。]+)/)?.[1] || '';
   const totalScore = text.match(/综合 ([^；。]+)/)?.[1] || '';
+  const sourceContext = text.match(/外部来源[^。]+。?/)?.[0] || '';
   const market = text.match(/盘口：([^。]+)/)?.[1] || '';
   const marketShort = market.split('，').slice(0, 2).join('，');
   const metricParts = [
@@ -112,6 +113,7 @@ function summarizeRouterReason(routerText) {
     firstSentence,
     candidateType ? `${candidateType}` : '',
     metricParts,
+    sourceContext ? sourceContext.replace(/。$/, '') : '',
     marketShort,
   ].filter(Boolean).join('；'));
 }

@@ -1,5 +1,6 @@
 import { defaultAiPredictionScores } from './aiPredictionBatch.mjs';
 import { candidateStrategies } from './strategyCandidates.mjs';
+import { getExternalPredictionStrength } from './sourceConsensusStrategy.mjs';
 
 const fallbackStrategyId = 'low_score_basket_4';
 const dynamicRouterCandidateLimit = 4;
@@ -8,6 +9,7 @@ const dynamicCandidateMinHitMatches = 3;
 const dynamicCandidateMinRoiPercent = 0;
 const dynamicCandidateMaxAveragePicks = 4.5;
 export const routerCandidateStrategyIds = [
+  'market_consensus_sources',
   'tem_hybrid_draw_poisson_v2_d1_n2',
   'tem_draw_anchor_3_max5_5',
   'context_poisson_ev_v3',
@@ -67,9 +69,9 @@ export function routeStrategyForMatch({
     .map((strategy) => ({
       strategy,
       stats: rollingStats[strategy.id] || emptyStats(strategy.id),
-      featureScore: scoreStrategyFeatures({ strategy, odds }),
+      featureScore: scoreStrategyFeatures({ strategy, odds, match }),
     }))
-    .filter((item) => strategyCanPick(item.strategy, odds))
+    .filter((item) => strategyCanPick(item.strategy, odds, match))
     .map((item) => ({
       ...item,
       isDynamicCandidate: dynamicCandidateIds.includes(item.strategy.id),
@@ -207,12 +209,16 @@ function buildRoute({ match, strategy, stats, confidence, reason }) {
 function buildReason({ match, selected, odds }) {
   const market = describeMarket(odds);
   const candidateType = selected.isDynamicCandidate ? '流动候选' : '核心候选';
+  const sourceText = selected.strategy.id === 'market_consensus_sources'
+    ? `外部来源 ${getExternalPredictionStrength(match?.strategyContext || {})} 条；${isKnockoutMatch(match) ? '淘汰赛优先信市场主线。' : '非淘汰赛按普通权重处理。'}`
+    : '';
   return [
     `${formatMatch(match)}：选「${selected.strategy.name}」。`,
     `选择标准：核心候选固定保留，榜单达标策略可作为流动候选；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自${candidateType}。`,
     `本场：滚动历史 ROI ${formatSignedPercent(selected.stats.roiPercent)}，样本 ${selected.stats.settledMatches}；适配 ${formatMetric(selected.featureScore)}，综合 ${formatMetric(selected.routerScore)}。`,
+    sourceText,
     `盘口：${market}。`,
-  ].join('');
+  ].filter(Boolean).join('');
 }
 
 function withScoreSelectionReason({ route, picks, scoreOptions }) {
@@ -245,6 +251,9 @@ function getStrategyPickStandard(strategyId) {
   if (strategyId === 'context_poisson_ev_v3') {
     return '标准是用赛前 context 估进球，做低比分/平局修正后按 EV 取前列。';
   }
+  if (strategyId === 'market_consensus_sources') {
+    return '标准是优先采纳机构明确比分，再用方向预测和赔率低位补足。';
+  }
   if (strategyId === fallbackStrategyId) {
     return '标准是缺赔率时覆盖最常见低比分。';
   }
@@ -258,6 +267,9 @@ function describePickedScore({ strategyId, pick, scoreOptions }) {
   const valueText = formatProbabilityEvText(pick);
 
   if (valueText) return `${score} ${valueText}，${oddsText}`;
+  if (strategyId === 'market_consensus_sources' && pick?.reason) {
+    return `${score} ${pick.reason}，${oddsText}`;
+  }
 
   if (strategyId === 'tem_draw_anchor_3_max5_5') {
     if (score === '1-1') return `${score} 核心平局，${oddsText}`;
@@ -282,8 +294,15 @@ function describePickedScore({ strategyId, pick, scoreOptions }) {
   return `${score} 符合策略规则，${oddsText}`;
 }
 
-function scoreStrategyFeatures({ strategy, odds }) {
+function scoreStrategyFeatures({ strategy, odds, match = null }) {
   const market = getMarketFeatures(odds);
+  const externalPredictionStrength = getExternalPredictionStrength(match?.strategyContext || {});
+  const knockoutBonus = isKnockoutMatch(match) ? 0.45 : 0;
+  if (strategy.id === 'market_consensus_sources') {
+    if (externalPredictionStrength >= 3) return 1.25 + knockoutBonus;
+    if (externalPredictionStrength >= 1) return 0.75 + knockoutBonus / 2;
+    return 0.28;
+  }
   if (strategy.id === 'draw_anchor_3') {
     return market.drawLean ? 0.8 : 0.15;
   }
@@ -395,8 +414,8 @@ function describeMarket(odds) {
   return parts.join('，');
 }
 
-function strategyCanPick(strategy, odds) {
-  return uniqueScores(strategy.selectPicks({ odds }) || []).length > 0;
+function strategyCanPick(strategy, odds, match = null) {
+  return uniqueScores(strategy.selectPicks({ odds, context: match?.strategyContext || {}, match }) || []).length > 0;
 }
 
 function findStrategy(strategies, strategyId) {
@@ -434,6 +453,8 @@ function uniquePicks(picks) {
       ...(Number.isFinite(Number(pick?.odds)) ? { odds: Number(pick.odds) } : {}),
       ...(Number.isFinite(Number(pick?.probability)) ? { probability: Number(pick.probability) } : {}),
       ...(Number.isFinite(Number(pick?.ev)) ? { ev: Number(pick.ev) } : {}),
+      ...(Number.isFinite(Number(pick?.sourceScore)) ? { sourceScore: Number(pick.sourceScore) } : {}),
+      ...(pick?.reason ? { reason: pick.reason } : {}),
     });
   }
   return unique;
@@ -499,6 +520,10 @@ function emptyStats(strategyId) {
     roiPercent: 0,
     hitMatches: 0,
   };
+}
+
+function isKnockoutMatch(match) {
+  return /Round of|Quarterfinal|Semifinal|Final|Third-place/i.test(match?.stage || '');
 }
 
 function formatMatch(match) {

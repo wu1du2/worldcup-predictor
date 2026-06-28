@@ -154,3 +154,44 @@ test('buildAiRecommendationRows separates router reason from per-score predictio
   assert.match(row.match_reason_detail, /- 0-1：预计概率 4\.9%，EV \+0\.42，赔率 29/);
   assert.match(row.match_reason_detail, /- 0-0：预计概率 4\.7%，EV \+0\.13，赔率 24/);
 });
+
+test('buildAiRecommendationRows keeps source consensus router context', () => {
+  const predictionLog = {
+    generatedAt: '2026-06-28T04:50:00.000Z',
+    strategy_router: 'rolling_roi_market_router_v1',
+    predictions: [
+      {
+        matchId: 'espn-760487',
+        scores: ['2-1', '3-1', '1-0'],
+        pickDetails: [
+          { score: '2-1', odds: 6.5, reason: 'CBS明确2-1' },
+          { score: '3-1', odds: 11, reason: 'Ladbrokes明确3-1' },
+          { score: '1-0', odds: 6.25, reason: 'CBS/Ladbrokes/BetMGM/DraftKings方向支持' },
+        ],
+        route: {
+          strategyId: 'market_consensus_sources',
+          strategyName: '市场来源共识',
+          strategyDescription: '综合机构明确比分、方向型预测和比分赔率低位。',
+          historicalRoiPercent: -31.05,
+          roiLabel: '-31.05%',
+          reason: [
+            '巴西 vs 日本：选「市场来源共识」。',
+            '选择标准：核心候选固定保留，榜单达标策略可作为流动候选；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自核心候选。',
+            '本场：滚动历史 ROI -31.05%，样本 70；适配 1.7，综合 1.58。',
+            '外部来源 4 条；淘汰赛优先信市场主线。',
+            '盘口：主胜最低 6.25，平局最低 6.25，客胜最低 8。',
+            '比分选择：标准是优先采纳机构明确比分，再用方向预测和赔率低位补足。2-1 CBS明确2-1，赔率 6.5；3-1 Ladbrokes明确3-1，赔率 11；1-0 CBS/Ladbrokes/BetMGM/DraftKings方向支持，赔率 6.25。',
+          ].join(''),
+        },
+      },
+    ],
+  };
+
+  const [row] = buildAiRecommendationRows({ predictionLog });
+
+  assert.match(row.router_reason, /外部来源 4 条/);
+  assert.match(row.router_reason, /淘汰赛优先信市场主线/);
+  assert.doesNotMatch(row.router_reason, /比分选择/);
+  assert.match(row.match_reason_summary, /CBS明确2-1/);
+  assert.match(row.match_reason_detail, /- 1-0：CBS\/Ladbrokes\/BetMGM\/DraftKings方向支持/);
+});

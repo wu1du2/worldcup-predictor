@@ -52,13 +52,14 @@ const sampleOdds = {
 };
 
 test('candidate strategy set contains final3 production candidates and offline strategies', () => {
-  assert.equal(candidateStrategies.length, 20);
-  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 20);
+  assert.equal(candidateStrategies.length, 21);
+  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 21);
   assert.deepEqual(candidateStrategies.map((strategy) => strategy.id), [
     'low_score_basket_4',
     'lowest_odds_2',
     'lowest_odds_3',
     'market_consensus_4',
+    'market_consensus_sources',
     'favorite_narrow_win_3',
     'draw_anchor_3',
     'underdog_cover_3',
@@ -84,7 +85,7 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
     scoreOddsByMatch: sampleOdds,
   });
 
-  assert.equal(results.length, 20);
+  assert.equal(results.length, 21);
 
   const lowScore = results.find((result) => result.strategyId === 'low_score_basket_4');
   assert.equal(lowScore.cost, 8);

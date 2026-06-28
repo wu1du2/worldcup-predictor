@@ -5,6 +5,7 @@ import {
   buildContextPoissonEvV3Selection,
   buildMarketPoissonEvSelection,
 } from './poissonEvStrategy.mjs';
+import { buildSourceConsensusSelection } from './sourceConsensusStrategy.mjs';
 
 export const candidateStrategies = [
   {
@@ -30,6 +31,12 @@ export const candidateStrategies = [
     name: '市场共识四项',
     description: '买最低赔率四项，但限制过高赔率噪音。',
     selectPicks: ({ odds }) => sortByOdds(odds).filter((pick) => pick.odds <= 18).slice(0, 4),
+  },
+  {
+    id: 'market_consensus_sources',
+    name: '市场来源共识',
+    description: '综合机构明确比分、方向型预测和比分赔率低位，优先给出可解释的市场主线比分。',
+    selectPicks: ({ odds, context }) => buildSourceConsensusSelection({ odds, context }).picks,
   },
   {
     id: 'favorite_narrow_win_3',
@@ -357,6 +364,8 @@ function uniquePicks(picks) {
       ...(pick.changePct !== null ? { changePct: pick.changePct } : {}),
       ...(Number.isFinite(Number(pick.probability)) ? { probability: pick.probability } : {}),
       ...(Number.isFinite(Number(pick.ev)) ? { ev: pick.ev } : {}),
+      ...(Number.isFinite(Number(pick.sourceScore)) ? { sourceScore: pick.sourceScore } : {}),
+      ...(pick.reason ? { reason: pick.reason } : {}),
     });
   }
   return unique;

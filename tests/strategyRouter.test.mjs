@@ -74,6 +74,80 @@ test('routeStrategyForMatch chooses an available positive-history strategy and r
   assert.match(route.reason, /葡萄牙 vs 乌兹别克斯坦/);
 });
 
+test('routeStrategyForMatch prefers source consensus for knockout matches with explicit external picks', () => {
+  const route = routeStrategyForMatch({
+    match: {
+      id: 'brazil-japan',
+      date: '2026-06-30',
+      time: '01:00',
+      home: '巴西',
+      away: '日本',
+      stage: 'Round of 32',
+      strategyContext: {
+        externalPredictions: [
+          { source: 'CBS', kind: 'score', score: '2-1', outcome: 'home' },
+          { source: 'Ladbrokes', kind: 'score', score: '3-1', outcome: 'home', bothTeamsScore: true },
+          { source: 'BetMGM', kind: 'market', outcome: 'home', bothTeamsScore: true },
+          { source: 'DraftKings', kind: 'market', outcome: 'home', totalLean: 'under' },
+        ],
+      },
+    },
+    scoreOptions: [
+      { score: '1-0', odds: 6.25 },
+      { score: '1-1', odds: 6.25 },
+      { score: '2-1', odds: 6.5 },
+      { score: '2-0', odds: 7 },
+      { score: '0-0', odds: 10 },
+      { score: '3-1', odds: 11 },
+      { score: '2-2', odds: 14 },
+    ],
+    historicalResults,
+  });
+
+  assert.equal(route.strategyId, 'market_consensus_sources');
+  assert.match(route.reason, /外部来源/);
+  assert.match(route.reason, /淘汰赛/);
+});
+
+test('buildRoutedAiPredictionEntries explains source-backed score choices', () => {
+  const entries = buildRoutedAiPredictionEntries({
+    matches: [
+      {
+        id: 'brazil-japan',
+        date: '2026-06-30',
+        time: '01:00',
+        home: '巴西',
+        away: '日本',
+        stage: 'Round of 32',
+        strategyContext: {
+          externalPredictions: [
+            { source: 'CBS', kind: 'score', score: '2-1', outcome: 'home' },
+            { source: 'Ladbrokes', kind: 'score', score: '3-1', outcome: 'home', bothTeamsScore: true },
+            { source: 'BetMGM', kind: 'market', outcome: 'home', bothTeamsScore: true },
+            { source: 'DraftKings', kind: 'market', outcome: 'home', totalLean: 'under' },
+          ],
+        },
+      },
+    ],
+    scoreOddsByMatch: {
+      'brazil-japan': [
+        { score: '1-0', odds: 6.25 },
+        { score: '1-1', odds: 6.25 },
+        { score: '2-1', odds: 6.5 },
+        { score: '2-0', odds: 7 },
+        { score: '0-0', odds: 10 },
+        { score: '3-1', odds: 11 },
+        { score: '2-2', odds: 14 },
+      ],
+    },
+    historicalResults,
+  });
+
+  assert.deepEqual(entries[0].scores, ['2-1', '3-1', '1-0']);
+  assert.match(entries[0].route.reason, /CBS/);
+  assert.match(entries[0].route.reason, /Ladbrokes/);
+});
+
 test('buildRoutedAiPredictionEntries falls back to low-score scores when odds are missing', () => {
   const entries = buildRoutedAiPredictionEntries({
     matches: [
@@ -168,6 +242,7 @@ test('routeStrategyForMatch only considers the production router candidate pool 
   });
 
   assert.deepEqual(routerCandidateStrategyIds, [
+    'market_consensus_sources',
     'tem_hybrid_draw_poisson_v2_d1_n2',
     'tem_draw_anchor_3_max5_5',
     'context_poisson_ev_v3',

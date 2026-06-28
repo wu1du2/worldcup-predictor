@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "context_mode": "manual_prematch_sources",
+  "context_quality": "trusted_external_prematch",
+  "generatedAt": "2026-06-28T04:45:00.000Z",
+  "match": {
+    "id": "espn-760487",
+    "date": "2026-06-30",
+    "time": "01:00",
+    "kickoff_utc8": "2026-06-30T01:00:00+08:00",
+    "home": "巴西",
+    "away": "日本",
+    "stage": "Round of 32"
+  },
+  "sourceGate": {
+    "rule": "Only public pages available before kickoff in UTC+8 enter this context.",
+    "accepted_source_ids": [
+      "cbs_round_of_32_bracket_prediction",
+      "ladbrokes_brazil_japan_preview",
+      "betmgm_brazil_japan_prediction",
+      "draftkings_opening_odds_brazil_japan"
+    ],
+    "excluded_source_ids": [],
+    "weak_source_ids": []
+  },
+  "externalPredictions": [
+    {
+      "source": "CBS",
+      "kind": "score",
+      "score": "2-1",
+      "outcome": "home",
+      "url": "https://www.cbssports.com/soccer/news/2026-fifa-world-cup-predictions-picking-every-game-england-vs-spain-messi-vs-ronaldo-usmnt/",
+      "note": "Round of 32 bracket pick lists Brazil 2, Japan 1."
+    },
+    {
+      "source": "Ladbrokes",
+      "kind": "score",
+      "score": "3-1",
+      "outcome": "home",
+      "totalLean": "over",
+      "bothTeamsScore": true,
+      "url": "https://www.ladbrokes.com/en/news/brazil-japan-world-cup-round-of-32-preview-predictions-tips-2026-06-26/",
+      "note": "Preview predicts Brazil 3-1 Japan, both teams to score, and over 3.5 goals."
+    },
+    {
+      "source": "BetMGM",
+      "kind": "market",
+      "outcome": "home",
+      "bothTeamsScore": true,
+      "url": "https://sports.betmgm.com/en/blog/world-cup/brazil-vs-japan-prediction-odds-preview-world-cup-june-29-bm16/",
+      "note": "Prediction is both teams to score, citing Japan attacking quality and Brazil's attack."
+    },
+    {
+      "source": "DraftKings",
+      "kind": "market",
+      "outcome": "home",
+      "totalLean": "under",
+      "url": "https://dknetwork.draftkings.com/2026/06/26/opening-odds-for-brazil-vs-japan-in-the-2026-fifa-world-cup-round-of-32/",
+      "note": "Opening odds favor Brazil on the 90-minute moneyline while under 2.5 is slightly favored."
+    }
+  ]
+}
