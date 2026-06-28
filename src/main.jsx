@@ -27,7 +27,7 @@ import {
   saveGroupPredictions,
   submitAiUserStrategy,
 } from './supabaseData.mjs';
-import { formatReportStatusText } from './importReports.mjs';
+import { formatReportJobTitle, formatReportStatusText } from './importReports.mjs';
 import {
   getAiReasonPreview,
   getAiRecommendationForMatch,
@@ -1156,7 +1156,7 @@ function BackendReportDialog({ dialog, onClose }) {
             {dialog.reports.map((report) => (
               <article className={`report-item ${report.status}`} key={report.id}>
                 <div className="report-item-header">
-                  <strong>{report.jobName === 'odds' ? '赔率更新' : '比分更新'}</strong>
+                  <strong>{formatReportJobTitle(report)}</strong>
                   <span>{formatReportStatusText(report)}</span>
                 </div>
                 <p>{report.message || '无消息'}</p>

@@ -1,4 +1,4 @@
-export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T15:37:21.855Z";
+export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T16:02:32.162Z";
 export const knockoutStrategyEvolutionProxyMatches = 56;
 
 export const knockoutStrategyEvolutionFamilies = [

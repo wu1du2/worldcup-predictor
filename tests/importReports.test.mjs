@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   buildImportReportRow,
+  formatReportJobTitle,
   formatReportStatusText,
   writeImportReport,
 } from '../src/importReports.mjs';
@@ -79,4 +80,11 @@ test('formatReportStatusText renders compact report status labels', () => {
   assert.equal(formatReportStatusText({ status: 'success' }), '成功');
   assert.equal(formatReportStatusText({ status: 'failed' }), '失败');
   assert.equal(formatReportStatusText({ status: 'other' }), '未知');
+});
+
+test('formatReportJobTitle renders strategy loop updates', () => {
+  assert.equal(formatReportJobTitle({ jobName: 'odds' }), '赔率更新');
+  assert.equal(formatReportJobTitle({ jobName: 'matches' }), '比分更新');
+  assert.equal(formatReportJobTitle({ jobName: 'strategy_loop' }), '策略迭代');
+  assert.equal(formatReportJobTitle({ jobName: 'unknown' }), '后台任务');
 });

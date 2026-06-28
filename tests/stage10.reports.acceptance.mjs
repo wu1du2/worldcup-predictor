@@ -60,6 +60,19 @@ const reports = [
     run_url: 'https://github.com/wu1du2/worldcup-predictor/actions/runs/2',
     created_at: '2026-06-13T09:05:18.000Z',
   },
+  {
+    id: 'report-strategy-loop',
+    job_name: 'strategy_loop',
+    status: 'success',
+    started_at: '2026-06-13T09:10:00.000Z',
+    finished_at: '2026-06-13T09:12:18.000Z',
+    rows_written: 1,
+    items_seen: 841,
+    message: '策略迭代第6轮：进入平台期。本轮最高分 77.7，历史最高分 77.7。',
+    error_detail: '最佳策略：赛前泊松EV均衡 平局保护',
+    run_url: 'https://github.com/wu1du2/worldcup-predictor/actions/runs/3',
+    created_at: '2026-06-13T09:12:18.000Z',
+  },
 ];
 
 await mkdir(artifactDir, { recursive: true });
@@ -114,6 +127,8 @@ try {
   assert.match(dialogText, /比分更新/);
   assert.match(dialogText, /成功/);
   assert.match(dialogText, /写入72行/);
+  assert.match(dialogText, /策略迭代/);
+  assert.match(dialogText, /进入平台期/);
 
   await page.screenshot({ path: new URL('backend-report-iphone13.png', artifactDir).pathname, fullPage: true });
   await writeFile(new URL('backend-report-text.txt', artifactDir), `${dialogText}\n`);

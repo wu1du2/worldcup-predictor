@@ -52,6 +52,13 @@ export function formatReportStatusText(report) {
   return '未知';
 }
 
+export function formatReportJobTitle(report) {
+  if (report.jobName === 'odds') return '赔率更新';
+  if (report.jobName === 'matches') return '比分更新';
+  if (report.jobName === 'strategy_loop') return '策略迭代';
+  return '后台任务';
+}
+
 export function getGithubRunUrl(env = process.env) {
   if (!env.GITHUB_SERVER_URL || !env.GITHUB_REPOSITORY || !env.GITHUB_RUN_ID) return '';
   return `${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}`;
