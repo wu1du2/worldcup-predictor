@@ -45,6 +45,10 @@ import {
   getKnockoutStrategyFamilies,
   getKnockoutVersionPoints,
 } from './knockoutStrategyEvolution.mjs';
+import {
+  buildAiStrategyTabsForMatch,
+  getDefaultAiStrategyTabId,
+} from './aiStrategyTabs.mjs';
 import { sportteryScoreTemplate } from './scoreTemplate.mjs';
 import './styles.css';
 
@@ -580,7 +584,7 @@ function HomePage() {
 
 function InfoDialog({ title, message, onClose }) {
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label={title}>
+    <DialogBackdrop ariaLabel={title} onClose={onClose}>
       <div className="dialog compact-dialog info-dialog">
         <div className="dialog-header">
           <h2>{title}</h2>
@@ -593,13 +597,26 @@ function InfoDialog({ title, message, onClose }) {
           知道了
         </button>
       </div>
+    </DialogBackdrop>
+  );
+}
+
+function DialogBackdrop({ ariaLabel, onClose, children, dismissOnBackdrop = true }) {
+  function handleBackdropClick(event) {
+    if (!dismissOnBackdrop) return;
+    if (event.target === event.currentTarget) onClose();
+  }
+
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label={ariaLabel} onClick={handleBackdropClick}>
+      {children}
     </div>
   );
 }
 
 function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onOpenAiStrategy, onOpenKnockoutStrategy }) {
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="更多">
+    <DialogBackdrop ariaLabel="更多" onClose={onClose}>
       <div className="dialog compact-dialog more-menu-dialog" data-more-menu-dialog>
         <div className="dialog-header">
           <h2>更多</h2>
@@ -622,7 +639,7 @@ function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onO
           </button>
         </div>
       </div>
-    </div>
+    </DialogBackdrop>
   );
 }
 
@@ -636,8 +653,23 @@ function MatchCard({
   onToggle,
   onOpenAiRecommendation,
 }) {
-  const aiPreview = aiRecommendation
-    ? getAiReasonPreview(aiRecommendation.matchReasonSummary, { roiLabel: aiRecommendation.roiLabel, summaryLimit: 42 })
+  const strategyTabs = useMemo(() => buildAiStrategyTabsForMatch({
+    match,
+    scoreOptions,
+    routerRecommendation: aiRecommendation,
+  }), [match, scoreOptions, aiRecommendation]);
+  const defaultStrategyTabId = getDefaultAiStrategyTabId(strategyTabs, aiRecommendation);
+  const [activeStrategyTabId, setActiveStrategyTabId] = useState(defaultStrategyTabId);
+
+  useEffect(() => {
+    setActiveStrategyTabId(defaultStrategyTabId);
+  }, [defaultStrategyTabId, match.id]);
+
+  const activeStrategyTab = strategyTabs.find((tab) => tab.id === activeStrategyTabId) || strategyTabs[0];
+  const activeStrategyRecommendation = activeStrategyTab?.recommendation || aiRecommendation;
+  const activeRecommendedScores = activeStrategyRecommendation?.scores || recommendedScores || [];
+  const aiPreview = activeStrategyRecommendation
+    ? getAiReasonPreview(activeStrategyRecommendation.matchReasonSummary, { roiLabel: activeStrategyRecommendation.roiLabel, summaryLimit: 42 })
     : null;
 
   return (
@@ -648,14 +680,14 @@ function MatchCard({
           <h2>
             {match.home} <span>vs</span> {match.away}
           </h2>
-          {aiRecommendation ? (
+          {activeStrategyRecommendation ? (
             <button
               className="ai-summary-button"
               data-action="open-ai-recommendation"
-              onClick={() => onOpenAiRecommendation(aiRecommendation)}
+              onClick={() => onOpenAiRecommendation(activeStrategyRecommendation)}
             >
               <strong>AI推荐</strong>
-              <span>· 历史[{aiRecommendation.roiLabel}]</span>
+              {activeStrategyRecommendation.roiLabel ? <span>· 历史[{activeStrategyRecommendation.roiLabel}]</span> : null}
               <span>· 理由 {aiPreview.summary}</span>
               <span aria-hidden="true">›</span>
             </button>
@@ -665,9 +697,24 @@ function MatchCard({
           <div className="score-pill">{getMatchScoreText(match)}</div>
         </div>
       </div>
+      {strategyTabs.length > 0 ? (
+        <div className="ai-strategy-tabs" aria-label="AI策略类型">
+          {strategyTabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`ai-strategy-tab ${tab.id === activeStrategyTab?.id ? 'selected' : ''} ${tab.isRouterPick ? 'router-pick' : ''}`}
+              data-ai-strategy-tab={tab.id}
+              onClick={() => setActiveStrategyTabId(tab.id)}
+            >
+              <span>{tab.label}</span>
+              {tab.isRouterPick ? <small>推荐</small> : null}
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div className="score-grid">
         {scoreOptions.map((option) => {
-          const isRecommended = recommendedScores.includes(option.score);
+          const isRecommended = activeRecommendedScores.includes(option.score);
 
           return (
             <button
@@ -695,7 +742,7 @@ function MatchCard({
 
 function AiRecommendationDialog({ recommendation, onClose }) {
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="AI推荐详情">
+    <DialogBackdrop ariaLabel="AI推荐详情" onClose={onClose}>
       <div className="dialog ai-detail-dialog" data-ai-recommendation-dialog>
         <div className="ai-detail-header">
           <button className="icon-button ai-back-button" data-action="close-ai-recommendation" aria-label="返回" onClick={onClose}>
@@ -705,7 +752,7 @@ function AiRecommendationDialog({ recommendation, onClose }) {
             <p>AI推荐</p>
             <h2>{recommendation.strategyName}</h2>
           </div>
-          <span className="ai-roi-badge">历史收益率 {recommendation.roiLabel}</span>
+          {recommendation.roiLabel ? <span className="ai-roi-badge">历史收益率 {recommendation.roiLabel}</span> : null}
         </div>
 
         <div className="ai-score-strip" aria-label="推荐结果">
@@ -724,10 +771,12 @@ function AiRecommendationDialog({ recommendation, onClose }) {
           <p>{recommendation.strategyFeature}</p>
         </section>
 
-        <section className="ai-detail-section">
-          <h3>Router 选择理由</h3>
-          <p>{recommendation.routerReason}</p>
-        </section>
+        {recommendation.routerReason ? (
+          <section className="ai-detail-section">
+            <h3>Router 选择理由</h3>
+            <p>{recommendation.routerReason}</p>
+          </section>
+        ) : null}
 
         <section className="ai-detail-section">
           <h3>本次预测</h3>
@@ -739,13 +788,13 @@ function AiRecommendationDialog({ recommendation, onClose }) {
           <p>{recommendation.matchReasonDetail}</p>
         </section>
       </div>
-    </div>
+    </DialogBackdrop>
   );
 }
 
 function AddPlayerDialog({ name, onNameChange, onClose, onConfirm }) {
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="新增名字">
+    <DialogBackdrop ariaLabel="新增名字" onClose={onClose}>
       <div className="dialog compact-dialog">
         <div className="dialog-header">
           <h2>新增名字</h2>
@@ -765,7 +814,7 @@ function AddPlayerDialog({ name, onNameChange, onClose, onConfirm }) {
           确定新增
         </button>
       </div>
-    </div>
+    </DialogBackdrop>
   );
 }
 
@@ -774,7 +823,7 @@ function AiStrategyDialog({ form, onChange, onClose, onSubmit }) {
   const saved = form.status === 'saved';
 
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="AI策略">
+    <DialogBackdrop ariaLabel="AI策略" onClose={onClose} dismissOnBackdrop={false}>
       <div className="dialog strategy-dialog">
         <div className="dialog-header">
           <div>
@@ -823,13 +872,13 @@ function AiStrategyDialog({ form, onChange, onClose, onSubmit }) {
           {saving ? '提交中...' : '提交策略'}
         </button>
       </div>
-    </div>
+    </DialogBackdrop>
   );
 }
 
 function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="AI预测排行榜">
+    <DialogBackdrop ariaLabel="AI预测排行榜" onClose={onClose}>
       <div className="dialog strategy-rank-dialog" data-ai-strategy-leaderboard-dialog>
         <div className="dialog-header">
           <h2>AI预测排行榜</h2>
@@ -880,7 +929,7 @@ function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
           </button>
         </div>
       </div>
-    </div>
+    </DialogBackdrop>
   );
 }
 
@@ -891,7 +940,7 @@ function KnockoutStrategyDialog({ onClose }) {
   const selectedMetricLabel = metricLabels.find((metric) => metric.id === selectedMetric)?.label || '分项';
 
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="淘汰赛策略">
+    <DialogBackdrop ariaLabel="淘汰赛策略" onClose={onClose}>
       <div className="dialog knockout-strategy-dialog" data-knockout-strategy-dialog>
         <div className="dialog-header">
           <div>
@@ -969,7 +1018,7 @@ function KnockoutStrategyDialog({ onClose }) {
           ))}
         </section>
       </div>
-    </div>
+    </DialogBackdrop>
   );
 }
 
@@ -1060,7 +1109,7 @@ function ExportDialog({ text, onClose }) {
   }
 
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="导出文本">
+    <DialogBackdrop ariaLabel="导出文本" onClose={onClose}>
       <div className="dialog">
         <div className="dialog-header">
           <h2>复制到微信群</h2>
@@ -1075,13 +1124,13 @@ function ExportDialog({ text, onClose }) {
         </div>
         <textarea readOnly data-export-text value={text} />
       </div>
-    </div>
+    </DialogBackdrop>
   );
 }
 
 function BackendReportDialog({ dialog, onClose }) {
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="后台报告">
+    <DialogBackdrop ariaLabel="后台报告" onClose={onClose}>
       <div className="dialog report-dialog" data-backend-report-dialog>
         <div className="dialog-header">
           <h2>后台报告</h2>
@@ -1121,7 +1170,7 @@ function BackendReportDialog({ dialog, onClose }) {
           </div>
         ) : null}
       </div>
-    </div>
+    </DialogBackdrop>
   );
 }
 

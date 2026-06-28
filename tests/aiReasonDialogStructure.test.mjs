@@ -32,9 +32,30 @@ test('AI recommended scores render a star inside score options', () => {
   const starIndex = matchCardSource.indexOf('className="ai-recommendation-star"');
   const scoreGridIndex = matchCardSource.indexOf('className="score-grid"');
 
-  assert.match(mainSource, /recommendedScores={recommendation\?\.scores \|\| aiPredictions\[match\.id\] \|\| \[\]}/);
-  assert.match(matchCardSource, /recommendedScores\.includes\(option\.score\)/);
+  assert.match(mainSource, /buildAiStrategyTabsForMatch/);
+  assert.match(mainSource, /const activeRecommendedScores = activeStrategyRecommendation\?\.scores \|\| recommendedScores \|\| \[\]/);
+  assert.match(matchCardSource, /activeRecommendedScores\.includes\(option\.score\)/);
   assert.ok(scoreGridIndex < starIndex);
+});
+
+test('match cards expose three AI strategy tabs and keep router reason scoped to routed tab', () => {
+  const matchCardSource = componentSource('MatchCard', 'AddPlayerDialog');
+
+  assert.match(matchCardSource, /className="ai-strategy-tabs"/);
+  assert.match(matchCardSource, /strategyTabs\.map/);
+  assert.match(matchCardSource, /data-ai-strategy-tab/);
+  assert.match(matchCardSource, /tab\.isRouterPick/);
+  assert.match(matchCardSource, /activeStrategyTabId/);
+  assert.match(stylesSource, /\.ai-strategy-tabs/);
+  assert.match(stylesSource, /\.ai-strategy-tab\.selected/);
+});
+
+test('dialog backdrops close on blank area while AI strategy input dialog is protected', () => {
+  assert.match(mainSource, /function DialogBackdrop/);
+  assert.match(mainSource, /event\.target === event\.currentTarget/);
+  assert.match(mainSource, /dismissOnBackdrop = true/);
+  assert.match(mainSource, /<DialogBackdrop ariaLabel="AI策略" onClose={onClose} dismissOnBackdrop={false}>/);
+  assert.match(mainSource, /<DialogBackdrop ariaLabel="AI推荐详情" onClose={onClose}>/);
 });
 
 test('AI leaderboard is a topbar action and strategy submission lives in the more menu', () => {
