@@ -150,28 +150,20 @@ export const candidateStrategies = [
     selectPicks: ({ odds, context }) => buildContextPoissonEvV2Selection({ odds, context }).picks,
   },
   {
-    id: 'tem_poisson_context_v1_n3_cap35_p0_006',
-    name: '赛前泊松EV基础 3 格',
+    id: 'tem_poisson_diverse_context_v1_n2_cap35_p0_006',
+    name: '赛前泊松EV多样性 2 格',
     family: 'poisson_ev',
-    style: 'balanced',
+    style: 'selected',
     parameters: {
       variant: 'context_v1',
-      maxPicks: 3,
+      maxPicks: 2,
       maxSelectableOdds: 35,
       minSelectableProbability: 0.006,
+      diversity: 'outcome',
     },
-    description: '价值型 v3：用赛前泊松基础模型选最多 3 个 EV 靠前比分，赔率上限 35，概率下限 0.006。',
-    explanation: '在保留 EV 正向解释的同时，用 3 格覆盖把单点高波动降下来。',
-    selectPicks: ({ odds, context }) => buildContextPoissonEvSelection({
-      odds,
-      context,
-      options: {
-        maxPicks: 3,
-        minPicks: 2,
-        maxSelectableOdds: 35,
-        minSelectableProbability: 0.006,
-      },
-    }).picks,
+    description: '价值型 v4：用赛前泊松基础模型生成 EV 候选池，再优先选择不同赛果方向的 2 个比分。',
+    explanation: '保留概率*赔率的 EV 解释，同时避免推荐全部集中在相邻低平局。',
+    selectPicks: ({ odds, context }) => pickDiverseContextPoissonV1(odds, context),
   },
   {
     id: 'context_poisson_ev_v3',
@@ -330,6 +322,29 @@ function pickConsensusPoissonContextV1(odds, context) {
       },
     }).picks,
   ]).slice(0, 4);
+}
+
+function pickDiverseContextPoissonV1(odds, context) {
+  const pool = buildContextPoissonEvSelection({
+    odds,
+    context,
+    options: {
+      maxPicks: 8,
+      minPicks: 2,
+      maxSelectableOdds: 35,
+      minSelectableProbability: 0.006,
+    },
+  }).picks;
+  const selected = [];
+  const usedOutcomes = new Set();
+  for (const pick of pool) {
+    const outcome = getScoreOutcome(pick.score);
+    if (usedOutcomes.has(outcome)) continue;
+    selected.push(pick);
+    usedOutcomes.add(outcome);
+    if (selected.length >= 2) return selected;
+  }
+  return uniquePicks(pool).slice(0, 2);
 }
 
 function pickFavoriteNarrowWin(odds) {

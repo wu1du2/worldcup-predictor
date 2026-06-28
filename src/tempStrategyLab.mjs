@@ -3,6 +3,7 @@ import {
   buildContextPoissonEvV2Selection,
   buildContextPoissonEvV3Selection,
 } from './poissonEvStrategy.mjs';
+import { buildSourceConsensusSelection } from './sourceConsensusStrategy.mjs';
 
 export const defaultQualificationGate = {
   minRoiPercent: 5,
@@ -285,6 +286,38 @@ function addConsensusStrategies(add) {
       }
     }
   }
+
+  for (const poisson of poissonBuilders) {
+    for (const sourceCount of [1, 2]) {
+      for (const maxPicks of [3, 4]) {
+        for (const maxSourceOdds of [7, 10, 15]) {
+          add({
+            id: `source_consensus_poisson_${poisson.key}_s${sourceCount}_n${maxPicks}_cap${maxSourceOdds}`,
+            name: `来源共识泊松 ${maxPicks} 格`,
+            family: 'market_consensus',
+            style: maxPicks <= 3 ? 'balanced' : 'attack',
+            parameters: {
+              sourceFirst: true,
+              poissonVariant: poisson.key,
+              sourceCount,
+              maxPicks,
+              maxSourceOdds,
+            },
+            description: `先取 ${sourceCount} 个外部来源/共识比分，再用泊松 EV 补足到 ${maxPicks} 个。`,
+            explanation: '把赛前文章的明确比分或倾向放在前面，再用泊松 EV 做可解释补位。',
+            selectPicks: ({ odds, context }) => pickSourceConsensusPoisson({
+              odds,
+              context,
+              sourceCount,
+              maxPicks,
+              maxSourceOdds,
+              poissonBuilder: poisson.builder,
+            }),
+          });
+        }
+      }
+    }
+  }
 }
 
 function addDrawAnchorStrategies(add) {
@@ -337,6 +370,46 @@ function addDrawAnchorStrategies(add) {
             return pickFixedScores(odds, activeScores).filter((pick) => pick.odds <= maxPickOdds);
           },
         });
+      }
+    }
+  }
+
+  const adaptiveFourthSets = [
+    { key: 'smallwin', home: '1-0', away: '0-1', balanced: '1-0' },
+    { key: 'bttswin', home: '2-1', away: '1-2', balanced: '1-0' },
+    { key: 'clean2', home: '2-0', away: '0-2', balanced: '0-1' },
+  ];
+  for (const fourth of adaptiveFourthSets) {
+    for (const drawMaxOdds of [5.5, 6.5, 7.5]) {
+      for (const favoriteGap of [1.5, 2.5]) {
+        for (const maxPickOdds of [25, 35]) {
+          add({
+            id: `draw_anchor_adaptive_${fourth.key}_draw${String(drawMaxOdds).replace('.', '_')}_gap${String(favoriteGap).replace('.', '_')}_cap${maxPickOdds}`,
+            name: '平局锚点自适应',
+            family: 'draw_anchor',
+            style: 'balanced',
+            parameters: {
+              scores: ['1-1', '0-0', '2-2'],
+              homeFourth: fourth.home,
+              awayFourth: fourth.away,
+              balancedFourth: fourth.balanced,
+              drawMaxOdds,
+              favoriteGap,
+              maxPickOdds,
+            },
+            description: `以低平局为锚点，第四格按热门方向切到 ${fourth.home}/${fourth.away}，赔率上限 ${maxPickOdds}。`,
+            explanation: '保留 1-1/0-0/2-2 的稳定结构，但让非平局保护项跟随赛前强弱方向。',
+            selectPicks: ({ odds }) => pickAdaptiveDrawAnchor({
+              odds,
+              drawMaxOdds,
+              maxPickOdds,
+              favoriteGap,
+              homeFourth: fourth.home,
+              awayFourth: fourth.away,
+              balancedFourth: fourth.balanced,
+            }),
+          });
+        }
       }
     }
   }
@@ -530,6 +603,118 @@ function addPoissonEvStrategies(add) {
       }
     }
   }
+
+  for (const variant of builders) {
+    for (const maxPicks of [2, 3, 4]) {
+      for (const maxSelectableOdds of [25, 35, 50]) {
+        for (const minSelectableProbability of [0.006, 0.01]) {
+          add({
+            id: `poisson_diverse_${variant.key}_n${maxPicks}_cap${maxSelectableOdds}_p${String(minSelectableProbability).replace('.', '_')}`,
+            name: `${variant.name} 多样性 ${maxPicks} 格`,
+            family: 'poisson_ev',
+            style: maxPicks <= 2 ? 'selected' : 'balanced',
+            parameters: {
+              variant: variant.key,
+              maxPicks,
+              maxSelectableOdds,
+              minSelectableProbability,
+              diversity: 'outcome',
+            },
+            description: `${variant.name} 先取 EV 候选池，再优先覆盖不同赛果方向，最多 ${maxPicks} 个。`,
+            explanation: '避免泊松 EV 全部挤在相邻低平局，用胜/平/负方向多样性提高推荐形态。',
+            selectPicks: ({ odds, context }) => pickDiversePoissonEv({
+              odds,
+              context,
+              builder: variant.builder,
+              maxPicks,
+              maxSelectableOdds,
+              minSelectableProbability,
+            }),
+          });
+        }
+      }
+    }
+  }
+}
+
+function pickSourceConsensusPoisson({
+  odds,
+  context,
+  sourceCount,
+  maxPicks,
+  maxSourceOdds,
+  poissonBuilder,
+}) {
+  const sourceCandidates = buildSourceConsensusSelection({
+    odds,
+    context,
+    maxPicks: Math.max(sourceCount * 2, sourceCount + 2),
+  }).picks;
+  const sourcePicks = sourceCandidates
+    .filter((pick) => pick.odds <= maxSourceOdds || String(pick.reason || '').includes('明确'))
+    .slice(0, sourceCount);
+  const poissonPicks = poissonBuilder({
+    odds,
+    context,
+    options: {
+      maxPicks,
+      minPicks: 2,
+      maxSelectableOdds: 35,
+      minSelectableProbability: 0.006,
+    },
+  }).picks;
+  return uniquePicks([...sourcePicks, ...poissonPicks]).slice(0, maxPicks);
+}
+
+function pickAdaptiveDrawAnchor({
+  odds,
+  drawMaxOdds,
+  maxPickOdds,
+  favoriteGap,
+  homeFourth,
+  awayFourth,
+  balancedFourth,
+}) {
+  const drawMin = minOddsForOutcome(odds, 'draw');
+  const homeMin = minOddsForOutcome(odds, 'home');
+  const awayMin = minOddsForOutcome(odds, 'away');
+  const baseScores = drawMin <= drawMaxOdds ? ['1-1', '0-0', '2-2'] : ['1-1', '0-0'];
+  let fourth = balancedFourth;
+  if (homeMin + favoriteGap < awayMin) fourth = homeFourth;
+  if (awayMin + favoriteGap < homeMin) fourth = awayFourth;
+  return pickFixedScores(odds, [...baseScores, fourth]).filter((pick) => pick.odds <= maxPickOdds);
+}
+
+function pickDiversePoissonEv({
+  odds,
+  context,
+  builder,
+  maxPicks,
+  maxSelectableOdds,
+  minSelectableProbability,
+}) {
+  const pool = builder({
+    odds,
+    context,
+    options: {
+      maxPicks: Math.max(maxPicks * 3, 8),
+      minPicks: Math.min(2, maxPicks),
+      maxSelectableOdds,
+      minSelectableProbability,
+    },
+  }).picks;
+  const selected = [];
+  const usedOutcomes = new Set();
+
+  for (const pick of pool) {
+    const outcome = getScoreOutcome(pick.score);
+    if (usedOutcomes.has(outcome)) continue;
+    selected.push(pick);
+    usedOutcomes.add(outcome);
+    if (selected.length >= maxPicks) return selected;
+  }
+
+  return uniquePicks([...selected, ...pool]).slice(0, maxPicks);
 }
 
 function pickFavoriteCover({ odds, favoriteMaxOdds, underdogMinOdds, maxPicks }) {

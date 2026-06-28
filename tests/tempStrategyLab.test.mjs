@@ -40,6 +40,27 @@ test('generateTempStrategyCandidates includes capped draw anchor experiments', (
   assert.ok(cappedDraw.every((strategy) => strategy.parameters.maxPickOdds <= 35));
 });
 
+test('generateTempStrategyCandidates includes adaptive capped draw anchor experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 700 });
+  const adaptiveDraw = candidates.filter((strategy) => strategy.id.includes('draw_anchor_adaptive'));
+
+  assert.ok(adaptiveDraw.length > 0);
+  assert.ok(adaptiveDraw.every((strategy) => strategy.family === 'draw_anchor'));
+  assert.ok(adaptiveDraw.every((strategy) => strategy.parameters.favoriteGap > 1));
+
+  const homeFavorite = adaptiveDraw[0].selectPicks({
+    odds: makeOdds({
+      '1-1': 5,
+      '0-0': 7,
+      '2-2': 15,
+      '1-0': 6,
+      '0-1': 12,
+    }),
+  });
+  assert.ok(homeFavorite.some((pick) => pick.score === '1-0'));
+  assert.equal(homeFavorite.some((pick) => pick.score === '0-1'), false);
+});
+
 test('generateTempStrategyCandidates includes consensus plus poisson experiments', () => {
   const candidates = generateTempStrategyCandidates({ maxCandidates: 500 });
   const consensusPoisson = candidates.filter((strategy) => strategy.id.includes('consensus_poisson'));
@@ -47,6 +68,61 @@ test('generateTempStrategyCandidates includes consensus plus poisson experiments
   assert.ok(consensusPoisson.length > 0);
   assert.ok(consensusPoisson.every((strategy) => strategy.family === 'market_consensus'));
   assert.ok(consensusPoisson.every((strategy) => strategy.parameters.poissonVariant));
+});
+
+test('generateTempStrategyCandidates includes source consensus plus poisson experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 700 });
+  const sourceConsensusPoisson = candidates.filter((strategy) => strategy.id.includes('source_consensus_poisson'));
+
+  assert.ok(sourceConsensusPoisson.length > 0);
+  assert.ok(sourceConsensusPoisson.every((strategy) => strategy.family === 'market_consensus'));
+  assert.ok(sourceConsensusPoisson.every((strategy) => strategy.parameters.sourceFirst === true));
+
+  const picks = sourceConsensusPoisson[0].selectPicks({
+    odds: makeOdds({
+      '1-0': 6,
+      '0-0': 8,
+      '2-1': 9,
+      '1-1': 5,
+      '0-1': 11,
+    }),
+    context: {
+      externalPredictions: [
+        { source: 'Example Preview', kind: 'score', score: '2-1', outcome: 'home', totalLean: 'over' },
+      ],
+    },
+  });
+
+  assert.equal(picks[0].score, '2-1');
+});
+
+test('generateTempStrategyCandidates includes diverse poisson EV experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 700 });
+  const diversePoisson = candidates.filter((strategy) => strategy.id.includes('poisson_diverse'));
+
+  assert.ok(diversePoisson.length > 0);
+  assert.ok(diversePoisson.every((strategy) => strategy.family === 'poisson_ev'));
+  assert.ok(diversePoisson.every((strategy) => strategy.parameters.diversity === 'outcome'));
+
+  const picks = diversePoisson[0].selectPicks({
+    odds: makeOdds({
+      '0-0': 8,
+      '1-1': 5,
+      '2-2': 13,
+      '1-0': 7,
+      '0-1': 9,
+      '2-1': 10,
+      '1-2': 11,
+    }),
+    context: {
+      model: {
+        expectedGoals: { home: 1.2, away: 1.05 },
+        drawMultiplier: 1.16,
+      },
+    },
+  });
+
+  assert.ok(new Set(picks.map((pick) => getScoreOutcome(pick.score))).size >= 2);
 });
 
 test('enrichBacktestResult computes information richness metrics and gate status', () => {
@@ -139,4 +215,18 @@ function makeResult(strategyId, family, style, roiPercent, avgPicks) {
     hitMatches: 6,
     rows,
   }, defaultQualificationGate);
+}
+
+function makeOdds(oddsByScore) {
+  return Object.entries(oddsByScore).map(([score, odds]) => ({ score, odds }));
+}
+
+function getScoreOutcome(score) {
+  const match = String(score).match(/^(\d+)-(\d+)$/);
+  if (!match) return 'unknown';
+  const home = Number(match[1]);
+  const away = Number(match[2]);
+  if (home > away) return 'home';
+  if (home === away) return 'draw';
+  return 'away';
 }

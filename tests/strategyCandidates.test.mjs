@@ -75,7 +75,7 @@ test('candidate strategy set contains final3 production candidates and offline s
     'market_poisson_ev',
     'context_poisson_ev',
     'context_poisson_ev_v2',
-    'tem_poisson_context_v1_n3_cap35_p0_006',
+    'tem_poisson_diverse_context_v1_n2_cap35_p0_006',
     'context_poisson_ev_v3',
     'tem_hybrid_draw_poisson_v2_d1_n2',
     'tem_draw_anchor_3_max5_5',
@@ -85,10 +85,11 @@ test('candidate strategy set contains final3 production candidates and offline s
   assert.equal(consensusV3.family, 'market_consensus');
   assert.equal(consensusV3.style, 'balanced');
   assert.deepEqual(consensusV3.parameters, { maxPicks: 3, maxOdds: 7 });
-  const valueV3 = candidateStrategies.find((strategy) => strategy.id === 'tem_poisson_context_v1_n3_cap35_p0_006');
-  assert.equal(valueV3.family, 'poisson_ev');
-  assert.equal(valueV3.style, 'balanced');
-  assert.equal(valueV3.parameters.maxPicks, 3);
+  const valueV4 = candidateStrategies.find((strategy) => strategy.id === 'tem_poisson_diverse_context_v1_n2_cap35_p0_006');
+  assert.equal(valueV4.family, 'poisson_ev');
+  assert.equal(valueV4.style, 'selected');
+  assert.equal(valueV4.parameters.maxPicks, 2);
+  assert.equal(valueV4.parameters.diversity, 'outcome');
   const consensusV4 = candidateStrategies.find((strategy) => strategy.id === 'tem_consensus_poisson_context_v1_c1_n4_cap7');
   assert.equal(consensusV4.family, 'market_consensus');
   assert.equal(consensusV4.style, 'attack');
@@ -147,10 +148,10 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.ok(contextPoissonV2.rows[0].picks.length <= 2);
   assert.ok(Number.isFinite(contextPoissonV2.rows[0].picks[0].ev));
 
-  const valueV3 = results.find((result) => result.strategyId === 'tem_poisson_context_v1_n3_cap35_p0_006');
-  assert.equal(valueV3.settledMatches, 2);
-  assert.ok(valueV3.rows[0].picks.length <= 3);
-  assert.ok(Number.isFinite(valueV3.rows[0].picks[0].ev));
+  const valueV4 = results.find((result) => result.strategyId === 'tem_poisson_diverse_context_v1_n2_cap35_p0_006');
+  assert.equal(valueV4.settledMatches, 2);
+  assert.ok(valueV4.rows[0].picks.length <= 2);
+  assert.ok(Number.isFinite(valueV4.rows[0].picks[0].ev));
 
   const contextPoissonV3 = results.find((result) => result.strategyId === 'context_poisson_ev_v3');
   assert.equal(contextPoissonV3.settledMatches, 2);
@@ -179,7 +180,7 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.match(summary, /tem_consensus_poisson_context_v1_c1_n4_cap7/);
   assert.match(summary, /market_poisson_ev/);
   assert.match(summary, /context_poisson_ev_v2/);
-  assert.match(summary, /tem_poisson_context_v1_n3_cap35_p0_006/);
+  assert.match(summary, /tem_poisson_diverse_context_v1_n2_cap35_p0_006/);
   assert.match(summary, /context_poisson_ev_v3/);
   assert.match(summary, /tem_hybrid_draw_poisson_v2_d1_n2/);
   assert.match(summary, /tem_draw_anchor_3_max5_5/);
