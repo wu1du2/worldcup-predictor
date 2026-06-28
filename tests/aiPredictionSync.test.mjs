@@ -131,7 +131,7 @@ test('buildAiRecommendationRows separates router reason from per-score predictio
           roiLabel: '+13.6%',
           reason: [
             '塞内加尔 vs 伊拉克：选「赛前泊松EV精选」。',
-            '选择标准：核心候选固定保留，榜单达标策略可作为流动候选；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自流动候选。',
+            '选择标准：生产 router 只在三旗舰中排序；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自三旗舰候选。',
             '本场：滚动历史 ROI +13.6%，样本 46；适配 0.2，综合 0.25。',
             '盘口：主胜最低 7，平局最低 6，客胜最低 8。',
             '比分选择：标准是按模型概率乘赔率后的EV排序。0-1 泊松 EV 补位，赔率 8；0-0 防低节奏，赔率 6。',
@@ -143,7 +143,7 @@ test('buildAiRecommendationRows separates router reason from per-score predictio
 
   const [row] = buildAiRecommendationRows({ predictionLog });
 
-  assert.match(row.router_reason, /流动候选/);
+  assert.match(row.router_reason, /三旗舰候选/);
   assert.match(row.router_reason, /历史\+13\.6%/);
   assert.doesNotMatch(row.router_reason, /比分选择/);
   assert.ok(row.router_reason.length < 130);
@@ -176,7 +176,7 @@ test('buildAiRecommendationRows keeps source consensus router context', () => {
           roiLabel: '-31.05%',
           reason: [
             '巴西 vs 日本：选「市场来源共识」。',
-            '选择标准：核心候选固定保留，榜单达标策略可作为流动候选；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自核心候选。',
+            '选择标准：生产 router 只在三旗舰中排序；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自三旗舰候选。',
             '本场：滚动历史 ROI -31.05%，样本 70；适配 1.7，综合 1.58。',
             '外部来源 4 条；淘汰赛优先信市场主线。',
             '盘口：主胜最低 6.25，平局最低 6.25，客胜最低 8。',

@@ -242,16 +242,15 @@ test('routeStrategyForMatch only considers the production router candidate pool 
   });
 
   assert.deepEqual(routerCandidateStrategyIds, [
-    'market_consensus_sources',
-    'tem_hybrid_draw_poisson_v2_d1_n2',
     'tem_draw_anchor_3_max5_5',
-    'context_poisson_ev_v3',
+    'context_poisson_ev_v2',
+    'market_consensus_sources',
   ]);
   assert.ok(routerCandidateStrategyIds.includes(route.strategyId));
   assert.notEqual(route.strategyId, 'market_poisson_ev');
 });
 
-test('routeStrategyForMatch adds qualified rolling leaderboard strategies to the router pool', () => {
+test('routeStrategyForMatch keeps qualified rolling leaderboard strategies out of the production router pool', () => {
   const fullScoreOptions = [
     '1-0', '2-0', '2-1', '3-0', '3-1', '3-2', '4-0', '4-1', '4-2', '5-0',
     '5-1', '5-2', '胜其他', '0-0', '1-1', '2-2', '3-3', '平其他', '0-1',
@@ -285,8 +284,9 @@ test('routeStrategyForMatch adds qualified rolling leaderboard strategies to the
     ],
   });
 
-  assert.equal(route.strategyId, 'market_consensus_4');
-  assert.match(route.reason, /流动候选/);
+  assert.notEqual(route.strategyId, 'market_consensus_4');
+  assert.ok(routerCandidateStrategyIds.includes(route.strategyId));
+  assert.match(route.reason, /三旗舰候选/);
 });
 
 test('routeStrategyForMatch does not qualify dynamic strategies using matches after the target kickoff', () => {

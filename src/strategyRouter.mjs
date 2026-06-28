@@ -3,16 +3,15 @@ import { candidateStrategies } from './strategyCandidates.mjs';
 import { getExternalPredictionStrength } from './sourceConsensusStrategy.mjs';
 
 const fallbackStrategyId = 'low_score_basket_4';
-const dynamicRouterCandidateLimit = 4;
+const dynamicRouterCandidateLimit = 0;
 const dynamicCandidateMinSettledMatches = 40;
 const dynamicCandidateMinHitMatches = 3;
 const dynamicCandidateMinRoiPercent = 0;
 const dynamicCandidateMaxAveragePicks = 4.5;
 export const routerCandidateStrategyIds = [
-  'market_consensus_sources',
-  'tem_hybrid_draw_poisson_v2_d1_n2',
   'tem_draw_anchor_3_max5_5',
-  'context_poisson_ev_v3',
+  'context_poisson_ev_v2',
+  'market_consensus_sources',
 ];
 
 export function buildRollingStrategyStats({ historicalResults, cutoffDate, cutoffTime = '00:00' }) {
@@ -208,13 +207,13 @@ function buildRoute({ match, strategy, stats, confidence, reason }) {
 
 function buildReason({ match, selected, odds }) {
   const market = describeMarket(odds);
-  const candidateType = selected.isDynamicCandidate ? '流动候选' : '核心候选';
+  const candidateType = selected.isDynamicCandidate ? '流动候选' : '三旗舰候选';
   const sourceText = selected.strategy.id === 'market_consensus_sources'
     ? `外部来源 ${getExternalPredictionStrength(match?.strategyContext || {})} 条；${isKnockoutMatch(match) ? '淘汰赛优先信市场主线。' : '非淘汰赛按普通权重处理。'}`
     : '';
   return [
     `${formatMatch(match)}：选「${selected.strategy.name}」。`,
-    `选择标准：核心候选固定保留，榜单达标策略可作为流动候选；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自${candidateType}。`,
+    `选择标准：生产 router 只在三旗舰中排序；候选策略按历史 ROI/250 + 盘口适配分排序。本策略来自${candidateType}。`,
     `本场：滚动历史 ROI ${formatSignedPercent(selected.stats.roiPercent)}，样本 ${selected.stats.settledMatches}；适配 ${formatMetric(selected.featureScore)}，综合 ${formatMetric(selected.routerScore)}。`,
     sourceText,
     `盘口：${market}。`,
@@ -251,6 +250,9 @@ function getStrategyPickStandard(strategyId) {
   if (strategyId === 'context_poisson_ev_v3') {
     return '标准是用赛前 context 估进球，做低比分/平局修正后按 EV 取前列。';
   }
+  if (strategyId === 'context_poisson_ev_v2') {
+    return '标准是用赛前 context 估进球，提高概率门槛后按 EV 精选。';
+  }
   if (strategyId === 'market_consensus_sources') {
     return '标准是优先采纳机构明确比分，再用方向预测和赔率低位补足。';
   }
@@ -283,7 +285,7 @@ function describePickedScore({ strategyId, pick, scoreOptions }) {
     return `${score} 泊松 EV 补位，${oddsText}`;
   }
 
-  if (strategyId === 'context_poisson_ev_v3') {
+  if (strategyId === 'context_poisson_ev_v2' || strategyId === 'context_poisson_ev_v3') {
     return `${score} EV 靠前，${oddsText}`;
   }
 
