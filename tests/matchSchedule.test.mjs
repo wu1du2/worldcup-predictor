@@ -121,6 +121,49 @@ test('normalizeEspnScoreboard converts ESPN events into UTC+8 match rows with sc
   ]);
 });
 
+test('normalizeEspnScoreboard keeps knockout stages and skips unresolved bracket placeholders', () => {
+  const rows = normalizeEspnScoreboard({
+    events: [
+      {
+        id: '760495',
+        date: '2026-07-01T16:00Z',
+        season: { year: 2026, type: 13801, slug: 'round-of-32' },
+        status: { type: { state: 'pre', completed: false, shortDetail: 'Scheduled' } },
+        competitions: [
+          {
+            competitors: [
+              { homeAway: 'home', score: '0', team: { displayName: 'England', abbreviation: 'ENG' } },
+              { homeAway: 'away', score: '0', team: { displayName: 'Congo DR', abbreviation: 'COD' } },
+            ],
+          },
+        ],
+      },
+      {
+        id: '760502',
+        date: '2026-07-04T17:00Z',
+        season: { year: 2026, type: 13800, slug: 'round-of-16' },
+        status: { type: { state: 'pre', completed: false, shortDetail: 'Scheduled' } },
+        competitions: [
+          {
+            competitors: [
+              { homeAway: 'home', score: '0', team: { displayName: 'Round of 32 1 Winner', abbreviation: 'RD32' } },
+              { homeAway: 'away', score: '0', team: { displayName: 'Round of 32 3 Winner', abbreviation: 'RD32' } },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].match_code, 'espn-760495');
+  assert.equal(rows[0].stage, 'Round of 32');
+  assert.equal(rows[0].match_date_cn, '2026-07-02');
+  assert.equal(rows[0].time_cn, '00:00');
+  assert.equal(rows[0].home_cn, '英格兰');
+  assert.equal(rows[0].away_cn, '刚果民主共和国');
+});
+
 test('buildDateTabs returns sorted UTC+8 dates with compact labels and counts', () => {
   const tabs = buildDateTabs(normalizeEspnScoreboard(espnScoreboard));
 

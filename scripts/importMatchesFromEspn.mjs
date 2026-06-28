@@ -6,7 +6,7 @@ import { normalizeEspnScoreboard, toMatchUpsertRows } from '../src/matchSchedule
 import { attachTeamsToMatches, parseTeamNameCsv, toTeamUpsertRows } from '../src/teamNames.mjs';
 import { getGithubRunUrl, writeImportReport } from '../src/importReports.mjs';
 
-const scoreboardUrl = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260627&limit=200';
+const scoreboardUrl = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260720&limit=300';
 const dryRun = process.argv.includes('--dry-run');
 const startedAt = new Date().toISOString();
 
@@ -24,7 +24,7 @@ try {
   const teamNames = parseTeamNameCsv(await readFile(new URL('../data/team-name-mapping.csv', import.meta.url), 'utf8'));
   validateMatches(matches);
 
-  console.log(`Fetched ${matches.length} World Cup group-stage matches from ESPN.`);
+  console.log(`Fetched ${matches.length} resolved World Cup matches from ESPN.`);
   console.log(`Date range CN: ${matches[0].match_date_cn} to ${matches[matches.length - 1].match_date_cn}`);
 
   if (dryRun) {
@@ -86,20 +86,31 @@ async function fetchScoreboard() {
 }
 
 function validateMatches(matches) {
-  if (matches.length !== 72) {
-    throw new Error(`Expected 72 group-stage matches, got ${matches.length}.`);
+  if (matches.length < 72) {
+    throw new Error(`Expected at least 72 resolved World Cup matches, got ${matches.length}.`);
   }
 
   const codes = new Set();
+  let groupStageCount = 0;
   for (const match of matches) {
     for (const field of ['match_code', 'kickoff_at_utc', 'match_date_cn', 'time_cn', 'home', 'away']) {
       if (!match[field]) throw new Error(`Match ${match.match_code || 'unknown'} missing ${field}.`);
     }
 
+    if (/\b(Winner|Loser)\b/.test(`${match.home} ${match.away}`)) {
+      throw new Error(`Unresolved bracket placeholder was not filtered for ${match.match_code}.`);
+    }
+
+    if (match.stage === 'Group Stage') groupStageCount += 1;
+
     if (codes.has(match.match_code)) {
       throw new Error(`Duplicate match_code ${match.match_code}.`);
     }
     codes.add(match.match_code);
+  }
+
+  if (groupStageCount !== 72) {
+    throw new Error(`Expected 72 group-stage matches inside the import, got ${groupStageCount}.`);
   }
 }
 

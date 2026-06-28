@@ -121,6 +121,7 @@ Stage 1 commands:
 - Full-page mobile screenshots can show fixed bottom bars over later content. Verify the actual viewport path as well as saved screenshots.
 - Hand-written `375x667` is not the narrowest iPhone check. Playwright's built-in `iPhone SE` descriptor uses a `320x568` CSS viewport and caught score-chip overflow.
 - ESPN's public World Cup scoreboard endpoint can be slow or intermittently time out. Import scripts should use retry with timeout and never make frontend rendering depend on live ESPN fetches.
+- ESPN's 2026 World Cup scoreboard can return the full tournament range with `dates=20260611-20260720&limit=300`. Import only resolved matchups: keep real knockout pairings such as `round-of-32`, but skip placeholder teams containing `Winner` or `Loser` until ESPN replaces them with actual teams.
 - 500.com Sporttery pages are GB18030 encoded. Decode with `new TextDecoder('gb18030')`, not UTF-8, or Chinese teams and odds text will be unreliable.
 - 500.com date URLs can return overlapping rolling sales windows. Odds importers must dedupe by source match key and then filter by UTC+8 kickoff date before writing/reviewing rows.
 - 500.com score pages can repeat the same score odds inside one parsed match block. Deduplicate score rows by `source + source_match_key + score` before validation/upsert, and keep parsed snapshots deduped so audit logs stay readable.

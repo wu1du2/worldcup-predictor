@@ -15,15 +15,20 @@ const chinaClockFormatter = new Intl.DateTimeFormat('en-GB', {
 const teamNameCnByEnglish = {
   Argentina: '阿根廷',
   Australia: '澳大利亚',
+  Austria: '奥地利',
+  Belgium: '比利时',
   'Bosnia-Herzegovina': '波黑',
   Brazil: '巴西',
+  'Cape Verde': '佛得角',
   Cameroon: '喀麦隆',
   Canada: '加拿大',
   Chile: '智利',
   Colombia: '哥伦比亚',
+  'Congo DR': '刚果民主共和国',
   'Costa Rica': '哥斯达黎加',
   Croatia: '克罗地亚',
   Cuba: '古巴',
+  Curaçao: '库拉索',
   Czechia: '捷克',
   Denmark: '丹麦',
   Ecuador: '厄瓜多尔',
@@ -34,12 +39,16 @@ const teamNameCnByEnglish = {
   Ghana: '加纳',
   Haiti: '海地',
   Iran: '伊朗',
+  Iraq: '伊拉克',
   Italy: '意大利',
+  'Ivory Coast': '科特迪瓦',
   Jamaica: '牙买加',
   Japan: '日本',
+  Jordan: '约旦',
   Mexico: '墨西哥',
   Morocco: '摩洛哥',
   Netherlands: '荷兰',
+  'New Zealand': '新西兰',
   Nigeria: '尼日利亚',
   Norway: '挪威',
   Panama: '巴拿马',
@@ -63,10 +72,23 @@ const teamNameCnByEnglish = {
   Switzerland: '瑞士',
   Tunisia: '突尼斯',
   Turkey: '土耳其',
+  Türkiye: '土耳其',
   Ukraine: '乌克兰',
+  'United States': '美国',
   Uruguay: '乌拉圭',
   USA: '美国',
+  Uzbekistan: '乌兹别克斯坦',
   Wales: '威尔士',
+};
+
+const stageLabelBySlug = {
+  'group-stage': 'Group Stage',
+  'round-of-32': 'Round of 32',
+  'round-of-16': 'Round of 16',
+  quarterfinals: 'Quarterfinals',
+  semifinals: 'Semifinals',
+  '3rd-place-match': 'Third-place Match',
+  final: 'Final',
 };
 
 export function normalizeEspnScoreboard(scoreboard) {
@@ -171,6 +193,10 @@ function normalizeEspnEvent(event) {
   const homeName = getTeamName(home);
   const awayName = getTeamName(away);
 
+  if (isUnresolvedBracketName(homeName) || isUnresolvedBracketName(awayName)) {
+    return null;
+  }
+
   return {
     id: event.id,
     match_code: `espn-${event.id}`,
@@ -186,7 +212,7 @@ function normalizeEspnEvent(event) {
     status: state,
     status_detail: event.status?.type?.shortDetail || '',
     venue: formatVenue(competition?.venue),
-    stage: 'Group Stage',
+    stage: getStageLabel(event),
     source: 'espn',
   };
 }
@@ -202,6 +228,15 @@ function getTeamName(competitor) {
 
 function getTeamNameCn(name) {
   return teamNameCnByEnglish[name] || name;
+}
+
+function getStageLabel(event) {
+  const slug = event.season?.slug;
+  return stageLabelBySlug[slug] || 'Group Stage';
+}
+
+function isUnresolvedBracketName(name) {
+  return /\b(Winner|Loser)\b/.test(name);
 }
 
 function normalizeScore(score, state) {
