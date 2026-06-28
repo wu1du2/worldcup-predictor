@@ -56,7 +56,7 @@ const scoreOddsByMatch = mapScoreOddsByMatch(matches, oddsRows, trendRows);
 const proxyMatches = filterKnockoutProxyMatches({ matches, scoreOddsByMatch });
 const proxyMatchList = proxyMatches.map((item) => item.match);
 const productionStrategyIds = new Set(candidateStrategies.map((strategy) => strategy.id));
-const tempStrategies = generateTempStrategyCandidates({ maxCandidates: 200 })
+const tempStrategies = generateTempStrategyCandidates({ maxCandidates: 360 })
   .filter((strategy) => !productionStrategyIds.has(strategy.id));
 const strategies = [...candidateStrategies, ...tempStrategies];
 const strategyMetadataById = new Map(strategies.map((strategy) => [strategy.id, serializeStrategyDefinition(strategy)]));

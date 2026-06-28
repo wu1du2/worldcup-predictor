@@ -52,14 +52,15 @@ const sampleOdds = {
 };
 
 test('candidate strategy set contains final3 production candidates and offline strategies', () => {
-  assert.equal(candidateStrategies.length, 22);
-  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 22);
+  assert.equal(candidateStrategies.length, 25);
+  assert.equal(new Set(candidateStrategies.map((strategy) => strategy.id)).size, 25);
   assert.deepEqual(candidateStrategies.map((strategy) => strategy.id), [
     'low_score_basket_4',
     'lowest_odds_2',
     'lowest_odds_3',
     'market_consensus_4',
     'tem_consensus_n3_cap7',
+    'tem_consensus_poisson_context_v1_c1_n4_cap7',
     'market_consensus_sources',
     'favorite_narrow_win_3',
     'draw_anchor_3',
@@ -74,14 +75,28 @@ test('candidate strategy set contains final3 production candidates and offline s
     'market_poisson_ev',
     'context_poisson_ev',
     'context_poisson_ev_v2',
+    'tem_poisson_context_v1_n3_cap35_p0_006',
     'context_poisson_ev_v3',
     'tem_hybrid_draw_poisson_v2_d1_n2',
     'tem_draw_anchor_3_max5_5',
+    'tem_draw_anchor_capped_1_draw5_5_cap35',
   ]);
   const consensusV3 = candidateStrategies.find((strategy) => strategy.id === 'tem_consensus_n3_cap7');
   assert.equal(consensusV3.family, 'market_consensus');
   assert.equal(consensusV3.style, 'balanced');
   assert.deepEqual(consensusV3.parameters, { maxPicks: 3, maxOdds: 7 });
+  const valueV3 = candidateStrategies.find((strategy) => strategy.id === 'tem_poisson_context_v1_n3_cap35_p0_006');
+  assert.equal(valueV3.family, 'poisson_ev');
+  assert.equal(valueV3.style, 'balanced');
+  assert.equal(valueV3.parameters.maxPicks, 3);
+  const consensusV4 = candidateStrategies.find((strategy) => strategy.id === 'tem_consensus_poisson_context_v1_c1_n4_cap7');
+  assert.equal(consensusV4.family, 'market_consensus');
+  assert.equal(consensusV4.style, 'attack');
+  assert.equal(consensusV4.parameters.poissonVariant, 'context_v1');
+  const drawV4 = candidateStrategies.find((strategy) => strategy.id === 'tem_draw_anchor_capped_1_draw5_5_cap35');
+  assert.equal(drawV4.family, 'draw_anchor');
+  assert.equal(drawV4.style, 'balanced');
+  assert.equal(drawV4.parameters.maxPickOdds, 35);
 });
 
 test('runCandidateStrategyBacktests settles every candidate with consistent ROI accounting', () => {
@@ -90,7 +105,7 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
     scoreOddsByMatch: sampleOdds,
   });
 
-  assert.equal(results.length, 22);
+  assert.equal(results.length, 25);
 
   const lowScore = results.find((result) => result.strategyId === 'low_score_basket_4');
   assert.equal(lowScore.cost, 8);
@@ -105,6 +120,11 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   const consensusV3 = results.find((result) => result.strategyId === 'tem_consensus_n3_cap7');
   assert.deepEqual(consensusV3.rows[0].picks.map((pick) => pick.score), ['2-1', '1-1', '1-0']);
   assert.deepEqual(consensusV3.rows[1].picks.map((pick) => pick.score), ['1-1', '1-0']);
+
+  const consensusV4 = results.find((result) => result.strategyId === 'tem_consensus_poisson_context_v1_c1_n4_cap7');
+  assert.equal(consensusV4.settledMatches, 2);
+  assert.ok(consensusV4.rows[0].picks.length <= 4);
+  assert.equal(consensusV4.rows[0].picks[0].score, '2-1');
 
   const lowDutch = results.find((result) => result.strategyId === 'low_score_dutch_3');
   assert.deepEqual(lowDutch.rows[0].picks.map((pick) => pick.score), ['0-0', '1-0', '0-1']);
@@ -127,6 +147,11 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.ok(contextPoissonV2.rows[0].picks.length <= 2);
   assert.ok(Number.isFinite(contextPoissonV2.rows[0].picks[0].ev));
 
+  const valueV3 = results.find((result) => result.strategyId === 'tem_poisson_context_v1_n3_cap35_p0_006');
+  assert.equal(valueV3.settledMatches, 2);
+  assert.ok(valueV3.rows[0].picks.length <= 3);
+  assert.ok(Number.isFinite(valueV3.rows[0].picks[0].ev));
+
   const contextPoissonV3 = results.find((result) => result.strategyId === 'context_poisson_ev_v3');
   assert.equal(contextPoissonV3.settledMatches, 2);
   assert.ok(contextPoissonV3.rows[0].picks.length >= 2);
@@ -141,14 +166,22 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.equal(drawFinal.settledMatches, 2);
   assert.deepEqual(drawFinal.rows[0].picks.map((pick) => pick.score), ['1-1', '0-0']);
 
+  const cappedDraw = results.find((result) => result.strategyId === 'tem_draw_anchor_capped_1_draw5_5_cap35');
+  assert.equal(cappedDraw.settledMatches, 2);
+  assert.deepEqual(cappedDraw.rows[0].picks.map((pick) => pick.score), ['1-1', '0-0']);
+  assert.ok(cappedDraw.rows.every((row) => row.picks.every((pick) => pick.odds <= 35)));
+
   const summary = formatCandidateStrategySummary(results);
   assert.match(summary, /候选策略回测/);
   assert.match(summary, /low_score_basket_4/);
   assert.match(summary, /trend_risers_2/);
   assert.match(summary, /tem_consensus_n3_cap7/);
+  assert.match(summary, /tem_consensus_poisson_context_v1_c1_n4_cap7/);
   assert.match(summary, /market_poisson_ev/);
   assert.match(summary, /context_poisson_ev_v2/);
+  assert.match(summary, /tem_poisson_context_v1_n3_cap35_p0_006/);
   assert.match(summary, /context_poisson_ev_v3/);
   assert.match(summary, /tem_hybrid_draw_poisson_v2_d1_n2/);
   assert.match(summary, /tem_draw_anchor_3_max5_5/);
+  assert.match(summary, /tem_draw_anchor_capped_1_draw5_5_cap35/);
 });

@@ -36,6 +36,23 @@ const historicalResults = [
       { date: '2026-06-26', time: '04:00', hitScore: '', cost: 4, revenue: 0 },
     ],
   },
+  {
+    strategyId: 'tem_draw_anchor_capped_1_draw5_5_cap35',
+    strategyName: '平局锚点限赔 4 格',
+    rows: [
+      { date: '2026-06-13', time: '03:00', hitScore: '1-1', cost: 4, revenue: 5.3 },
+      { date: '2026-06-14', time: '03:00', hitScore: '1-1', cost: 4, revenue: 11 },
+      { date: '2026-06-26', time: '04:00', hitScore: '', cost: 4, revenue: 0 },
+    ],
+  },
+  {
+    strategyId: 'tem_consensus_poisson_context_v1_c1_n4_cap7',
+    strategyName: '共识泊松 4 格',
+    rows: [
+      { date: '2026-06-13', time: '03:00', hitScore: '1-1', cost: 4, revenue: 5.3 },
+      { date: '2026-06-14', time: '03:00', hitScore: '', cost: 4, revenue: 0 },
+    ],
+  },
 ];
 
 const scoreOptions = [
@@ -67,8 +84,8 @@ test('routeStrategyForMatch chooses an available positive-history strategy and r
     historicalResults,
   });
 
-  assert.equal(route.strategyId, 'tem_draw_anchor_3_max5_5');
-  assert.equal(route.strategyName, '平局锚点 4 格');
+  assert.equal(route.strategyId, 'tem_draw_anchor_capped_1_draw5_5_cap35');
+  assert.equal(route.strategyName, '平局锚点限赔 4 格');
   assert.equal(route.roiLabel, '+103.75%');
   assert.match(route.reason, /滚动历史 ROI/);
   assert.match(route.reason, /葡萄牙 vs 乌兹别克斯坦/);
@@ -104,7 +121,7 @@ test('routeStrategyForMatch prefers the consensus flagship for knockout matches 
     historicalResults,
   });
 
-  assert.equal(route.strategyId, 'tem_consensus_n3_cap7');
+  assert.equal(route.strategyId, 'tem_consensus_poisson_context_v1_c1_n4_cap7');
   assert.match(route.reason, /外部来源/);
   assert.match(route.reason, /淘汰赛/);
 });
@@ -143,8 +160,8 @@ test('buildRoutedAiPredictionEntries explains consensus-flagship score choices',
     historicalResults,
   });
 
-  assert.deepEqual(entries[0].scores, ['1-0', '1-1', '2-1']);
-  assert.match(entries[0].route.reason, /市场低赔共识/);
+  assert.deepEqual(entries[0].scores, ['1-0', '0-0', '1-1']);
+  assert.match(entries[0].route.reason, /低赔共识锚点/);
   assert.match(entries[0].route.reason, /外部来源 4 条/);
 });
 
@@ -161,7 +178,7 @@ test('buildRoutedAiPredictionEntries falls back to low-score scores when odds ar
   });
 
   assert.deepEqual(entries.map((entry) => entry.matchId), ['with-odds', 'no-odds']);
-  assert.deepEqual(entries[0].scores, ['1-1', '2-2', '0-0', '1-0']);
+  assert.deepEqual(entries[0].scores, ['1-1', '0-0', '2-2', '1-0']);
   assert.deepEqual(entries[1].scores, ['0-0', '0-1', '1-0', '1-1']);
   assert.equal(entries[1].route.strategyId, 'low_score_basket_4');
   assert.match(entries[1].route.reason, /缺少可用赔率/);
@@ -242,9 +259,9 @@ test('routeStrategyForMatch only considers the production router candidate pool 
   });
 
   assert.deepEqual(routerCandidateStrategyIds, [
-    'tem_draw_anchor_3_max5_5',
-    'context_poisson_ev_v2',
-    'tem_consensus_n3_cap7',
+    'tem_draw_anchor_capped_1_draw5_5_cap35',
+    'tem_poisson_context_v1_n3_cap35_p0_006',
+    'tem_consensus_poisson_context_v1_c1_n4_cap7',
   ]);
   assert.ok(routerCandidateStrategyIds.includes(route.strategyId));
   assert.notEqual(route.strategyId, 'market_poisson_ev');

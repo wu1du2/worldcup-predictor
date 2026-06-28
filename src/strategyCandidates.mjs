@@ -43,9 +43,28 @@ export const candidateStrategies = [
     selectPicks: ({ odds }) => sortByOdds(odds).filter((pick) => pick.odds <= 7).slice(0, 3),
   },
   {
+    id: 'tem_consensus_poisson_context_v1_c1_n4_cap7',
+    name: '共识泊松 4 格',
+    family: 'market_consensus',
+    style: 'attack',
+    parameters: {
+      poissonVariant: 'context_v1',
+      consensusCount: 1,
+      maxPicks: 4,
+      maxConsensusOdds: 7,
+    },
+    description: '共识型 v4：先取 1 个不高于 7 的最低赔比分，再用赛前泊松 EV 补足到最多 4 格。',
+    explanation: '把低赔市场共识作为锚点，再用赛前泊松 EV 增加可解释的补充比分。',
+    selectPicks: ({ odds, context }) => pickConsensusPoissonContextV1(odds, context),
+  },
+  {
     id: 'market_consensus_sources',
     name: '市场来源共识',
+    family: 'market_consensus',
+    style: 'balanced',
+    parameters: { sourceFirst: true },
     description: '综合机构明确比分、方向型预测和比分赔率低位，优先给出可解释的市场主线比分。',
+    explanation: '优先采纳机构明确比分，再用方向预测和赔率低位补足。',
     selectPicks: ({ odds, context }) => buildSourceConsensusSelection({ odds, context }).picks,
   },
   {
@@ -123,8 +142,36 @@ export const candidateStrategies = [
   {
     id: 'context_poisson_ev_v2',
     name: '赛前泊松EV精选',
+    family: 'poisson_ev',
+    style: 'selected',
+    parameters: { variant: 'context_v2', maxPicks: 2 },
     description: '赛前泊松EV的精选版本，提高概率门槛并限制最多 2 个比分，优先减少低置信噪音。',
+    explanation: '用赛前 context 估计双方进球，再按 EV 精选少量比分。',
     selectPicks: ({ odds, context }) => buildContextPoissonEvV2Selection({ odds, context }).picks,
+  },
+  {
+    id: 'tem_poisson_context_v1_n3_cap35_p0_006',
+    name: '赛前泊松EV基础 3 格',
+    family: 'poisson_ev',
+    style: 'balanced',
+    parameters: {
+      variant: 'context_v1',
+      maxPicks: 3,
+      maxSelectableOdds: 35,
+      minSelectableProbability: 0.006,
+    },
+    description: '价值型 v3：用赛前泊松基础模型选最多 3 个 EV 靠前比分，赔率上限 35，概率下限 0.006。',
+    explanation: '在保留 EV 正向解释的同时，用 3 格覆盖把单点高波动降下来。',
+    selectPicks: ({ odds, context }) => buildContextPoissonEvSelection({
+      odds,
+      context,
+      options: {
+        maxPicks: 3,
+        minPicks: 2,
+        maxSelectableOdds: 35,
+        minSelectableProbability: 0.006,
+      },
+    }).picks,
   },
   {
     id: 'context_poisson_ev_v3',
@@ -141,8 +188,26 @@ export const candidateStrategies = [
   {
     id: 'tem_draw_anchor_3_max5_5',
     name: '平局锚点 4 格',
+    family: 'draw_anchor',
+    style: 'balanced',
+    parameters: { scores: ['1-1', '2-2', '0-0', '1-0'], drawMaxOdds: 5.5 },
     description: 'final3 均衡型：平局赔率较低时覆盖 1-1、2-2、0-0、1-0，否则回落到低平局三格。',
+    explanation: '用平局低赔判断比赛接近程度，再围绕低比分平局和一个小胜保护。',
     selectPicks: ({ odds }) => pickFinalDrawAnchor(odds),
+  },
+  {
+    id: 'tem_draw_anchor_capped_1_draw5_5_cap35',
+    name: '平局锚点限赔 4 格',
+    family: 'draw_anchor',
+    style: 'balanced',
+    parameters: {
+      scores: ['1-1', '0-0', '2-2', '1-0'],
+      drawMaxOdds: 5.5,
+      maxPickOdds: 35,
+    },
+    description: '稳定型 v3：平局最低赔不高于 5.5 时覆盖 1-1、0-0、2-2、1-0，并过滤 35 以上长尾。',
+    explanation: '保留平局结构锚点，同时限制超高赔尾部，避免靠一次长尾冲高评分。',
+    selectPicks: ({ odds }) => pickFinalDrawAnchorCapped(odds),
   },
 ];
 
@@ -251,6 +316,22 @@ function pickFixedScores(odds, scores) {
   return scores.filter((score) => oddsByScore.has(score)).map((score) => oddsByScore.get(score));
 }
 
+function pickConsensusPoissonContextV1(odds, context) {
+  return uniquePicks([
+    ...sortByOdds(odds).filter((pick) => pick.odds <= 7).slice(0, 1),
+    ...buildContextPoissonEvSelection({
+      odds,
+      context,
+      options: {
+        maxPicks: 4,
+        minPicks: 2,
+        maxSelectableOdds: 35,
+        minSelectableProbability: 0.006,
+      },
+    }).picks,
+  ]).slice(0, 4);
+}
+
 function pickFavoriteNarrowWin(odds) {
   const strength = getOutcomeStrength(odds);
   if (strength.home < strength.away) {
@@ -323,6 +404,14 @@ function pickFinalDrawAnchor(odds) {
     ? ['1-1', '2-2', '0-0', '1-0']
     : ['1-1', '0-0', '2-2'];
   return pickFixedScores(odds, scores);
+}
+
+function pickFinalDrawAnchorCapped(odds) {
+  const drawMin = minOddsForOutcome(odds, 'draw');
+  const scores = drawMin <= 5.5
+    ? ['1-1', '0-0', '2-2', '1-0']
+    : ['1-1', '0-0', '2-2'];
+  return pickFixedScores(odds, scores).filter((pick) => pick.odds <= 35);
 }
 
 function getOutcomeStrength(odds) {

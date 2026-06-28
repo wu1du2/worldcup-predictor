@@ -20,6 +20,35 @@ test('generateTempStrategyCandidates creates a broad uniquely named experiment p
   assert.ok(new Set(candidates.map((strategy) => strategy.family)).size >= 8);
 });
 
+test('generateTempStrategyCandidates samples families evenly when capped', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 40 });
+  const families = new Set(candidates.map((strategy) => strategy.family));
+
+  assert.ok(families.has('poisson_ev'));
+  assert.ok(families.has('trend'));
+  assert.ok(families.has('draw_anchor'));
+  assert.ok(families.has('market_consensus'));
+  assert.ok(families.size >= 8);
+});
+
+test('generateTempStrategyCandidates includes capped draw anchor experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 500 });
+  const cappedDraw = candidates.filter((strategy) => strategy.id.includes('draw_anchor_capped'));
+
+  assert.ok(cappedDraw.length > 0);
+  assert.ok(cappedDraw.every((strategy) => strategy.family === 'draw_anchor'));
+  assert.ok(cappedDraw.every((strategy) => strategy.parameters.maxPickOdds <= 35));
+});
+
+test('generateTempStrategyCandidates includes consensus plus poisson experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 500 });
+  const consensusPoisson = candidates.filter((strategy) => strategy.id.includes('consensus_poisson'));
+
+  assert.ok(consensusPoisson.length > 0);
+  assert.ok(consensusPoisson.every((strategy) => strategy.family === 'market_consensus'));
+  assert.ok(consensusPoisson.every((strategy) => strategy.parameters.poissonVariant));
+});
+
 test('enrichBacktestResult computes information richness metrics and gate status', () => {
   const enriched = enrichBacktestResult({
     strategyId: 'tem_sample',

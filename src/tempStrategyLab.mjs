@@ -36,7 +36,7 @@ export function generateTempStrategyCandidates({ maxCandidates = 200 } = {}) {
   addPoissonEvStrategies(add);
   addTrendStrategies(add);
 
-  return strategies.slice(0, maxCandidates);
+  return selectBalancedStrategyCandidates(strategies, maxCandidates);
 }
 
 export function enrichBacktestResult(result, gate = defaultQualificationGate, metadata = {}) {
@@ -206,6 +206,30 @@ function addScoreBasketStrategies(add) {
   }
 }
 
+function selectBalancedStrategyCandidates(strategies, maxCandidates) {
+  if (!Number.isFinite(Number(maxCandidates)) || maxCandidates <= 0 || strategies.length <= maxCandidates) {
+    return strategies;
+  }
+
+  const byFamily = new Map();
+  for (const strategy of strategies) {
+    const family = strategy.family || 'unknown';
+    if (!byFamily.has(family)) byFamily.set(family, []);
+    byFamily.get(family).push(strategy);
+  }
+
+  const selected = [];
+  const familyQueues = [...byFamily.values()];
+  while (selected.length < maxCandidates && familyQueues.some((queue) => queue.length)) {
+    for (const queue of familyQueues) {
+      if (!queue.length) continue;
+      selected.push(queue.shift());
+      if (selected.length >= maxCandidates) break;
+    }
+  }
+  return selected;
+}
+
 function addConsensusStrategies(add) {
   for (const maxPicks of [2, 3, 4, 5]) {
     for (const maxOdds of [7, 8, 10, 12, 15, 18, 25]) {
@@ -219,6 +243,46 @@ function addConsensusStrategies(add) {
         explanation: '把最低赔率视作市场共识，限制过高赔率噪音。',
         selectPicks: ({ odds }) => sortByOdds(odds).filter((pick) => pick.odds <= maxOdds).slice(0, maxPicks),
       });
+    }
+  }
+
+  const poissonBuilders = [
+    { key: 'context_v1', builder: buildContextPoissonEvSelection },
+    { key: 'context_v3', builder: buildContextPoissonEvV3Selection },
+  ];
+  for (const poisson of poissonBuilders) {
+    for (const consensusCount of [1, 2]) {
+      for (const maxPicks of [3, 4]) {
+        for (const maxConsensusOdds of [7, 8, 10]) {
+          add({
+            id: `consensus_poisson_${poisson.key}_c${consensusCount}_n${maxPicks}_cap${maxConsensusOdds}`,
+            name: `共识泊松 ${maxPicks} 格`,
+            family: 'market_consensus',
+            style: maxPicks <= 3 ? 'balanced' : 'attack',
+            parameters: {
+              poissonVariant: poisson.key,
+              consensusCount,
+              maxPicks,
+              maxConsensusOdds,
+            },
+            description: `先取 ${consensusCount} 个不高于 ${maxConsensusOdds} 的最低赔比分，再用泊松 EV 补足。`,
+            explanation: '把市场共识作为锚点，再用赛前泊松 EV 增加可解释的补充比分。',
+            selectPicks: ({ odds, context }) => uniquePicks([
+              ...sortByOdds(odds).filter((pick) => pick.odds <= maxConsensusOdds).slice(0, consensusCount),
+              ...poisson.builder({
+                odds,
+                context,
+                options: {
+                  maxPicks,
+                  minPicks: 2,
+                  maxSelectableOdds: 35,
+                  minSelectableProbability: 0.006,
+                },
+              }).picks,
+            ]).slice(0, maxPicks),
+          });
+        }
+      }
     }
   }
 }
@@ -247,6 +311,33 @@ function addDrawAnchorStrategies(add) {
           return pickFixedScores(odds, drawMin <= drawMaxOdds ? scores : fallback.slice(0, Math.min(3, scores.length)));
         },
       });
+    }
+  }
+
+  const cappedDrawSets = [
+    ['1-1', '0-0', '2-2', '1-0'],
+    ['1-1', '0-0', '2-2', '0-1'],
+    ['1-1', '0-0', '2-2', '2-1'],
+    ['1-1', '0-0', '2-2', '1-2'],
+  ];
+  for (const [index, scores] of cappedDrawSets.entries()) {
+    for (const drawMaxOdds of [5.5, 6.5, 7.5]) {
+      for (const maxPickOdds of [25, 35]) {
+        add({
+          id: `draw_anchor_capped_${index + 1}_draw${String(drawMaxOdds).replace('.', '_')}_cap${maxPickOdds}`,
+          name: `平局锚点限赔 ${scores.length} 格`,
+          family: 'draw_anchor',
+          style: 'balanced',
+          parameters: { scores, drawMaxOdds, maxPickOdds },
+          description: `平局最低赔不高于 ${drawMaxOdds} 时覆盖 ${scores.join('、')}，但每项赔率不高于 ${maxPickOdds}。`,
+          explanation: '保留平局结构锚点，同时限制超高赔尾部，避免靠一次长尾冲高评分。',
+          selectPicks: ({ odds }) => {
+            const drawMin = minOddsForOutcome(odds, 'draw');
+            const activeScores = drawMin <= drawMaxOdds ? scores : scores.slice(0, 3);
+            return pickFixedScores(odds, activeScores).filter((pick) => pick.odds <= maxPickOdds);
+          },
+        });
+      }
     }
   }
 }

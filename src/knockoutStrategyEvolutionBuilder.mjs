@@ -116,6 +116,7 @@ export function buildKnockoutStrategyEvolutionData({
       metadataById,
       familyId: family.experimentFamily,
       includedIds,
+      activeVersion,
     });
 
     const versions = experiment
@@ -189,23 +190,31 @@ function demotePreviousActive(versions) {
   ));
 }
 
-function findBestExperiment({ results, metadataById, familyId, includedIds }) {
-  return [...(results || [])]
+function findBestExperiment({ results, metadataById, familyId, includedIds, activeVersion }) {
+  const candidates = [...(results || [])]
     .filter((result) => !includedIds.has(result.strategyId))
     .filter((result) => metadataById.get(result.strategyId)?.family === familyId)
-    .sort((a, b) => b.knockoutProxyScore - a.knockoutProxyScore || b.roiPercent - a.roiPercent)[0] || null;
+    .sort((a, b) => b.knockoutProxyScore - a.knockoutProxyScore || b.roiPercent - a.roiPercent);
+  return candidates.find((candidate) => isPromotion({ experiment: candidate, activeVersion }))
+    || candidates[0]
+    || null;
 }
 
 function isPromotion({ experiment, activeVersion }) {
   if (!experiment || !activeVersion) return false;
   const activeScore = getWeightedTotal(activeVersion.metrics);
   return Number(experiment.knockoutProxyScore) >= activeScore + 1
-    && Number(experiment.maxHitOdds || 0) < 60;
+    && Number(experiment.maxHitOdds || 0) < 60
+    && Number(experiment.averagePicks || 0) >= 1.5
+    && Number(experiment.averagePicks || 0) <= 4;
 }
 
 function getRejectionReason(experiment, activeVersion) {
   if (Number(experiment.maxHitOdds || 0) >= 60) {
     return '主要收益依赖高赔尾部命中，按防彩票化规则保留为失败实验。';
+  }
+  if (Number(experiment.averagePicks || 0) < 1.5 || Number(experiment.averagePicks || 0) > 4) {
+    return '平均下注数不在 1.5-4 的健康区间内，暂不作为旗舰升级。';
   }
   const activeScore = getWeightedTotal(activeVersion?.metrics || {});
   return `没有超过当前候选总分 ${formatMetric(activeScore)} 的升级门槛。`;

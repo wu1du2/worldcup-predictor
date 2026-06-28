@@ -9,9 +9,9 @@ const dynamicCandidateMinHitMatches = 3;
 const dynamicCandidateMinRoiPercent = 0;
 const dynamicCandidateMaxAveragePicks = 4.5;
 export const routerCandidateStrategyIds = [
-  'tem_draw_anchor_3_max5_5',
-  'context_poisson_ev_v2',
-  'tem_consensus_n3_cap7',
+  'tem_draw_anchor_capped_1_draw5_5_cap35',
+  'tem_poisson_context_v1_n3_cap35_p0_006',
+  'tem_consensus_poisson_context_v1_c1_n4_cap7',
 ];
 
 export function buildRollingStrategyStats({ historicalResults, cutoffDate, cutoffTime = '00:00' }) {
@@ -222,7 +222,9 @@ function buildReason({ match, selected, odds }) {
 }
 
 function isConsensusStrategy(strategyId) {
-  return strategyId === 'market_consensus_sources' || strategyId === 'tem_consensus_n3_cap7';
+  return strategyId === 'market_consensus_sources'
+    || strategyId === 'tem_consensus_n3_cap7'
+    || strategyId === 'tem_consensus_poisson_context_v1_c1_n4_cap7';
 }
 
 function withScoreSelectionReason({ route, picks, scoreOptions }) {
@@ -249,11 +251,17 @@ function getStrategyPickStandard(strategyId) {
   if (strategyId === 'tem_draw_anchor_3_max5_5') {
     return '标准是平局赔率低时围绕平局，并加一个低比分保护。';
   }
+  if (strategyId === 'tem_draw_anchor_capped_1_draw5_5_cap35') {
+    return '标准是平局赔率低时围绕平局，并过滤 35 倍以上长尾。';
+  }
   if (strategyId === 'tem_hybrid_draw_poisson_v2_d1_n2') {
     return '标准是先保 1-1，再用赛前泊松 EV 补位。';
   }
   if (strategyId === 'context_poisson_ev_v3') {
     return '标准是用赛前 context 估进球，做低比分/平局修正后按 EV 取前列。';
+  }
+  if (strategyId === 'tem_poisson_context_v1_n3_cap35_p0_006') {
+    return '标准是用赛前泊松基础模型估进球，选择赔率不高于 35 且 EV 靠前的三个比分。';
   }
   if (strategyId === 'context_poisson_ev_v2') {
     return '标准是用赛前 context 估进球，提高概率门槛后按 EV 精选。';
@@ -263,6 +271,9 @@ function getStrategyPickStandard(strategyId) {
   }
   if (strategyId === 'tem_consensus_n3_cap7') {
     return '标准是选择赔率最低且不高于 7 的三个市场共识比分。';
+  }
+  if (strategyId === 'tem_consensus_poisson_context_v1_c1_n4_cap7') {
+    return '标准是先取低赔共识锚点，再用赛前泊松 EV 补足。';
   }
   if (strategyId === fallbackStrategyId) {
     return '标准是缺赔率时覆盖最常见低比分。';
@@ -288,17 +299,30 @@ function describePickedScore({ strategyId, pick, scoreOptions }) {
     return `${score} 低比分保护，${oddsText}`;
   }
 
+  if (strategyId === 'tem_draw_anchor_capped_1_draw5_5_cap35') {
+    if (score === '1-1') return `${score} 核心平局，${oddsText}`;
+    if (score === '0-0') return `${score} 低节奏平局，${oddsText}`;
+    if (score === '2-2') return `${score} 进球平局扩展，${oddsText}`;
+    return `${score} 限赔低比分保护，${oddsText}`;
+  }
+
   if (strategyId === 'tem_hybrid_draw_poisson_v2_d1_n2') {
     if (score === '1-1') return `${score} 固定平局锚点，${oddsText}`;
     return `${score} 泊松 EV 补位，${oddsText}`;
   }
 
-  if (strategyId === 'context_poisson_ev_v2' || strategyId === 'context_poisson_ev_v3') {
+  if (strategyId === 'context_poisson_ev_v2'
+    || strategyId === 'context_poisson_ev_v3'
+    || strategyId === 'tem_poisson_context_v1_n3_cap35_p0_006') {
     return `${score} EV 靠前，${oddsText}`;
   }
 
   if (strategyId === 'tem_consensus_n3_cap7') {
     return `${score} 市场低赔共识，${oddsText}`;
+  }
+
+  if (strategyId === 'tem_consensus_poisson_context_v1_c1_n4_cap7') {
+    return `${score} 低赔共识锚点或泊松 EV 补位，${oddsText}`;
   }
 
   if (strategyId === fallbackStrategyId) {
@@ -334,6 +358,11 @@ function scoreStrategyFeatures({ strategy, odds, match = null }) {
     if (externalPredictionStrength >= 1) return 0.95 + knockoutBonus / 2;
     return market.lowOddsScores >= 3 ? 0.88 : 0.15;
   }
+  if (strategy.id === 'tem_consensus_poisson_context_v1_c1_n4_cap7') {
+    if (externalPredictionStrength >= 3) return 1.25 + knockoutBonus;
+    if (externalPredictionStrength >= 1) return 0.95 + knockoutBonus / 2;
+    return market.hasCompleteScoreBoard ? 0.92 : 0.25;
+  }
   if (strategy.id === 'favorite_narrow_win_3') {
     return market.heavyFavorite ? 0.75 : 0.1;
   }
@@ -355,9 +384,11 @@ function scoreStrategyFeatures({ strategy, odds, match = null }) {
   if (strategy.id === 'market_poisson_ev') return market.hasCompleteScoreBoard ? 1.05 : 0.35;
   if (strategy.id === 'context_poisson_ev') return market.hasCompleteScoreBoard ? 0.65 : 0.2;
   if (strategy.id === 'context_poisson_ev_v2') return market.hasCompleteScoreBoard ? 0.7 : 0.2;
+  if (strategy.id === 'tem_poisson_context_v1_n3_cap35_p0_006') return market.hasCompleteScoreBoard ? 1.05 : 0.35;
   if (strategy.id === 'context_poisson_ev_v3') return market.hasCompleteScoreBoard ? 0.75 : 0.2;
   if (strategy.id === 'tem_hybrid_draw_poisson_v2_d1_n2') return market.hasCompleteScoreBoard && market.drawLean ? 0.95 : 0.35;
   if (strategy.id === 'tem_draw_anchor_3_max5_5') return market.drawLean ? 1 : 0.2;
+  if (strategy.id === 'tem_draw_anchor_capped_1_draw5_5_cap35') return market.drawLean ? 1.05 : 0.22;
   return 0;
 }
 

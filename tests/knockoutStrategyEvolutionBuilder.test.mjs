@@ -63,6 +63,39 @@ test('buildKnockoutStrategyEvolutionData rejects tail-driven experiments and pro
   assert.equal(consensus.versions.at(-1).status, 'discarded');
 });
 
+test('buildKnockoutStrategyEvolutionData skips unhealthy one-pick upgrades when a healthy candidate qualifies', () => {
+  const data = buildKnockoutStrategyEvolutionData({
+    results: [
+      ...results,
+      result('tem_poisson_one_pick', '泊松单点实验', 74.5, {
+        roi: 100,
+        hitRate: 7.1,
+        coverage: 100,
+        shapeHealth: 80,
+        explainability: 84,
+      }, { averagePicks: 1, maxHitOdds: 28 }),
+      result('tem_poisson_balanced', '泊松均衡实验', 74.1, {
+        roi: 80,
+        hitRate: 19.6,
+        coverage: 100,
+        shapeHealth: 88,
+        explainability: 84,
+      }, { averagePicks: 2.7, maxHitOdds: 28 }),
+    ],
+    strategies: [
+      ...strategies,
+      { id: 'tem_poisson_one_pick', name: '泊松单点实验', family: 'poisson_ev' },
+      { id: 'tem_poisson_balanced', name: '泊松均衡实验', family: 'poisson_ev' },
+    ],
+    proxyMatches: 56,
+  });
+  const value = data.families.find((family) => family.id === 'knockout_value');
+
+  assert.equal(value.versions.at(-1).label, '泊松均衡实验');
+  assert.equal(value.versions.at(-1).status, 'active');
+  assert.match(value.versions.at(-1).verdict, /升级为当前候选/);
+});
+
 test('formatKnockoutStrategyEvolutionDataModule writes an importable module', async () => {
   const data = buildKnockoutStrategyEvolutionData({
     results,
