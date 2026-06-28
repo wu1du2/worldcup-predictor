@@ -43,19 +43,22 @@ export const candidateStrategies = [
     selectPicks: ({ odds }) => sortByOdds(odds).filter((pick) => pick.odds <= 7).slice(0, 3),
   },
   {
-    id: 'tem_consensus_poisson_context_v1_c1_n4_cap7',
-    name: '共识泊松 4 格',
+    id: 'tem_source_consensus_poisson_context_v1_s2_c3_n3_cap6',
+    name: '来源低赔泊松 3 格',
     family: 'market_consensus',
     style: 'attack',
     parameters: {
+      sourceFirst: true,
       poissonVariant: 'context_v1',
-      consensusCount: 1,
-      maxPicks: 4,
-      maxConsensusOdds: 7,
+      sourceCount: 2,
+      consensusCount: 3,
+      maxPicks: 3,
+      maxConsensusOdds: 6,
+      maxSourceOdds: 30,
     },
-    description: '共识型 v4：先取 1 个不高于 7 的最低赔比分，再用赛前泊松 EV 补足到最多 4 格。',
-    explanation: '把低赔市场共识作为锚点，再用赛前泊松 EV 增加可解释的补充比分。',
-    selectPicks: ({ odds, context }) => pickConsensusPoissonContextV1(odds, context),
+    description: '共识型 v5：先取外部来源明确比分和 6 倍内低赔共识，再用赛前泊松 EV 补足到 3 格。',
+    explanation: '把机构/媒体明确比分、市场低赔和泊松 EV 三层信号合并，同时控制成本与候选密度。',
+    selectPicks: ({ odds, context }) => pickSourceConsensusPoissonContextV1(odds, context),
   },
   {
     id: 'market_consensus_sources',
@@ -190,18 +193,19 @@ export const candidateStrategies = [
     selectPicks: ({ odds }) => pickFinalDrawAnchor(odds),
   },
   {
-    id: 'tem_draw_anchor_capped_1_draw5_5_cap35',
-    name: '平局锚点限赔 4 格',
+    id: 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25',
+    name: '平局锚点省注',
     family: 'draw_anchor',
     style: 'balanced',
     parameters: {
-      scores: ['1-1', '0-0', '2-2', '1-0'],
+      baseScores: ['1-1', '0-0'],
       drawMaxOdds: 5.5,
-      maxPickOdds: 35,
+      maxPickOdds: 25,
+      extraMode: 'homeAwayLow2',
     },
-    description: '稳定型 v3：平局最低赔不高于 5.5 时覆盖 1-1、0-0、2-2、1-0，并过滤 35 以上长尾。',
-    explanation: '保留平局结构锚点，同时限制超高赔尾部，避免靠一次长尾冲高评分。',
-    selectPicks: ({ odds }) => pickFinalDrawAnchorCapped(odds),
+    description: '稳定型 v4：固定保留 1-1/0-0；平局低于 5.5 时加入两个最低赔非平局比分，并过滤 25 以上长尾。',
+    explanation: '减少 2-2 等成本项，用市场最低的非平局比分做小胜保护，保持低比分底座。',
+    selectPicks: ({ odds }) => pickLeanDrawAnchorHomeAway2(odds),
   },
 ];
 
@@ -310,6 +314,27 @@ function pickFixedScores(odds, scores) {
   return scores.filter((score) => oddsByScore.has(score)).map((score) => oddsByScore.get(score));
 }
 
+function pickSourceConsensusPoissonContextV1(odds, context) {
+  return uniquePicks([
+    ...buildSourceConsensusSelection({
+      odds,
+      context,
+      maxPicks: 3,
+    }).picks.filter((pick) => pick.odds <= 30 || String(pick.reason || '').includes('明确')).slice(0, 2),
+    ...sortByOdds(odds).filter((pick) => pick.odds <= 6).slice(0, 3),
+    ...buildContextPoissonEvSelection({
+      odds,
+      context,
+      options: {
+        maxPicks: 3,
+        minPicks: 2,
+        maxSelectableOdds: 35,
+        minSelectableProbability: 0.006,
+      },
+    }).picks,
+  ]).slice(0, 3);
+}
+
 function pickConsensusPoissonContextV1(odds, context) {
   return uniquePicks([
     ...sortByOdds(odds).filter((pick) => pick.odds <= 7).slice(0, 1),
@@ -324,6 +349,16 @@ function pickConsensusPoissonContextV1(odds, context) {
       },
     }).picks,
   ]).slice(0, 4);
+}
+
+function pickLeanDrawAnchorHomeAway2(odds) {
+  const base = pickFixedScores(odds, ['1-1', '0-0'])
+    .filter((pick) => pick.odds <= 25);
+  if (minOddsForOutcome(odds, 'draw') > 5.5) return base;
+  const nonDraw = sortByOdds(odds)
+    .filter((pick) => getScoreOutcome(pick.score) !== 'draw' && pick.odds <= 25)
+    .slice(0, 2);
+  return uniquePicks([...base, ...nonDraw]);
 }
 
 function pickPoissonDrawGuardContextV3(odds, context) {

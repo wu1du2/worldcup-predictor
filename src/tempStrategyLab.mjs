@@ -318,6 +318,44 @@ function addConsensusStrategies(add) {
       }
     }
   }
+
+  for (const poisson of poissonBuilders) {
+    for (const sourceCount of [1, 2]) {
+      for (const consensusCount of [1, 2, 3]) {
+        for (const maxPicks of [3, 4]) {
+          for (const maxConsensusOdds of [6, 7, 8]) {
+            add({
+              id: `source_consensus_poisson_${poisson.key}_s${sourceCount}_c${consensusCount}_n${maxPicks}_cap${String(maxConsensusOdds).replace('.', '_')}`,
+              name: `来源低赔泊松 ${maxPicks} 格`,
+              family: 'market_consensus',
+              style: maxPicks <= 3 ? 'balanced' : 'attack',
+              parameters: {
+                sourceFirst: true,
+                poissonVariant: poisson.key,
+                sourceCount,
+                consensusCount,
+                maxPicks,
+                maxConsensusOdds,
+                maxSourceOdds: 30,
+              },
+              description: `先取 ${sourceCount} 个外部来源比分和 ${consensusCount} 个低赔共识，再用泊松 EV 补足到 ${maxPicks} 个。`,
+              explanation: '把机构明确比分、低赔市场共识和泊松 EV 三层信号合并，限制总注数保持可读。',
+              selectPicks: ({ odds, context }) => pickSourceConsensusPoisson({
+                odds,
+                context,
+                sourceCount,
+                consensusCount,
+                maxPicks,
+                maxSourceOdds: 30,
+                maxConsensusOdds,
+                poissonBuilder: poisson.builder,
+              }),
+            });
+          }
+        }
+      }
+    }
+  }
 }
 
 function addDrawAnchorStrategies(add) {
@@ -411,6 +449,32 @@ function addDrawAnchorStrategies(add) {
           });
         }
       }
+    }
+  }
+
+  for (const drawMaxOdds of [5, 5.5, 6]) {
+    for (const maxPickOdds of [25, 30]) {
+      add({
+        id: `draw_anchor_lean_homeaway2_draw${String(drawMaxOdds).replace('.', '_')}_cap${maxPickOdds}`,
+        name: '平局锚点省注',
+        family: 'draw_anchor',
+        style: 'balanced',
+        parameters: {
+          baseScores: ['1-1', '0-0'],
+          extraMode: 'homeAwayLow2',
+          drawMaxOdds,
+          maxPickOdds,
+        },
+        description: `固定保留 1-1/0-0；平局低于 ${drawMaxOdds} 时加入两个最低赔非平局比分，过滤 ${maxPickOdds} 以上长尾。`,
+        explanation: '用 1-1/0-0 控制低比分底座，再用市场最低的非平局比分做小胜保护，减少无效注数。',
+        selectPicks: ({ odds }) => pickLeanDrawAnchor({
+          odds,
+          baseScores: ['1-1', '0-0'],
+          drawMaxOdds,
+          maxPickOdds,
+          extraCount: 2,
+        }),
+      });
     }
   }
 }
@@ -677,8 +741,10 @@ function pickSourceConsensusPoisson({
   odds,
   context,
   sourceCount,
+  consensusCount = 0,
   maxPicks,
   maxSourceOdds,
+  maxConsensusOdds = 7,
   poissonBuilder,
 }) {
   const sourceCandidates = buildSourceConsensusSelection({
@@ -689,6 +755,9 @@ function pickSourceConsensusPoisson({
   const sourcePicks = sourceCandidates
     .filter((pick) => pick.odds <= maxSourceOdds || String(pick.reason || '').includes('明确'))
     .slice(0, sourceCount);
+  const consensusPicks = sortByOdds(odds)
+    .filter((pick) => pick.odds <= maxConsensusOdds)
+    .slice(0, consensusCount);
   const poissonPicks = poissonBuilder({
     odds,
     context,
@@ -699,7 +768,23 @@ function pickSourceConsensusPoisson({
       minSelectableProbability: 0.006,
     },
   }).picks;
-  return uniquePicks([...sourcePicks, ...poissonPicks]).slice(0, maxPicks);
+  return uniquePicks([...sourcePicks, ...consensusPicks, ...poissonPicks]).slice(0, maxPicks);
+}
+
+function pickLeanDrawAnchor({
+  odds,
+  baseScores,
+  drawMaxOdds,
+  maxPickOdds,
+  extraCount,
+}) {
+  const base = pickFixedScores(odds, baseScores)
+    .filter((pick) => pick.odds <= maxPickOdds);
+  if (minOddsForOutcome(odds, 'draw') > drawMaxOdds) return base;
+  const nonDraw = sortByOdds(odds)
+    .filter((pick) => getScoreOutcome(pick.score) !== 'draw' && pick.odds <= maxPickOdds)
+    .slice(0, extraCount);
+  return uniquePicks([...base, ...nonDraw]);
 }
 
 function pickAdaptiveDrawAnchor({

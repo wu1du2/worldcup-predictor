@@ -154,6 +154,67 @@ test('generateTempStrategyCandidates includes poisson draw-guard experiments', (
   assert.ok(picks.length <= 3);
 });
 
+test('generateTempStrategyCandidates includes lean stable draw anchor experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 800 });
+  const leanStable = candidates.find((strategy) => (
+    strategy.id === 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25'
+  ));
+
+  assert.ok(leanStable);
+  assert.equal(leanStable.family, 'draw_anchor');
+  assert.equal(leanStable.parameters.baseScores.length, 2);
+  assert.equal(leanStable.parameters.extraMode, 'homeAwayLow2');
+
+  const picks = leanStable.selectPicks({
+    odds: makeOdds({
+      '1-1': 5,
+      '0-0': 7,
+      '2-2': 16,
+      '1-0': 6,
+      '2-1': 7,
+      '0-1': 14,
+    }),
+  });
+
+  assert.deepEqual(picks.map((pick) => pick.score), ['1-1', '0-0', '1-0', '2-1']);
+  assert.ok(picks.every((pick) => pick.odds <= 25));
+});
+
+test('generateTempStrategyCandidates includes source and consensus poisson cap experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 800 });
+  const consensus = candidates.find((strategy) => (
+    strategy.id === 'tem_source_consensus_poisson_context_v3_s2_c3_n4_cap7'
+  ));
+
+  assert.ok(consensus);
+  assert.equal(consensus.family, 'market_consensus');
+  assert.equal(consensus.parameters.sourceCount, 2);
+  assert.equal(consensus.parameters.consensusCount, 3);
+  assert.equal(consensus.parameters.maxPicks, 4);
+
+  const picks = consensus.selectPicks({
+    odds: makeOdds({
+      '2-1': 6,
+      '1-0': 6.5,
+      '1-1': 6.8,
+      '0-0': 8,
+      '3-1': 12,
+      '0-1': 13,
+    }),
+    context: {
+      externalPredictions: [
+        { source: 'Preview A', kind: 'score', score: '3-1', outcome: 'home', totalLean: 'over' },
+        { source: 'Preview B', kind: 'score', score: '2-1', outcome: 'home', bothTeamsScore: true },
+      ],
+    },
+  });
+
+  assert.ok(picks.length <= 4);
+  assert.equal(picks[0].score, '2-1');
+  assert.ok(picks.some((pick) => pick.score === '2-1'));
+  assert.ok(picks.some((pick) => pick.score === '3-1'));
+});
+
 test('enrichBacktestResult computes information richness metrics and gate status', () => {
   const enriched = enrichBacktestResult({
     strategyId: 'tem_sample',

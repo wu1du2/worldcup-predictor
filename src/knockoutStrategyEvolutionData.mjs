@@ -1,4 +1,4 @@
-export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T14:27:06.289Z";
+export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T14:42:50.645Z";
 export const knockoutStrategyEvolutionProxyMatches = 56;
 
 export const knockoutStrategyEvolutionFamilies = [
@@ -54,14 +54,14 @@ export const knockoutStrategyEvolutionFamilies = [
       {
         "version": "v3",
         "status": "active",
-        "label": "平局锚点限赔 4 格",
-        "changed": "代理样本 56 场：本轮自动实验 tem_draw_anchor_capped_1_draw5_5_cap35，平均 3.1 注，最大命中赔率 28。",
-        "verdict": "升级为当前候选：总分 72.4，ROI +14.37%，命中 18/56。",
+        "label": "平局锚点省注",
+        "changed": "代理样本 56 场：本轮自动实验 tem_draw_anchor_lean_homeaway2_draw5_5_cap25，平均 2.4 注，最大命中赔率 22。",
+        "verdict": "升级为当前候选：总分 74.1，ROI +15.94%，命中 17/56。",
         "metrics": {
-          "roi": 74.4,
-          "hitRate": 32.1,
+          "roi": 75.9,
+          "hitRate": 30.4,
           "coverage": 100,
-          "shapeHealth": 88,
+          "shapeHealth": 98,
           "explainability": 78
         }
       }
@@ -184,14 +184,14 @@ export const knockoutStrategyEvolutionFamilies = [
       {
         "version": "v3",
         "status": "active",
-        "label": "共识泊松 4 格",
-        "changed": "代理样本 56 场：本轮自动实验 tem_consensus_poisson_context_v1_c1_n4_cap7，平均 3.7 注，最大命中赔率 28。",
-        "verdict": "升级为当前候选：总分 68.2，ROI +3.54%，命中 17/56。",
+        "label": "来源低赔泊松 3 格",
+        "changed": "代理样本 56 场：本轮自动实验 tem_source_consensus_poisson_context_v1_s2_c3_n3_cap6，平均 3 注，最大命中赔率 28。",
+        "verdict": "升级为当前候选：总分 71.1，ROI +2.86%，命中 20/56。",
         "metrics": {
-          "roi": 63.5,
-          "hitRate": 30.4,
+          "roi": 62.9,
+          "hitRate": 35.7,
           "coverage": 100,
-          "shapeHealth": 76,
+          "shapeHealth": 90,
           "explainability": 90
         }
       }
