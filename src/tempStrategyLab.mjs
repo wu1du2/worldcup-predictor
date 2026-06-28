@@ -323,7 +323,7 @@ function addConsensusStrategies(add) {
     for (const sourceCount of [1, 2]) {
       for (const consensusCount of [1, 2, 3]) {
         for (const maxPicks of [3, 4]) {
-          for (const maxConsensusOdds of [6, 7, 8]) {
+          for (const maxConsensusOdds of [5.5, 6, 7, 8]) {
             add({
               id: `source_consensus_poisson_${poisson.key}_s${sourceCount}_c${consensusCount}_n${maxPicks}_cap${String(maxConsensusOdds).replace('.', '_')}`,
               name: `来源低赔泊松 ${maxPicks} 格`,
@@ -475,6 +475,35 @@ function addDrawAnchorStrategies(add) {
           extraCount: 2,
         }),
       });
+    }
+  }
+
+  for (const drawMaxOdds of [5.5, 6.5]) {
+    for (const favoriteGap of [3, 4, 5]) {
+      for (const maxPickOdds of [25, 30]) {
+        add({
+          id: `draw_anchor_directional_homeaway2_draw${String(drawMaxOdds).replace('.', '_')}_gap${String(favoriteGap).replace('.', '_')}_cap${maxPickOdds}`,
+          name: '平局锚点方向保护',
+          family: 'draw_anchor',
+          style: 'balanced',
+          parameters: {
+            baseScores: ['1-1', '0-0'],
+            extraMode: 'directionalHomeAwayLow2',
+            drawMaxOdds,
+            favoriteGap,
+            maxPickOdds,
+          },
+          description: `固定保留 1-1/0-0；只有热门方向领先至少 ${favoriteGap} 个赔率点时，才加入该方向两个最低赔非平局比分。`,
+          explanation: '把非平局保护从无条件最低赔改成单边热门触发，避免均势场同时追两边小胜。',
+          selectPicks: ({ odds }) => pickDirectionalLeanDrawAnchor({
+            odds,
+            drawMaxOdds,
+            favoriteGap,
+            maxPickOdds,
+            extraCount: 2,
+          }),
+        });
+      }
     }
   }
 }
@@ -735,6 +764,42 @@ function addPoissonEvStrategies(add) {
       }
     }
   }
+
+  for (const variant of [
+    { key: 'context_v1', name: '赛前泊松EV基础', builder: buildContextPoissonEvSelection },
+    { key: 'context_v3', name: '赛前泊松EV均衡', builder: buildContextPoissonEvV3Selection },
+  ]) {
+    for (const basePicks of [2, 3]) {
+      for (const drawOddsRatioMax of [1.25, 1.35, 1.5]) {
+        add({
+          id: `poisson_drawstructure_${variant.key}_n${basePicks}_ratio${String(drawOddsRatioMax).replace('.', '_')}_cap35_p0_006`,
+          name: `${variant.name} 平局结构`,
+          family: 'poisson_ev',
+          style: basePicks <= 2 ? 'selected' : 'balanced',
+          parameters: {
+            variant: variant.key,
+            basePicks,
+            maxSelectableOdds: 35,
+            minSelectableProbability: 0.006,
+            diversity: 'outcome',
+            drawStructure: 'oneOneVsNilNil',
+            drawOddsRatioMax,
+          },
+          description: `${variant.name} 先取 ${basePicks} 个多样性 EV 候选；当 1-1 与 0-0 赔率结构接近时，同时加入这两个平局锚点。`,
+          explanation: '用 1-1/0-0 的相对赔率判断平局形态，而不是只看 1-1 单点赔率。',
+          selectPicks: ({ odds, context }) => pickPoissonDrawStructure({
+            odds,
+            context,
+            builder: variant.builder,
+            basePicks,
+            drawOddsRatioMax,
+            maxSelectableOdds: 35,
+            minSelectableProbability: 0.006,
+          }),
+        });
+      }
+    }
+  }
 }
 
 function pickSourceConsensusPoisson({
@@ -785,6 +850,30 @@ function pickLeanDrawAnchor({
     .filter((pick) => getScoreOutcome(pick.score) !== 'draw' && pick.odds <= maxPickOdds)
     .slice(0, extraCount);
   return uniquePicks([...base, ...nonDraw]);
+}
+
+function pickDirectionalLeanDrawAnchor({
+  odds,
+  drawMaxOdds,
+  favoriteGap,
+  maxPickOdds,
+  extraCount,
+}) {
+  const base = pickFixedScores(odds, ['1-1', '0-0'])
+    .filter((pick) => pick.odds <= maxPickOdds);
+  if (minOddsForOutcome(odds, 'draw') > drawMaxOdds) return base;
+
+  const homeMin = minOddsForOutcome(odds, 'home');
+  const awayMin = minOddsForOutcome(odds, 'away');
+  let direction = '';
+  if (homeMin + favoriteGap < awayMin) direction = 'home';
+  if (awayMin + favoriteGap < homeMin) direction = 'away';
+  if (!direction) return base;
+
+  const directional = sortByOdds(odds)
+    .filter((pick) => getScoreOutcome(pick.score) === direction && pick.odds <= maxPickOdds)
+    .slice(0, extraCount);
+  return uniquePicks([...base, ...directional]);
 }
 
 function pickAdaptiveDrawAnchor({
@@ -869,6 +958,47 @@ function pickPoissonDrawGuard({
   const modelOneOne = modelSelection.evTable?.find((pick) => pick.score === '1-1');
   const drawGuard = oddsOneOne ? [modelOneOne || oddsOneOne] : [];
   return uniquePicks([...drawGuard, ...base]).slice(0, oddsOneOne ? Math.max(basePicks, 3) : basePicks);
+}
+
+function pickPoissonDrawStructure({
+  odds,
+  context,
+  builder,
+  basePicks,
+  drawOddsRatioMax,
+  maxSelectableOdds,
+  minSelectableProbability,
+}) {
+  const base = pickDiversePoissonEv({
+    odds,
+    context,
+    builder,
+    maxPicks: basePicks,
+    maxSelectableOdds,
+    minSelectableProbability,
+  });
+  const modelSelection = builder({
+    odds,
+    context,
+    options: {
+      maxPicks: 12,
+      minPicks: 2,
+      maxSelectableOdds,
+      minSelectableProbability,
+    },
+  });
+  const byScore = new Map((odds || []).map((pick) => [pick.score, pick]));
+  const nilNil = byScore.get('0-0');
+  const oneOne = byScore.get('1-1');
+  const ratio = nilNil && oneOne
+    ? Math.max(Number(nilNil.odds), Number(oneOne.odds)) / Math.min(Number(nilNil.odds), Number(oneOne.odds))
+    : Number.POSITIVE_INFINITY;
+  const structurePicks = ratio <= drawOddsRatioMax
+    ? ['1-1', '0-0']
+      .map((score) => modelSelection.evTable?.find((pick) => pick.score === score) || byScore.get(score))
+      .filter(Boolean)
+    : [];
+  return uniquePicks([...structurePicks, ...base]).slice(0, Math.max(basePicks, structurePicks.length + basePicks));
 }
 
 function pickFavoriteCover({ odds, favoriteMaxOdds, underdogMinOdds, maxPicks }) {

@@ -1,4 +1,4 @@
-export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T14:42:50.645Z";
+export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T15:14:08.596Z";
 export const knockoutStrategyEvolutionProxyMatches = 56;
 
 export const knockoutStrategyEvolutionFamilies = [
@@ -28,7 +28,7 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "discarded",
         "label": "平局锚点 4 格",
         "changed": "代理样本 56 场：平局低位时覆盖 1-1、2-2、0-0、1-0，否则回落到三格。",
-        "verdict": "被后续版本替代；作为当前候选保留：总分 70.5，ROI +9.94%，命中 18/56。",
+        "verdict": "保留为失败实验：总分 70.5，ROI +9.94%，命中 18/56。",
         "metrics": {
           "roi": 69.9,
           "hitRate": 32.1,
@@ -55,13 +55,27 @@ export const knockoutStrategyEvolutionFamilies = [
         "version": "v3",
         "status": "active",
         "label": "平局锚点省注",
-        "changed": "代理样本 56 场：本轮自动实验 tem_draw_anchor_lean_homeaway2_draw5_5_cap25，平均 2.4 注，最大命中赔率 22。",
-        "verdict": "升级为当前候选：总分 74.1，ROI +15.94%，命中 17/56。",
+        "changed": "代理样本 56 场：固定保留 1-1/0-0；平局低位时加入两个最低赔非平局保护，并过滤 25 倍以上长尾。",
+        "verdict": "作为当前候选保留：总分 74.1，ROI +15.94%，命中 17/56。",
         "metrics": {
           "roi": 75.9,
           "hitRate": 30.4,
           "coverage": 100,
           "shapeHealth": 98,
+          "explainability": 78
+        }
+      },
+      {
+        "version": "v4",
+        "status": "discarded",
+        "label": "平局锚点省注",
+        "changed": "代理样本 56 场：本轮自动实验 tem_draw_anchor_lean_homeaway2_draw6_cap25，平均 2.5 注，最大命中赔率 22。",
+        "verdict": "未升级：总分 73.9，ROI +13.65%，命中 18/56；没有超过当前候选总分 74 的升级门槛。",
+        "metrics": {
+          "roi": 73.7,
+          "hitRate": 32.1,
+          "coverage": 100,
+          "shapeHealth": 100,
           "explainability": 78
         }
       }
@@ -93,7 +107,7 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "discarded",
         "label": "赛前泊松EV精选",
         "changed": "代理样本 56 场：提高概率门槛并限制最多 2 个比分。",
-        "verdict": "被后续版本替代；作为当前候选保留：总分 63.1，ROI -2.31%，命中 6/56。",
+        "verdict": "保留为失败实验：总分 63.1，ROI -2.31%，命中 6/56。",
         "metrics": {
           "roi": 57.7,
           "hitRate": 10.7,
@@ -120,13 +134,27 @@ export const knockoutStrategyEvolutionFamilies = [
         "version": "v3",
         "status": "active",
         "label": "赛前泊松EV平局保护",
-        "changed": "代理样本 56 场：本轮自动实验 tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006，平均 2.5 注，最大命中赔率 28。",
-        "verdict": "升级为当前候选：总分 77.7，ROI +26.06%，命中 14/56。",
+        "changed": "代理样本 56 场：先取两个赛前泊松多样性 EV 候选；若 1-1 不高于 7.5 倍，则加入平局保护。",
+        "verdict": "作为当前候选保留：总分 77.7，ROI +26.06%，命中 14/56。",
         "metrics": {
           "roi": 86.1,
           "hitRate": 25,
           "coverage": 100,
           "shapeHealth": 100,
+          "explainability": 84
+        }
+      },
+      {
+        "version": "v4",
+        "status": "discarded",
+        "label": "赛前泊松EV基础 平局保护",
+        "changed": "代理样本 56 场：本轮自动实验 tem_poisson_drawguard_context_v1_n2_draw7_5_cap35_p0_006，平均 2.6 注，最大命中赔率 28。",
+        "verdict": "未升级：总分 76.5，ROI +23.45%，命中 14/56；没有超过当前候选总分 77.7 的升级门槛。",
+        "metrics": {
+          "roi": 83.5,
+          "hitRate": 25,
+          "coverage": 100,
+          "shapeHealth": 98,
           "explainability": 84
         }
       }
@@ -158,7 +186,7 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "discarded",
         "label": "来源不足补位",
         "changed": "代理样本 56 场：综合机构明确比分、方向型预测和赔率低位。",
-        "verdict": "被后续版本替代；作为当前候选保留：总分 63.5，ROI -21.07%，命中 22/56。",
+        "verdict": "保留为失败实验：总分 63.5，ROI -21.07%，命中 22/56。",
         "metrics": {
           "roi": 38.9,
           "hitRate": 39.3,
@@ -185,8 +213,22 @@ export const knockoutStrategyEvolutionFamilies = [
         "version": "v3",
         "status": "active",
         "label": "来源低赔泊松 3 格",
-        "changed": "代理样本 56 场：本轮自动实验 tem_source_consensus_poisson_context_v1_s2_c3_n3_cap6，平均 3 注，最大命中赔率 28。",
-        "verdict": "升级为当前候选：总分 71.1，ROI +2.86%，命中 20/56。",
+        "changed": "代理样本 56 场：先取外部来源明确比分和 6 倍内低赔共识，再用赛前泊松 EV 补足到 3 格。",
+        "verdict": "作为当前候选保留：总分 71.1，ROI +2.86%，命中 20/56。",
+        "metrics": {
+          "roi": 62.9,
+          "hitRate": 35.7,
+          "coverage": 100,
+          "shapeHealth": 90,
+          "explainability": 90
+        }
+      },
+      {
+        "version": "v4",
+        "status": "discarded",
+        "label": "来源低赔泊松 3 格",
+        "changed": "代理样本 56 场：本轮自动实验 tem_source_consensus_poisson_context_v3_s2_c3_n3_cap6，平均 3 注，最大命中赔率 28。",
+        "verdict": "未升级：总分 71.1，ROI +2.86%，命中 20/56；没有超过当前候选总分 71.2 的升级门槛。",
         "metrics": {
           "roi": 62.9,
           "hitRate": 35.7,
