@@ -40,6 +40,11 @@ import {
   getMatchScoreText,
   getNextMatchDateCn,
 } from './matchSchedule.mjs';
+import {
+  getKnockoutMetricLabels,
+  getKnockoutStrategyFamilies,
+  getKnockoutVersionPoints,
+} from './knockoutStrategyEvolution.mjs';
 import { sportteryScoreTemplate } from './scoreTemplate.mjs';
 import './styles.css';
 
@@ -74,6 +79,7 @@ function App() {
   const [aiStrategyOpen, setAiStrategyOpen] = useState(false);
   const [aiStrategyForm, setAiStrategyForm] = useState({ authorName: '', strategyName: '', strategyPrompt: '', status: 'idle', error: '' });
   const [strategyRankDialog, setStrategyRankDialog] = useState({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' });
+  const [knockoutStrategyOpen, setKnockoutStrategyOpen] = useState(false);
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -494,6 +500,10 @@ function App() {
             setMoreMenuOpen(false);
             setAiStrategyOpen(true);
           }}
+          onOpenKnockoutStrategy={() => {
+            setMoreMenuOpen(false);
+            setKnockoutStrategyOpen(true);
+          }}
         />
       ) : null}
 
@@ -536,6 +546,10 @@ function App() {
           onClose={() => setStrategyRankDialog({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' })}
           onPageChange={showAiStrategyLeaderboard}
         />
+      ) : null}
+
+      {knockoutStrategyOpen ? (
+        <KnockoutStrategyDialog onClose={() => setKnockoutStrategyOpen(false)} />
       ) : null}
 
       {aiRecommendationDialog ? (
@@ -583,7 +597,7 @@ function InfoDialog({ title, message, onClose }) {
   );
 }
 
-function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onOpenAiStrategy }) {
+function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onOpenAiStrategy, onOpenKnockoutStrategy }) {
   return (
     <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="更多">
       <div className="dialog compact-dialog more-menu-dialog" data-more-menu-dialog>
@@ -602,6 +616,9 @@ function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onO
           </button>
           <button className="menu-action-button" data-action="open-ai-strategy" onClick={onOpenAiStrategy}>
             AI策略
+          </button>
+          <button className="menu-action-button" data-action="open-knockout-strategy" onClick={onOpenKnockoutStrategy}>
+            淘汰赛策略
           </button>
         </div>
       </div>
@@ -865,6 +882,162 @@ function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
       </div>
     </div>
   );
+}
+
+function KnockoutStrategyDialog({ onClose }) {
+  const families = useMemo(() => getKnockoutStrategyFamilies(), []);
+  const metricLabels = useMemo(() => getKnockoutMetricLabels(), []);
+  const [selectedMetric, setSelectedMetric] = useState('roi');
+  const selectedMetricLabel = metricLabels.find((metric) => metric.id === selectedMetric)?.label || '分项';
+
+  return (
+    <div className="dialog-backdrop" role="dialog" aria-modal="true" aria-label="淘汰赛策略">
+      <div className="dialog knockout-strategy-dialog" data-knockout-strategy-dialog>
+        <div className="dialog-header">
+          <div>
+            <h2>淘汰赛策略</h2>
+            <p>代理样本评分，失败实验也保留在曲线上。</p>
+          </div>
+          <button className="icon-button" data-action="close-knockout-strategy" aria-label="关闭" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <div className="knockout-family-grid">
+          {families.map((family) => {
+            const activeVersion = family.versions.find((version) => version.status === 'active') || family.versions.at(-1);
+            return (
+              <article className="knockout-family-card" key={family.id} style={{ '--family-color': family.color }}>
+                <div>
+                  <strong>{family.name}</strong>
+                  <span>{activeVersion.version} · {activeVersion.totalScore}分</span>
+                </div>
+                <p>{family.thesis}</p>
+              </article>
+            );
+          })}
+        </div>
+
+        <section className="strategy-chart-section" data-knockout-total-chart>
+          <div className="chart-section-header">
+            <h3>总分演进</h3>
+            <span>ROI 35 / 命中 20 / 覆盖 15 / 形态 15 / 解释 15</span>
+          </div>
+          <StrategyEvolutionChart
+            series={getKnockoutVersionPoints(families, 'total')}
+            metricLabel="总分"
+          />
+        </section>
+
+        <section className="strategy-chart-section" data-knockout-metric-chart>
+          <div className="chart-section-header">
+            <h3>{selectedMetricLabel}走势</h3>
+            <span>切换分项观察每次实验的得失</span>
+          </div>
+          <div className="metric-tabs" aria-label="选择分项指标">
+            {metricLabels.filter((metric) => metric.id !== 'total').map((metric) => (
+              <button
+                key={metric.id}
+                className={metric.id === selectedMetric ? 'selected' : ''}
+                onClick={() => setSelectedMetric(metric.id)}
+              >
+                {metric.label}
+              </button>
+            ))}
+          </div>
+          <StrategyEvolutionChart
+            series={getKnockoutVersionPoints(families, selectedMetric)}
+            metricLabel={selectedMetricLabel}
+          />
+        </section>
+
+        <section className="strategy-version-list" aria-label="版本记录">
+          {families.map((family) => (
+            <div className="strategy-family-history" key={family.id}>
+              <h3>{family.name}</h3>
+              {family.versions.map((version) => (
+                <article className={`strategy-version-item ${version.status}`} key={`${family.id}-${version.version}`}>
+                  <div>
+                    <strong>{version.version} · {version.label}</strong>
+                    <span>{getVersionStatusLabel(version.status)} · 总分 {version.totalScore}</span>
+                  </div>
+                  <p>{version.changed}</p>
+                  <small>{version.verdict}</small>
+                </article>
+              ))}
+            </div>
+          ))}
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function StrategyEvolutionChart({ series, metricLabel }) {
+  const width = 320;
+  const height = 168;
+  const padding = { top: 18, right: 20, bottom: 26, left: 32 };
+  const allValues = series.flatMap((item) => item.points.map((point) => point.value));
+  const minValue = Math.max(0, Math.floor((Math.min(...allValues, 0) - 8) / 10) * 10);
+  const maxValue = Math.min(100, Math.ceil((Math.max(...allValues, 100) + 8) / 10) * 10);
+  const maxIndex = Math.max(...series.map((item) => item.points.length - 1), 1);
+
+  function xFor(index) {
+    return padding.left + (index / maxIndex) * (width - padding.left - padding.right);
+  }
+
+  function yFor(value) {
+    const ratio = (Number(value) - minValue) / Math.max(1, maxValue - minValue);
+    return height - padding.bottom - ratio * (height - padding.top - padding.bottom);
+  }
+
+  return (
+    <div className="strategy-chart" aria-label={`${metricLabel}折线图`}>
+      <svg viewBox={`0 0 ${width} ${height}`} role="img">
+        <line className="chart-axis" x1={padding.left} y1={height - padding.bottom} x2={width - padding.right} y2={height - padding.bottom} />
+        <line className="chart-axis" x1={padding.left} y1={padding.top} x2={padding.left} y2={height - padding.bottom} />
+        <text className="chart-tick" x={padding.left - 8} y={yFor(maxValue) + 4} textAnchor="end">{maxValue}</text>
+        <text className="chart-tick" x={padding.left - 8} y={yFor(minValue) + 4} textAnchor="end">{minValue}</text>
+
+        {series.map((item) => {
+          const path = item.points
+            .map((point, index) => `${index === 0 ? 'M' : 'L'} ${xFor(point.x)} ${yFor(point.value)}`)
+            .join(' ');
+          return (
+            <g key={item.familyId}>
+              <path className="chart-line" d={path} style={{ stroke: item.color }} />
+              {item.points.map((point) => (
+                <g key={`${item.familyId}-${point.version}`}>
+                  <circle
+                    className={`chart-point ${point.status}`}
+                    cx={xFor(point.x)}
+                    cy={yFor(point.value)}
+                    r={point.status === 'discarded' ? 4.2 : 5}
+                    style={{ stroke: item.color, fill: point.status === 'discarded' ? '#ffffff' : item.color }}
+                  />
+                  <text className="chart-version-label" x={xFor(point.x)} y={height - 8} textAnchor="middle">{point.version}</text>
+                </g>
+              ))}
+            </g>
+          );
+        })}
+      </svg>
+      <div className="chart-legend">
+        {series.map((item) => (
+          <span key={item.familyId}>
+            <i style={{ background: item.color }} />
+            {item.name}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function getVersionStatusLabel(status) {
+  if (status === 'active') return '当前候选';
+  if (status === 'discarded') return '失败实验';
+  return '基线版本';
 }
 
 function getAiStrategyRankMeta(rank) {
