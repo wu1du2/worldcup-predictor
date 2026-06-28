@@ -126,7 +126,7 @@ test('generateTempStrategyCandidates includes diverse poisson EV experiments', (
 });
 
 test('generateTempStrategyCandidates includes poisson draw-guard experiments', () => {
-  const candidates = generateTempStrategyCandidates({ maxCandidates: 700 });
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1200 });
   const drawGuard = candidates.filter((strategy) => strategy.id.includes('poisson_drawguard'));
 
   assert.ok(drawGuard.length > 0);
@@ -216,6 +216,129 @@ test('generateTempStrategyCandidates includes favorite-triggered stable draw anc
   assert.deepEqual(balancedPicks.map((pick) => pick.score), ['1-1', '0-0']);
 });
 
+test('generateTempStrategyCandidates includes favorite-cover draw anchor experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1200 });
+  const favoriteCover = candidates.find((strategy) => (
+    strategy.id === 'tem_draw_anchor_favoritecover_homeaway2_gap4_cap22'
+  ));
+
+  assert.ok(favoriteCover);
+  assert.equal(favoriteCover.family, 'draw_anchor');
+  assert.equal(favoriteCover.parameters.favoriteGap, 4);
+  assert.equal(favoriteCover.parameters.extraMode, 'favoriteCoverHomeAwayLow2');
+
+  const favoritePicks = favoriteCover.selectPicks({
+    odds: makeOdds({
+      '1-1': 7.8,
+      '0-0': 12,
+      '1-0': 5.5,
+      '2-0': 6.2,
+      '0-1': 18,
+      '1-2': 22,
+    }),
+  });
+  assert.deepEqual(favoritePicks.map((pick) => pick.score), ['1-1', '0-0', '1-0', '2-0']);
+
+  const balancedPicks = favoriteCover.selectPicks({
+    odds: makeOdds({
+      '1-1': 5.7,
+      '0-0': 8,
+      '1-0': 6,
+      '2-1': 7,
+      '0-1': 7.5,
+      '1-2': 8,
+    }),
+  });
+  assert.deepEqual(balancedPicks.map((pick) => pick.score), ['1-1', '0-0']);
+});
+
+test('generateTempStrategyCandidates includes fine threshold lean draw anchor experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1000 });
+  const fineLean = candidates.find((strategy) => (
+    strategy.id === 'tem_draw_anchor_lean_homeaway2_draw5_75_cap22'
+  ));
+
+  assert.ok(fineLean);
+  assert.equal(fineLean.family, 'draw_anchor');
+  assert.equal(fineLean.parameters.drawMaxOdds, 5.75);
+  assert.equal(fineLean.parameters.maxPickOdds, 22);
+
+  const picks = fineLean.selectPicks({
+    odds: makeOdds({
+      '1-1': 5.7,
+      '0-0': 8,
+      '1-0': 6,
+      '2-1': 7,
+      '0-1': 14,
+      '1-2': 24,
+    }),
+  });
+
+  assert.deepEqual(picks.map((pick) => pick.score), ['1-1', '0-0', '1-0', '2-1']);
+  assert.ok(picks.every((pick) => pick.odds <= 22));
+});
+
+test('generateTempStrategyCandidates includes one-extra lean draw anchor experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1100 });
+  const oneExtra = candidates.find((strategy) => (
+    strategy.id === 'tem_draw_anchor_lean_homeaway1_draw6_cap22'
+  ));
+
+  assert.ok(oneExtra);
+  assert.equal(oneExtra.family, 'draw_anchor');
+  assert.equal(oneExtra.parameters.extraCount, 1);
+  assert.equal(oneExtra.parameters.maxPickOdds, 22);
+
+  const picks = oneExtra.selectPicks({
+    odds: makeOdds({
+      '1-1': 5.7,
+      '0-0': 8,
+      '1-0': 6,
+      '2-1': 7,
+      '0-1': 14,
+      '1-2': 15,
+    }),
+  });
+
+  assert.deepEqual(picks.map((pick) => pick.score), ['1-1', '0-0', '1-0']);
+});
+
+test('generateTempStrategyCandidates includes skew-aware lean draw anchor experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1200 });
+  const skewAware = candidates.find((strategy) => (
+    strategy.id === 'tem_draw_anchor_skew_homeaway2_draw6_gap5_nil9_cap22'
+  ));
+
+  assert.ok(skewAware);
+  assert.equal(skewAware.family, 'draw_anchor');
+  assert.equal(skewAware.parameters.favoriteGap, 5);
+  assert.equal(skewAware.parameters.nilNilMaxOdds, 9);
+
+  const heavyFavoritePicks = skewAware.selectPicks({
+    odds: makeOdds({
+      '1-1': 5.7,
+      '0-0': 12,
+      '1-0': 5.5,
+      '2-0': 6,
+      '0-1': 18,
+      '1-2': 21,
+    }),
+  });
+  assert.deepEqual(heavyFavoritePicks.map((pick) => pick.score), ['1-1', '1-0', '2-0']);
+
+  const balancedPicks = skewAware.selectPicks({
+    odds: makeOdds({
+      '1-1': 5.7,
+      '0-0': 8.5,
+      '1-0': 6,
+      '2-1': 7,
+      '0-1': 8,
+      '1-2': 9,
+    }),
+  });
+  assert.deepEqual(balancedPicks.map((pick) => pick.score), ['1-1', '0-0', '1-0', '2-1']);
+});
+
 test('generateTempStrategyCandidates includes poisson relative draw-structure experiments', () => {
   const candidates = generateTempStrategyCandidates({ maxCandidates: 900 });
   const relativeDraw = candidates.find((strategy) => (
@@ -248,6 +371,69 @@ test('generateTempStrategyCandidates includes poisson relative draw-structure ex
   assert.ok(picks.some((pick) => pick.score === '1-1'));
   assert.ok(picks.some((pick) => pick.score === '0-0'));
   assert.ok(picks.length <= 4);
+});
+
+test('generateTempStrategyCandidates includes fine drawguard poisson experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1000 });
+  const fineDrawGuard = candidates.find((strategy) => (
+    strategy.id === 'tem_poisson_drawguard_context_v3_n2_draw8_cap35_p0_006'
+  ));
+
+  assert.ok(fineDrawGuard);
+  assert.equal(fineDrawGuard.family, 'poisson_ev');
+  assert.equal(fineDrawGuard.parameters.drawMaxOdds, 8);
+
+  const picks = fineDrawGuard.selectPicks({
+    odds: makeOdds({
+      '0-0': 9,
+      '1-1': 7.8,
+      '2-2': 14,
+      '1-0': 7,
+      '0-1': 8.5,
+      '2-1': 10,
+      '1-2': 11,
+    }),
+    context: {
+      model: {
+        expectedGoals: { home: 1.2, away: 1.05 },
+      },
+    },
+  });
+
+  assert.ok(picks.some((pick) => pick.score === '1-1'));
+  assert.ok(picks.length <= 3);
+});
+
+test('generateTempStrategyCandidates includes poisson consensus-guard experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1200 });
+  const consensusGuard = candidates.find((strategy) => (
+    strategy.id === 'tem_poisson_consensusguard_context_v3_n2_c1_cons6_5_cap35_p0_006'
+  ));
+
+  assert.ok(consensusGuard);
+  assert.equal(consensusGuard.family, 'poisson_ev');
+  assert.equal(consensusGuard.parameters.consensusCount, 1);
+  assert.equal(consensusGuard.parameters.maxConsensusOdds, 6.5);
+
+  const picks = consensusGuard.selectPicks({
+    odds: makeOdds({
+      '1-1': 5.5,
+      '0-0': 8,
+      '1-0': 6.1,
+      '2-0': 7,
+      '0-1': 12,
+      '1-2': 15,
+    }),
+    context: {
+      model: {
+        expectedGoals: { home: 1.35, away: 0.85 },
+        drawMultiplier: 1.1,
+      },
+    },
+  });
+
+  assert.ok(picks.some((pick) => pick.score === '1-1'));
+  assert.ok(picks.length <= 3);
 });
 
 test('generateTempStrategyCandidates includes low-cap source-first consensus experiments', () => {
@@ -283,8 +469,39 @@ test('generateTempStrategyCandidates includes low-cap source-first consensus exp
   assert.ok(picks.length <= 3);
 });
 
+test('generateTempStrategyCandidates includes explicit-source first consensus experiments', () => {
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1000 });
+  const explicitFirst = candidates.find((strategy) => (
+    strategy.id === 'tem_source_explicit_consensus_context_v1_s3_c2_n3_cap6'
+  ));
+
+  assert.ok(explicitFirst);
+  assert.equal(explicitFirst.family, 'market_consensus');
+  assert.equal(explicitFirst.parameters.explicitScoreFirst, true);
+
+  const picks = explicitFirst.selectPicks({
+    odds: makeOdds({
+      '2-1': 6.4,
+      '1-0': 5.4,
+      '1-1': 5.2,
+      '0-0': 8,
+      '3-1': 14,
+      '0-1': 13,
+    }),
+    context: {
+      externalPredictions: [
+        { source: 'Preview A', kind: 'score', score: '3-1', outcome: 'home', totalLean: 'over' },
+        { source: 'Preview B', kind: 'score', score: '2-1', outcome: 'home', bothTeamsScore: true },
+      ],
+    },
+  });
+
+  assert.deepEqual(picks.slice(0, 2).map((pick) => pick.score), ['2-1', '3-1']);
+  assert.ok(picks.length <= 3);
+});
+
 test('generateTempStrategyCandidates includes source and consensus poisson cap experiments', () => {
-  const candidates = generateTempStrategyCandidates({ maxCandidates: 800 });
+  const candidates = generateTempStrategyCandidates({ maxCandidates: 1200 });
   const consensus = candidates.find((strategy) => (
     strategy.id === 'tem_source_consensus_poisson_context_v3_s2_c3_n4_cap7'
   ));

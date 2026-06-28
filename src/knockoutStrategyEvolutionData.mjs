@@ -1,4 +1,4 @@
-export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T15:14:08.596Z";
+export const knockoutStrategyEvolutionGeneratedAt = "2026-06-28T15:37:21.855Z";
 export const knockoutStrategyEvolutionProxyMatches = 56;
 
 export const knockoutStrategyEvolutionFamilies = [
@@ -69,12 +69,12 @@ export const knockoutStrategyEvolutionFamilies = [
         "version": "v4",
         "status": "discarded",
         "label": "平局锚点省注",
-        "changed": "代理样本 56 场：本轮自动实验 tem_draw_anchor_lean_homeaway2_draw6_cap25，平均 2.5 注，最大命中赔率 22。",
-        "verdict": "未升级：总分 73.9，ROI +13.65%，命中 18/56；没有超过当前候选总分 74 的升级门槛。",
+        "changed": "代理样本 56 场：本轮自动实验 tem_draw_anchor_lean_homeaway2_draw6_cap22，平均 2.5 注，最大命中赔率 22。",
+        "verdict": "未升级：总分 74.9，ROI +16.97%，命中 18/55；没有超过当前候选总分 74 的升级门槛。",
         "metrics": {
-          "roi": 73.7,
-          "hitRate": 32.1,
-          "coverage": 100,
+          "roi": 77,
+          "hitRate": 32.7,
+          "coverage": 98.2,
           "shapeHealth": 100,
           "explainability": 78
         }
@@ -147,11 +147,11 @@ export const knockoutStrategyEvolutionFamilies = [
       {
         "version": "v4",
         "status": "discarded",
-        "label": "赛前泊松EV基础 平局保护",
-        "changed": "代理样本 56 场：本轮自动实验 tem_poisson_drawguard_context_v1_n2_draw7_5_cap35_p0_006，平均 2.6 注，最大命中赔率 28。",
-        "verdict": "未升级：总分 76.5，ROI +23.45%，命中 14/56；没有超过当前候选总分 77.7 的升级门槛。",
+        "label": "赛前泊松EV均衡 平局保护",
+        "changed": "代理样本 56 场：本轮自动实验 tem_poisson_drawguard_context_v3_n2_draw7_75_cap35_p0_006，平均 2.6 注，最大命中赔率 28。",
+        "verdict": "未升级：总分 76.8，ROI +24.31%，命中 14/56；没有超过当前候选总分 77.7 的升级门槛。",
         "metrics": {
-          "roi": 83.5,
+          "roi": 84.3,
           "hitRate": 25,
           "coverage": 100,
           "shapeHealth": 98,

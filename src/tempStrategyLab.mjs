@@ -320,6 +320,44 @@ function addConsensusStrategies(add) {
   }
 
   for (const poisson of poissonBuilders) {
+    for (const sourceCount of [2, 3]) {
+      for (const consensusCount of [1, 2]) {
+        for (const maxPicks of [3, 4]) {
+          for (const maxConsensusOdds of [6, 7]) {
+            add({
+              id: `source_explicit_consensus_${poisson.key}_s${sourceCount}_c${consensusCount}_n${maxPicks}_cap${String(maxConsensusOdds).replace('.', '_')}`,
+              name: `明确来源共识 ${maxPicks} 格`,
+              family: 'market_consensus',
+              style: maxPicks <= 3 ? 'balanced' : 'attack',
+              parameters: {
+                explicitScoreFirst: true,
+                poissonVariant: poisson.key,
+                sourceCount,
+                consensusCount,
+                maxPicks,
+                maxConsensusOdds,
+                maxSourceOdds: 35,
+              },
+              description: `先取最多 ${sourceCount} 个外部明确比分，再用 ${maxConsensusOdds} 倍内低赔和泊松 EV 补足。`,
+              explanation: '把明确比分来源和方向型来源分层处理：明确比分优先，市场低赔只做补位。',
+              selectPicks: ({ odds, context }) => pickExplicitSourceConsensusPoisson({
+                odds,
+                context,
+                sourceCount,
+                consensusCount,
+                maxPicks,
+                maxSourceOdds: 35,
+                maxConsensusOdds,
+                poissonBuilder: poisson.builder,
+              }),
+            });
+          }
+        }
+      }
+    }
+  }
+
+  for (const poisson of poissonBuilders) {
     for (const sourceCount of [1, 2]) {
       for (const consensusCount of [1, 2, 3]) {
         for (const maxPicks of [3, 4]) {
@@ -452,29 +490,65 @@ function addDrawAnchorStrategies(add) {
     }
   }
 
-  for (const drawMaxOdds of [5, 5.5, 6]) {
-    for (const maxPickOdds of [25, 30]) {
-      add({
-        id: `draw_anchor_lean_homeaway2_draw${String(drawMaxOdds).replace('.', '_')}_cap${maxPickOdds}`,
-        name: '平局锚点省注',
-        family: 'draw_anchor',
-        style: 'balanced',
-        parameters: {
-          baseScores: ['1-1', '0-0'],
-          extraMode: 'homeAwayLow2',
-          drawMaxOdds,
-          maxPickOdds,
-        },
-        description: `固定保留 1-1/0-0；平局低于 ${drawMaxOdds} 时加入两个最低赔非平局比分，过滤 ${maxPickOdds} 以上长尾。`,
-        explanation: '用 1-1/0-0 控制低比分底座，再用市场最低的非平局比分做小胜保护，减少无效注数。',
-        selectPicks: ({ odds }) => pickLeanDrawAnchor({
-          odds,
-          baseScores: ['1-1', '0-0'],
-          drawMaxOdds,
-          maxPickOdds,
-          extraCount: 2,
-        }),
-      });
+  for (const extraCount of [1, 2]) {
+    for (const drawMaxOdds of [5, 5.5, 5.75, 6]) {
+      for (const maxPickOdds of [22, 25, 30]) {
+        add({
+          id: `draw_anchor_lean_homeaway${extraCount}_draw${String(drawMaxOdds).replace('.', '_')}_cap${maxPickOdds}`,
+          name: '平局锚点省注',
+          family: 'draw_anchor',
+          style: extraCount === 1 ? 'selected' : 'balanced',
+          parameters: {
+            baseScores: ['1-1', '0-0'],
+            extraMode: `homeAwayLow${extraCount}`,
+            drawMaxOdds,
+            maxPickOdds,
+            extraCount,
+          },
+          description: `固定保留 1-1/0-0；平局低于 ${drawMaxOdds} 时加入 ${extraCount} 个最低赔非平局比分，过滤 ${maxPickOdds} 以上长尾。`,
+          explanation: '用 1-1/0-0 控制低比分底座，再用市场最低的非平局比分做小胜保护，减少无效注数。',
+          selectPicks: ({ odds }) => pickLeanDrawAnchor({
+            odds,
+            baseScores: ['1-1', '0-0'],
+            drawMaxOdds,
+            maxPickOdds,
+            extraCount,
+          }),
+        });
+      }
+    }
+  }
+
+  for (const drawMaxOdds of [5.5, 6]) {
+    for (const favoriteGap of [4, 5, 6]) {
+      for (const nilNilMaxOdds of [8, 9, 10]) {
+        for (const maxPickOdds of [22, 25]) {
+          add({
+            id: `draw_anchor_skew_homeaway2_draw${String(drawMaxOdds).replace('.', '_')}_gap${String(favoriteGap).replace('.', '_')}_nil${String(nilNilMaxOdds).replace('.', '_')}_cap${maxPickOdds}`,
+            name: '平局锚点强弱修正',
+            family: 'draw_anchor',
+            style: 'balanced',
+            parameters: {
+              baseScores: ['1-1', '0-0'],
+              extraMode: 'skewAwareHomeAwayLow2',
+              drawMaxOdds,
+              favoriteGap,
+              nilNilMaxOdds,
+              maxPickOdds,
+            },
+            description: `均势时保留 1-1/0-0；强弱悬殊且 0-0 高于 ${nilNilMaxOdds} 时剔除 0-0，改投热门方向两个低赔比分。`,
+            explanation: '把 0-0 从固定底仓改成条件底仓，强弱明显时降低无效平局成本，同时保留 1-1 的防冷门锚点。',
+            selectPicks: ({ odds }) => pickSkewAwareDrawAnchor({
+              odds,
+              drawMaxOdds,
+              favoriteGap,
+              nilNilMaxOdds,
+              maxPickOdds,
+              extraCount: 2,
+            }),
+          });
+        }
+      }
     }
   }
 
@@ -501,6 +575,34 @@ function addDrawAnchorStrategies(add) {
             favoriteGap,
             maxPickOdds,
             extraCount: 2,
+          }),
+        });
+      }
+    }
+  }
+
+  for (const favoriteGap of [3, 4, 5, 6]) {
+    for (const extraCount of [1, 2]) {
+      for (const maxPickOdds of [22, 25, 30]) {
+        add({
+          id: `draw_anchor_favoritecover_homeaway${extraCount}_gap${String(favoriteGap).replace('.', '_')}_cap${maxPickOdds}`,
+          name: '平局锚点热门保护',
+          family: 'draw_anchor',
+          style: extraCount === 1 ? 'selected' : 'balanced',
+          parameters: {
+            baseScores: ['1-1', '0-0'],
+            extraMode: `favoriteCoverHomeAwayLow${extraCount}`,
+            favoriteGap,
+            maxPickOdds,
+            extraCount,
+          },
+          description: `固定保留 1-1/0-0；热门方向最低赔领先至少 ${favoriteGap} 时，额外加入该方向 ${extraCount} 个低赔比分。`,
+          explanation: '淘汰赛强弱明确时，热门小胜/两球胜常比继续加平局更直观；均势场仍只保留低比分锚点。',
+          selectPicks: ({ odds }) => pickFavoriteCoverDrawAnchor({
+            odds,
+            favoriteGap,
+            maxPickOdds,
+            extraCount,
           }),
         });
       }
@@ -734,7 +836,7 @@ function addPoissonEvStrategies(add) {
     { key: 'context_v3', name: '赛前泊松EV均衡', builder: buildContextPoissonEvV3Selection },
   ]) {
     for (const basePicks of [2, 3]) {
-      for (const drawMaxOdds of [5.5, 6.5, 7, 7.5]) {
+      for (const drawMaxOdds of [5.5, 6.5, 7, 7.5, 7.75, 8]) {
         add({
           id: `poisson_drawguard_${variant.key}_n${basePicks}_draw${String(drawMaxOdds).replace('.', '_')}_cap35_p0_006`,
           name: `${variant.name} 平局保护`,
@@ -761,6 +863,46 @@ function addPoissonEvStrategies(add) {
             minSelectableProbability: 0.006,
           }),
         });
+      }
+    }
+  }
+
+  for (const variant of [
+    { key: 'context_v1', name: '赛前泊松EV基础', builder: buildContextPoissonEvSelection },
+    { key: 'context_v3', name: '赛前泊松EV均衡', builder: buildContextPoissonEvV3Selection },
+  ]) {
+    for (const basePicks of [2, 3]) {
+      for (const consensusCount of [1, 2]) {
+        for (const maxConsensusOdds of [6, 6.5]) {
+          add({
+            id: `poisson_consensusguard_${variant.key}_n${basePicks}_c${consensusCount}_cons${String(maxConsensusOdds).replace('.', '_')}_cap35_p0_006`,
+            name: `${variant.name} 共识保护`,
+            family: 'poisson_ev',
+            style: basePicks <= 2 ? 'selected' : 'balanced',
+            parameters: {
+              variant: variant.key,
+              basePicks,
+              consensusCount,
+              maxConsensusOdds,
+              maxSelectableOdds: 35,
+              minSelectableProbability: 0.006,
+              diversity: 'outcome',
+              guard: 'lowOddsConsensus',
+            },
+            description: `${variant.name} 先取 ${basePicks} 个多样性 EV 候选，再加入 ${consensusCount} 个不高于 ${maxConsensusOdds} 的市场共识低赔比分。`,
+            explanation: '让模型低估项和市场稳态项同场出现：前者追求赔率价值，后者提升命中与用户可读性。',
+            selectPicks: ({ odds, context }) => pickPoissonConsensusGuard({
+              odds,
+              context,
+              builder: variant.builder,
+              basePicks,
+              consensusCount,
+              maxConsensusOdds,
+              maxSelectableOdds: 35,
+              minSelectableProbability: 0.006,
+            }),
+          });
+        }
       }
     }
   }
@@ -836,6 +978,41 @@ function pickSourceConsensusPoisson({
   return uniquePicks([...sourcePicks, ...consensusPicks, ...poissonPicks]).slice(0, maxPicks);
 }
 
+function pickExplicitSourceConsensusPoisson({
+  odds,
+  context,
+  sourceCount,
+  consensusCount,
+  maxPicks,
+  maxSourceOdds,
+  maxConsensusOdds,
+  poissonBuilder,
+}) {
+  const sourceCandidates = buildSourceConsensusSelection({
+    odds,
+    context,
+    maxPicks: Math.max(sourceCount * 3, sourceCount + 3),
+  }).picks;
+  const explicitPicks = sourceCandidates
+    .filter((pick) => String(pick.reason || '').includes('明确'))
+    .filter((pick) => pick.odds <= maxSourceOdds || String(pick.reason || '').includes('明确'))
+    .slice(0, sourceCount);
+  const consensusPicks = sortByOdds(odds)
+    .filter((pick) => pick.odds <= maxConsensusOdds)
+    .slice(0, consensusCount);
+  const poissonPicks = poissonBuilder({
+    odds,
+    context,
+    options: {
+      maxPicks,
+      minPicks: 2,
+      maxSelectableOdds: 35,
+      minSelectableProbability: 0.006,
+    },
+  }).picks;
+  return uniquePicks([...explicitPicks, ...consensusPicks, ...poissonPicks]).slice(0, maxPicks);
+}
+
 function pickLeanDrawAnchor({
   odds,
   baseScores,
@@ -874,6 +1051,56 @@ function pickDirectionalLeanDrawAnchor({
     .filter((pick) => getScoreOutcome(pick.score) === direction && pick.odds <= maxPickOdds)
     .slice(0, extraCount);
   return uniquePicks([...base, ...directional]);
+}
+
+function pickSkewAwareDrawAnchor({
+  odds,
+  drawMaxOdds,
+  favoriteGap,
+  nilNilMaxOdds,
+  maxPickOdds,
+  extraCount,
+}) {
+  const homeMin = minOddsForOutcome(odds, 'home');
+  const awayMin = minOddsForOutcome(odds, 'away');
+  let direction = '';
+  if (homeMin + favoriteGap < awayMin) direction = 'home';
+  if (awayMin + favoriteGap < homeMin) direction = 'away';
+
+  const oneOne = pickFixedScores(odds, ['1-1']).filter((pick) => pick.odds <= maxPickOdds);
+  const nilNil = pickFixedScores(odds, ['0-0'])
+    .filter((pick) => pick.odds <= maxPickOdds && (!direction || pick.odds <= nilNilMaxOdds));
+  const base = [...oneOne, ...nilNil];
+
+  if (minOddsForOutcome(odds, 'draw') > drawMaxOdds) return base;
+
+  const eligibleNonDraw = sortByOdds(odds)
+    .filter((pick) => getScoreOutcome(pick.score) !== 'draw' && pick.odds <= maxPickOdds);
+  const directional = direction
+    ? eligibleNonDraw.filter((pick) => getScoreOutcome(pick.score) === direction)
+    : eligibleNonDraw;
+  return uniquePicks([...base, ...directional.slice(0, extraCount)]);
+}
+
+function pickFavoriteCoverDrawAnchor({
+  odds,
+  favoriteGap,
+  maxPickOdds,
+  extraCount,
+}) {
+  const base = pickFixedScores(odds, ['1-1', '0-0'])
+    .filter((pick) => pick.odds <= maxPickOdds);
+  const homeMin = minOddsForOutcome(odds, 'home');
+  const awayMin = minOddsForOutcome(odds, 'away');
+  let direction = '';
+  if (homeMin + favoriteGap < awayMin) direction = 'home';
+  if (awayMin + favoriteGap < homeMin) direction = 'away';
+  if (!direction) return base;
+
+  const favoriteScores = sortByOdds(odds)
+    .filter((pick) => getScoreOutcome(pick.score) === direction && pick.odds <= maxPickOdds)
+    .slice(0, extraCount);
+  return uniquePicks([...base, ...favoriteScores]);
 }
 
 function pickAdaptiveDrawAnchor({
@@ -958,6 +1185,30 @@ function pickPoissonDrawGuard({
   const modelOneOne = modelSelection.evTable?.find((pick) => pick.score === '1-1');
   const drawGuard = oddsOneOne ? [modelOneOne || oddsOneOne] : [];
   return uniquePicks([...drawGuard, ...base]).slice(0, oddsOneOne ? Math.max(basePicks, 3) : basePicks);
+}
+
+function pickPoissonConsensusGuard({
+  odds,
+  context,
+  builder,
+  basePicks,
+  consensusCount,
+  maxConsensusOdds,
+  maxSelectableOdds,
+  minSelectableProbability,
+}) {
+  const base = pickDiversePoissonEv({
+    odds,
+    context,
+    builder,
+    maxPicks: basePicks,
+    maxSelectableOdds,
+    minSelectableProbability,
+  });
+  const consensusPicks = sortByOdds(odds)
+    .filter((pick) => pick.odds <= maxConsensusOdds)
+    .slice(0, consensusCount);
+  return uniquePicks([...consensusPicks, ...base]).slice(0, basePicks + consensusCount);
 }
 
 function pickPoissonDrawStructure({
