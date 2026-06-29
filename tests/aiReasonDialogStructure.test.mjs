@@ -88,3 +88,17 @@ test('AI leaderboard highlights the top three strategies', () => {
   assert.match(stylesSource, /\.strategy-rank-item\.top-rank/);
   assert.match(stylesSource, /\.strategy-rank-medal/);
 });
+
+test('AI leaderboard opens strategy hit detail rows sorted by ROI', () => {
+  const leaderboardSource = componentSource('AiStrategyLeaderboardDialog', 'ExportDialog');
+  const detailSource = componentSource('AiStrategyHitDetailDialog', 'ExportDialog');
+
+  assert.match(mainSource, /getAiStrategyHitDetail/);
+  assert.match(leaderboardSource, /data-action="open-ai-strategy-detail"/);
+  assert.match(leaderboardSource, /onOpenDetail\(row\)/);
+  assert.match(detailSource, /data-ai-strategy-hit-detail-dialog/);
+  assert.match(detailSource, /detail\.hits\.map/);
+  assert.match(detailSource, /单场/);
+  assert.match(stylesSource, /\.strategy-hit-dialog/);
+  assert.match(stylesSource, /\.strategy-hit-row/);
+});

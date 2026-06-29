@@ -49,12 +49,18 @@ import {
   buildAiStrategyTabsForMatch,
   getDefaultAiStrategyTabId,
 } from './aiStrategyTabs.mjs';
+import {
+  buildAiStrategyHitDetailsIndex,
+  formatHitDetailRoi,
+  getAiStrategyHitDetail,
+} from './aiStrategyHitDetails.mjs';
 import { sportteryScoreTemplate } from './scoreTemplate.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
 
 const fallbackScoreOptions = sportteryScoreTemplate.map((score) => ({ score }));
+let aiStrategyHitDetailsIndexCache = null;
 
 function loadState() {
   const saved = window.localStorage.getItem(storageKey);
@@ -83,6 +89,7 @@ function App() {
   const [aiStrategyOpen, setAiStrategyOpen] = useState(false);
   const [aiStrategyForm, setAiStrategyForm] = useState({ authorName: '', strategyName: '', strategyPrompt: '', status: 'idle', error: '' });
   const [strategyRankDialog, setStrategyRankDialog] = useState({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' });
+  const [strategyHitDetail, setStrategyHitDetail] = useState(null);
   const [knockoutStrategyOpen, setKnockoutStrategyOpen] = useState(false);
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
@@ -328,6 +335,52 @@ function App() {
     }
   }
 
+  async function showAiStrategyHitDetail(row) {
+    setStrategyHitDetail({
+      ...buildEmptyStrategyHitDetail(row),
+      status: 'loading',
+    });
+
+    try {
+      const detailIndex = await loadAiStrategyHitDetailsIndex();
+      const rowSummary = buildEmptyStrategyHitDetail(row);
+      const detail = getAiStrategyHitDetail(detailIndex, row);
+      setStrategyHitDetail({
+        ...rowSummary,
+        hitMatches: detail?.hitMatches || 0,
+        hits: detail?.hits || [],
+        status: 'ready',
+      });
+    } catch {
+      setStrategyHitDetail({
+        ...buildEmptyStrategyHitDetail(row),
+        status: 'error',
+      });
+    }
+  }
+
+  async function loadAiStrategyHitDetailsIndex() {
+    if (aiStrategyHitDetailsIndexCache) return aiStrategyHitDetailsIndexCache;
+    const response = await fetch('/ai-strategy-hit-details.json');
+    if (!response.ok) throw new Error('strategy hit details unavailable');
+    const seed = await response.json();
+    aiStrategyHitDetailsIndexCache = buildAiStrategyHitDetailsIndex(seed);
+    return aiStrategyHitDetailsIndexCache;
+  }
+
+  function buildEmptyStrategyHitDetail(row) {
+    return {
+      strategyName: row.strategyName,
+      roiPercent: row.roi,
+      cost: row.cost,
+      revenue: row.revenue,
+      netProfit: row.profit,
+      hitMatches: 0,
+      settledMatches: row.matchesCount,
+      hits: [],
+    };
+  }
+
   async function submitAiStrategy() {
     if (!client) {
       setAiStrategyForm((current) => ({ ...current, status: 'error', error: 'Supabase 配置缺失' }));
@@ -549,6 +602,14 @@ function App() {
           dialog={strategyRankDialog}
           onClose={() => setStrategyRankDialog({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' })}
           onPageChange={showAiStrategyLeaderboard}
+          onOpenDetail={showAiStrategyHitDetail}
+        />
+      ) : null}
+
+      {strategyHitDetail ? (
+        <AiStrategyHitDetailDialog
+          detail={strategyHitDetail}
+          onClose={() => setStrategyHitDetail(null)}
         />
       ) : null}
 
@@ -876,7 +937,7 @@ function AiStrategyDialog({ form, onChange, onClose, onSubmit }) {
   );
 }
 
-function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
+function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange, onOpenDetail }) {
   return (
     <DialogBackdrop ariaLabel="AI预测排行榜" onClose={onClose}>
       <div className="dialog strategy-rank-dialog" data-ai-strategy-leaderboard-dialog>
@@ -913,6 +974,9 @@ function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
                     返还 {formatNumber(row.revenue)}
                   </p>
                   <small>{row.matchesCount} 场比赛</small>
+                  <button className="detail-link-button" data-action="open-ai-strategy-detail" onClick={() => onOpenDetail(row)}>
+                    命中详情
+                  </button>
                 </article>
               );
             })}
@@ -928,6 +992,57 @@ function AiStrategyLeaderboardDialog({ dialog, onClose, onPageChange }) {
             下一页
           </button>
         </div>
+      </div>
+    </DialogBackdrop>
+  );
+}
+
+function AiStrategyHitDetailDialog({ detail, onClose }) {
+  return (
+    <DialogBackdrop ariaLabel="策略命中详情" onClose={onClose}>
+      <div className="dialog strategy-hit-dialog" data-ai-strategy-hit-detail-dialog>
+        <div className="dialog-header">
+          <div>
+            <h2>{detail.strategyName}</h2>
+            <p>按单场 ROI 从高到低展示命中场次</p>
+          </div>
+          <button className="icon-button" data-action="close-ai-strategy-hit-detail" aria-label="关闭" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <div className="strategy-hit-summary">
+          <span>{formatHitDetailRoi(detail.roiPercent)}</span>
+          <span>净收益 {formatSignedNumber(detail.netProfit)}</span>
+          <span>命中 {detail.hitMatches}/{detail.settledMatches}</span>
+          <span>成本 {formatNumber(detail.cost)}</span>
+        </div>
+
+        {detail.status === 'loading' ? (
+          <div className="report-empty">正在读取命中明细...</div>
+        ) : null}
+        {detail.status === 'error' ? (
+          <div className="report-empty">命中明细暂时读不到</div>
+        ) : null}
+        {detail.status !== 'loading' && detail.status !== 'error' && detail.hits.length === 0 ? (
+          <div className="report-empty">暂无可展示的命中明细</div>
+        ) : null}
+        {detail.status !== 'loading' && detail.status !== 'error' && detail.hits.length > 0 ? (
+          <div className="strategy-hit-list">
+            {detail.hits.map((hit) => (
+              <article className="strategy-hit-row" key={`${hit.matchId}-${hit.hitScore}`}>
+                <div className="strategy-hit-row-main">
+                  <strong>{hit.date} {hit.time} {hit.match}</strong>
+                  <span>{hit.actualScore} · 命中 {hit.hitScore}({formatNumber(hit.hitOdds)})</span>
+                </div>
+                <div className="strategy-hit-row-side">
+                  <strong>单场 {formatHitDetailRoi(hit.matchRoi)}</strong>
+                  <span>成本 {formatNumber(hit.cost)} · 返还 {formatNumber(hit.revenue)} · 净 {formatSignedNumber(hit.netProfit)}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : null}
       </div>
     </DialogBackdrop>
   );
