@@ -81,7 +81,7 @@ test('buildKnockoutStrategyEvolutionData skips unhealthy one-pick upgrades when 
         explainability: 84,
       }, { averagePicks: 1, maxHitOdds: 28 }),
       result('tem_poisson_balanced', '泊松均衡实验', 79.1, {
-        roi: 80,
+        roi: 95,
         hitRate: 19.6,
         coverage: 100,
         shapeHealth: 88,

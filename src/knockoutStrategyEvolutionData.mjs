@@ -1,4 +1,4 @@
-export const knockoutStrategyEvolutionGeneratedAt = "2026-06-29T07:03:37.714Z";
+export const knockoutStrategyEvolutionGeneratedAt = "2026-06-29T12:29:55.160Z";
 export const knockoutStrategyEvolutionProxyMatches = 57;
 
 export const knockoutStrategyEvolutionFamilies = [
@@ -14,13 +14,14 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "baseline",
         "label": "低比分篮子",
         "changed": "代理样本 57 场：固定覆盖 0-0、0-1、1-0、1-1。",
-        "verdict": "作为基线记录：总分 72.3，ROI -13.4%，命中 22/57。",
+        "verdict": "作为基线记录：总分 67.8，ROI -13.4%，命中 22/57。",
         "metrics": {
           "roi": 46.6,
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 70,
-          "explainability": 70
+          "explainability": 70,
+          "exploration": 70
         }
       },
       {
@@ -28,13 +29,14 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "discarded",
         "label": "平局锚点 4 格",
         "changed": "代理样本 57 场：平局低位时覆盖 1-1、2-2、0-0、1-0，否则回落到三格。",
-        "verdict": "保留为失败实验：总分 83.5，ROI +8.15%，命中 18/57。",
+        "verdict": "保留为失败实验：总分 81.2，ROI +8.15%，命中 18/57。",
         "metrics": {
           "roi": 68.2,
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 86,
-          "explainability": 78
+          "explainability": 78,
+          "exploration": 85
         }
       },
       {
@@ -42,13 +44,14 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "discarded",
         "label": "热门平局保护",
         "changed": "代理样本 57 场：热门小胜为主，同时保留 1-1。",
-        "verdict": "保留为失败实验：总分 62，ROI -46.32%，命中 20/57。",
+        "verdict": "保留为失败实验：总分 57.5，ROI -46.32%，命中 20/57。",
         "metrics": {
           "roi": 13.7,
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 70,
-          "explainability": 78
+          "explainability": 78,
+          "exploration": 70
         }
       },
       {
@@ -62,7 +65,8 @@ export const knockoutStrategyEvolutionFamilies = [
           "hitRate": 100,
           "coverage": 98.2,
           "shapeHealth": 100,
-          "explainability": 78
+          "explainability": 78,
+          "exploration": 100
         }
       },
       {
@@ -76,7 +80,8 @@ export const knockoutStrategyEvolutionFamilies = [
           "hitRate": 100,
           "coverage": 98.2,
           "shapeHealth": 96,
-          "explainability": 78
+          "explainability": 78,
+          "exploration": 100
         }
       }
     ]
@@ -93,13 +98,14 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "baseline",
         "label": "赛前泊松EV基础",
         "changed": "代理样本 57 场：用赛前 context 估计期望进球，再按 EV 排序。",
-        "verdict": "作为基线记录：总分 72，ROI -22.97%，命中 9/57。",
+        "verdict": "作为基线记录：总分 69.7，ROI -22.97%，命中 9/57。",
         "metrics": {
           "roi": 37,
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 76,
-          "explainability": 84
+          "explainability": 84,
+          "exploration": 85
         }
       },
       {
@@ -113,7 +119,8 @@ export const knockoutStrategyEvolutionFamilies = [
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 88,
-          "explainability": 84
+          "explainability": 84,
+          "exploration": 100
         }
       },
       {
@@ -121,13 +128,14 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "discarded",
         "label": "市场泊松高波动",
         "changed": "代理样本 57 场：用比分赔率反推市场进球分布再寻找高 EV。",
-        "verdict": "保留为失败实验：总分 52，ROI -43.23%，命中 2/57。",
+        "verdict": "保留为失败实验：总分 58.2，ROI -43.23%，命中 2/57。",
         "metrics": {
           "roi": 16.8,
           "hitRate": 43.9,
           "coverage": 100,
           "shapeHealth": 65,
-          "explainability": 84
+          "explainability": 84,
+          "exploration": 85
         }
       },
       {
@@ -141,21 +149,23 @@ export const knockoutStrategyEvolutionFamilies = [
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 100,
-          "explainability": 84
+          "explainability": 84,
+          "exploration": 100
         }
       },
       {
         "version": "v4",
         "status": "discarded",
-        "label": "赛前泊松EV基础 多样性 2 格",
-        "changed": "代理样本 57 场：本轮自动实验 tem_poisson_diverse_context_v1_n2_cap35_p0_006，平均 2 注，最大命中赔率 28。",
-        "verdict": "未升级：总分 90.9，ROI +25.22%，命中 8/57；没有超过当前候选总分 91.8 的升级门槛。",
+        "label": "赛前泊松EV基础 1 格",
+        "changed": "代理样本 57 场：本轮自动实验 tem_poisson_context_v1_n1_cap35_p0_006，平均 1 注，最大命中赔率 28。",
+        "verdict": "未升级：总分 92.5，ROI +40.35%，命中 4/57；平均下注数不在 1.5-4 的健康区间内，暂不作为旗舰升级。",
         "metrics": {
-          "roi": 85.2,
-          "hitRate": 100,
+          "roi": 100,
+          "hitRate": 87.7,
           "coverage": 100,
-          "shapeHealth": 90,
-          "explainability": 84
+          "shapeHealth": 70,
+          "explainability": 84,
+          "exploration": 100
         }
       }
     ]
@@ -172,13 +182,14 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "baseline",
         "label": "最低赔率三项",
         "changed": "代理样本 57 场：直接购买市场最低赔率的三个比分。",
-        "verdict": "作为基线记录：总分 73.3，ROI -19.01%，命中 23/57。",
+        "verdict": "作为基线记录：总分 68.8，ROI -19.01%，命中 23/57。",
         "metrics": {
           "roi": 41,
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 90,
-          "explainability": 70
+          "explainability": 70,
+          "exploration": 70
         }
       },
       {
@@ -192,7 +203,8 @@ export const knockoutStrategyEvolutionFamilies = [
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 90,
-          "explainability": 90
+          "explainability": 90,
+          "exploration": 100
         }
       },
       {
@@ -200,13 +212,14 @@ export const knockoutStrategyEvolutionFamilies = [
         "status": "discarded",
         "label": "四格共识扩展",
         "changed": "代理样本 57 场：最低赔率四项，覆盖更宽。",
-        "verdict": "保留为失败实验：总分 69.7，ROI -29.32%，命中 26/57。",
+        "verdict": "保留为失败实验：总分 67.5，ROI -29.32%，命中 26/57。",
         "metrics": {
           "roi": 30.7,
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 70,
-          "explainability": 90
+          "explainability": 90,
+          "exploration": 85
         }
       },
       {
@@ -220,7 +233,8 @@ export const knockoutStrategyEvolutionFamilies = [
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 90,
-          "explainability": 90
+          "explainability": 90,
+          "exploration": 100
         }
       },
       {
@@ -234,7 +248,8 @@ export const knockoutStrategyEvolutionFamilies = [
           "hitRate": 100,
           "coverage": 100,
           "shapeHealth": 90,
-          "explainability": 90
+          "explainability": 90,
+          "exploration": 100
         }
       }
     ]

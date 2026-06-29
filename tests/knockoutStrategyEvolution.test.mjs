@@ -34,7 +34,18 @@ test('getKnockoutTotalScore uses the weighted proxy scoring contract', () => {
     coverage: 80,
     shapeHealth: 70,
     explainability: 90,
-  }), 67);
+    exploration: 80,
+  }), 71.5);
+});
+
+test('getKnockoutTotalScore falls back to explainability for legacy exploration metrics', () => {
+  assert.equal(getKnockoutTotalScore({
+    roi: 60,
+    hitRate: 50,
+    coverage: 80,
+    shapeHealth: 70,
+    explainability: 90,
+  }), 73);
 });
 
 test('getKnockoutVersionPoints returns metric series for chart rendering', () => {
@@ -56,5 +67,6 @@ test('getKnockoutMetricLabels exposes the visible metric tabs', () => {
     'coverage',
     'shapeHealth',
     'explainability',
+    'exploration',
   ]);
 });

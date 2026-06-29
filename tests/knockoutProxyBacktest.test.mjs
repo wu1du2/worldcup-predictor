@@ -93,13 +93,15 @@ test('scoreKnockoutBacktestSummary treats healthy score hit rate as a penalty ga
     settledMatches: 20,
     averagePicks: 3,
     explanationScore: 80,
+    explorationScore: 70,
   });
 
-  assert.equal(score.total, 74.5);
+  assert.equal(score.total, 70);
   assert.equal(score.metrics.roi, 40);
   assert.equal(score.metrics.hitRate, 100);
   assert.equal(score.metrics.coverage, 100);
   assert.equal(score.metrics.shapeHealth, 90);
+  assert.equal(score.metrics.exploration, 70);
 });
 
 test('scoreKnockoutBacktestSummary penalizes hit rates below eight percent', () => {
@@ -109,10 +111,34 @@ test('scoreKnockoutBacktestSummary penalizes hit rates below eight percent', () 
     settledMatches: 50,
     averagePicks: 2.5,
     explanationScore: 80,
+    explorationScore: 90,
   });
 
   assert.equal(score.metrics.hitRate, 50);
-  assert.equal(score.total, 80);
+  assert.equal(score.total, 86);
+});
+
+test('scoreKnockoutBacktestSummary gives exploration quality the old hit-count weight', () => {
+  const lowExploration = scoreKnockoutBacktestSummary({
+    roiPercent: 0,
+    hitMatches: 10,
+    settledMatches: 20,
+    averagePicks: 2.5,
+    explanationScore: 80,
+    explorationScore: 30,
+  });
+  const highExploration = scoreKnockoutBacktestSummary({
+    roiPercent: 0,
+    hitMatches: 10,
+    settledMatches: 20,
+    averagePicks: 2.5,
+    explanationScore: 80,
+    explorationScore: 90,
+  });
+
+  assert.equal(highExploration.total - lowExploration.total, 9);
+  assert.equal(highExploration.metrics.hitRate, 100);
+  assert.equal(highExploration.metrics.exploration, 90);
 });
 
 test('scoreKnockoutBacktestSummary caps lottery-like tail wins in proxy score', () => {
@@ -168,6 +194,7 @@ test('enrichKnockoutProxyBacktestResult adds proxy score and metric breakdown', 
   assert.equal(enriched.maxHitOdds, 6);
   assert.equal(enriched.knockoutProxyMetrics.roi, 72);
   assert.equal(enriched.knockoutProxyMetrics.coverage, 66.7);
+  assert.ok(enriched.knockoutProxyMetrics.exploration >= 80);
   assert.ok(enriched.knockoutProxyScore > 50);
 });
 
@@ -197,6 +224,7 @@ test('buildKnockoutProxyBacktestReport renders filter reasons and scored ranking
           coverage: 100,
           shapeHealth: 90,
           explainability: 80,
+          exploration: 85,
         },
         roiPercent: 2,
         hitMatches: 1,
@@ -223,5 +251,6 @@ test('buildKnockoutProxyBacktestReport renders filter reasons and scored ranking
   assert.match(report, /保守盘、末轮压力/);
   assert.match(report, /stable-v1/);
   assert.match(report, /收益 62 \/ 命中 30 \/ 覆盖 100/);
+  assert.match(report, /探索 85/);
   assert.match(report, /命中 1-1/);
 });

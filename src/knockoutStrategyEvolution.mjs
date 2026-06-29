@@ -2,10 +2,11 @@ import { knockoutStrategyEvolutionFamilies } from './knockoutStrategyEvolutionDa
 
 const scoreWeights = {
   roi: 0.35,
-  hitRate: 0.2,
+  hitRate: 0.05,
   coverage: 0.15,
   shapeHealth: 0.15,
   explainability: 0.15,
+  exploration: 0.15,
 };
 
 const metricLabels = [
@@ -15,6 +16,7 @@ const metricLabels = [
   { id: 'coverage', label: '覆盖' },
   { id: 'shapeHealth', label: '形态' },
   { id: 'explainability', label: '解释' },
+  { id: 'exploration', label: '探索' },
 ];
 
 export function getKnockoutMetricLabels() {
@@ -34,7 +36,8 @@ export function getKnockoutStrategyFamilies() {
 
 export function getKnockoutTotalScore(metrics) {
   const total = Object.entries(scoreWeights).reduce((sum, [key, weight]) => {
-    return sum + Number(metrics?.[key] || 0) * weight;
+    const fallback = key === 'exploration' ? Number(metrics?.explainability || 0) : 0;
+    return sum + Number(metrics?.[key] ?? fallback) * weight;
   }, 0);
   return Math.round((total + Number.EPSILON) * 10) / 10;
 }

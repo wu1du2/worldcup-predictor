@@ -1,9 +1,10 @@
 const scoreWeights = {
   roi: 0.35,
-  hitRate: 0.2,
+  hitRate: 0.05,
   coverage: 0.15,
   shapeHealth: 0.15,
   explainability: 0.15,
+  exploration: 0.15,
 };
 
 export function getScoreMarketProfile(scoreOptions = []) {
@@ -68,6 +69,7 @@ export function scoreKnockoutBacktestSummary({
   settledMatches = 0,
   averagePicks = 0,
   explanationScore = 70,
+  explorationScore = 70,
   proxyMatches = settledMatches,
   maxHitOdds = 0,
 }) {
@@ -78,6 +80,7 @@ export function scoreKnockoutBacktestSummary({
     coverage: proxyMatches > 0 ? clamp((Number(settledMatches) / Number(proxyMatches)) * 100) : 0,
     shapeHealth: Math.min(getShapeHealth(averagePicks), getTailShapeCap(maxHitOdds)),
     explainability: clamp(explanationScore),
+    exploration: clamp(explorationScore),
   };
   const total = Object.entries(scoreWeights).reduce((sum, [key, weight]) => sum + metrics[key] * weight, 0);
 
@@ -104,12 +107,17 @@ export function enrichKnockoutProxyBacktestResult(result, {
   const averagePicks = pickCounts.length
     ? roundMetric(pickCounts.reduce((sum, count) => sum + count, 0) / pickCounts.length)
     : 0;
+  const explorationScore = getExplorationScore({
+    result,
+    metadata,
+  });
   const score = scoreKnockoutBacktestSummary({
     roiPercent: result?.roiPercent || 0,
     hitMatches: result?.hitMatches || 0,
     settledMatches: result?.settledMatches || 0,
     averagePicks,
     explanationScore,
+    explorationScore,
     proxyMatches,
     maxHitOdds,
   });
@@ -122,9 +130,31 @@ export function enrichKnockoutProxyBacktestResult(result, {
     explanation: metadata.explanation,
     averagePicks,
     maxHitOdds,
+    explorationScore,
     knockoutProxyScore: score.total,
     knockoutProxyMetrics: score.metrics,
   };
+}
+
+export function getExplorationScore({ result = {}, metadata = {} } = {}) {
+  const text = [
+    result.strategyId,
+    result.strategyName,
+    result.description,
+    metadata.family,
+    metadata.style,
+    metadata.explanation,
+    JSON.stringify(metadata.parameters || {}),
+  ].filter(Boolean).join(' ');
+
+  let score = 35;
+  if (metadata.family) score += 10;
+  if (metadata.style) score += 10;
+  if (metadata.parameters && Object.keys(metadata.parameters).length) score += 15;
+  if (String(metadata.explanation || result.description || '').trim().length >= 6) score += 15;
+  if (/(poisson|泊松|EV|context|来源|机构|媒体|trend|趋势|赔率变化|market|市场|Dixon|Coles)/i.test(text)) score += 15;
+
+  return clamp(score);
 }
 
 export function buildKnockoutProxyBacktestReport({
@@ -182,7 +212,7 @@ export function buildKnockoutProxyBacktestReport({
       `${result.hitMatches}/${result.settledMatches}`,
       result.settledMatches,
       formatMetric(result.averagePicks),
-      `收益 ${formatMetric(metrics.roi)} / 命中 ${formatMetric(metrics.hitRate)} / 覆盖 ${formatMetric(metrics.coverage)} / 形态 ${formatMetric(metrics.shapeHealth)} / 解释 ${formatMetric(metrics.explainability)} |`,
+      `收益 ${formatMetric(metrics.roi)} / 命中 ${formatMetric(metrics.hitRate)} / 覆盖 ${formatMetric(metrics.coverage)} / 形态 ${formatMetric(metrics.shapeHealth)} / 解释 ${formatMetric(metrics.explainability)} / 探索 ${formatMetric(metrics.exploration)} |`,
     ].join(' | '));
   }
 

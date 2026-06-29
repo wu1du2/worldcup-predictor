@@ -187,6 +187,7 @@ function appendExperimentVersion({ versions, experiment, proxyMatches }) {
   const status = isPromotion({ experiment, activeVersion: versions.find((version) => version.status === 'active') })
     ? 'active'
     : 'discarded';
+  const experimentScore = getResultWeightedTotal(experiment);
   return [
     ...versions,
     {
@@ -195,8 +196,8 @@ function appendExperimentVersion({ versions, experiment, proxyMatches }) {
       label: experiment.strategyName,
       changed: `代理样本 ${proxyMatches} 场：本轮自动实验 ${experiment.strategyId}，平均 ${formatMetric(experiment.averagePicks)} 注，最大命中赔率 ${formatMetric(experiment.maxHitOdds)}。`,
       verdict: status === 'active'
-        ? `升级为当前候选：总分 ${formatMetric(experiment.knockoutProxyScore)}，ROI ${formatSigned(experiment.roiPercent)}%，命中 ${experiment.hitMatches}/${experiment.settledMatches}。`
-        : `未升级：总分 ${formatMetric(experiment.knockoutProxyScore)}，ROI ${formatSigned(experiment.roiPercent)}%，命中 ${experiment.hitMatches}/${experiment.settledMatches}；${getRejectionReason(experiment, versions.find((version) => version.status === 'active'))}`,
+        ? `升级为当前候选：总分 ${formatMetric(experimentScore)}，ROI ${formatSigned(experiment.roiPercent)}%，命中 ${experiment.hitMatches}/${experiment.settledMatches}。`
+        : `未升级：总分 ${formatMetric(experimentScore)}，ROI ${formatSigned(experiment.roiPercent)}%，命中 ${experiment.hitMatches}/${experiment.settledMatches}；${getRejectionReason(experiment, versions.find((version) => version.status === 'active'))}`,
       metrics: normalizeMetrics(experiment),
     },
   ];
@@ -215,7 +216,7 @@ function findBestExperiment({ results, metadataById, familyId, includedIds, acti
   const candidates = [...(results || [])]
     .filter((result) => !includedIds.has(result.strategyId))
     .filter((result) => metadataById.get(result.strategyId)?.family === familyId)
-    .sort((a, b) => b.knockoutProxyScore - a.knockoutProxyScore || b.roiPercent - a.roiPercent);
+    .sort((a, b) => getResultWeightedTotal(b) - getResultWeightedTotal(a) || b.roiPercent - a.roiPercent);
   return candidates.find((candidate) => isPromotion({ experiment: candidate, activeVersion }))
     || candidates[0]
     || null;
@@ -224,7 +225,7 @@ function findBestExperiment({ results, metadataById, familyId, includedIds, acti
 function isPromotion({ experiment, activeVersion }) {
   if (!experiment || !activeVersion) return false;
   const activeScore = getWeightedTotal(activeVersion.metrics);
-  return Number(experiment.knockoutProxyScore) >= activeScore + 1
+  return getResultWeightedTotal(experiment) >= activeScore + 1
     && Number(experiment.maxHitOdds || 0) < 60
     && Number(experiment.averagePicks || 0) >= 1.5
     && Number(experiment.averagePicks || 0) <= 4;
@@ -239,6 +240,10 @@ function getRejectionReason(experiment, activeVersion) {
   }
   const activeScore = getWeightedTotal(activeVersion?.metrics || {});
   return `没有超过当前候选总分 ${formatMetric(activeScore)} 的升级门槛。`;
+}
+
+function getResultWeightedTotal(result) {
+  return getWeightedTotal(normalizeMetrics(result));
 }
 
 function buildVerdict({ result, status }) {
@@ -258,16 +263,18 @@ function normalizeMetrics(result) {
     coverage: roundMetric(result?.knockoutProxyMetrics?.coverage || 0),
     shapeHealth: roundMetric(result?.knockoutProxyMetrics?.shapeHealth || 0),
     explainability: roundMetric(result?.knockoutProxyMetrics?.explainability || 0),
+    exploration: roundMetric(result?.knockoutProxyMetrics?.exploration ?? result?.knockoutProxyMetrics?.explainability ?? 0),
   };
 }
 
 function getWeightedTotal(metrics) {
   return roundMetric(
     Number(metrics.roi || 0) * 0.35
-    + Number(metrics.hitRate || 0) * 0.2
+    + Number(metrics.hitRate || 0) * 0.05
     + Number(metrics.coverage || 0) * 0.15
     + Number(metrics.shapeHealth || 0) * 0.15
-    + Number(metrics.explainability || 0) * 0.15,
+    + Number(metrics.explainability || 0) * 0.15
+    + Number(metrics.exploration ?? metrics.explainability ?? 0) * 0.15,
   );
 }
 
