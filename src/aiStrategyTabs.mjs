@@ -5,7 +5,7 @@ export const aiStrategyTabDefinitions = {
   stable: {
     id: 'stable',
     label: '稳定型',
-    strategyId: 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25',
+    strategyId: 'tem_draw_anchor_lean_homeaway2_draw6_cap22',
   },
   value: {
     id: 'value',

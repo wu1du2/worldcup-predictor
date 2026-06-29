@@ -29,11 +29,11 @@ const baseFamilies = [
         changed: ({ proxyMatches }) => `代理样本 ${proxyMatches} 场：热门小胜为主，同时保留 1-1。`,
       },
       {
-        strategyId: 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25',
+        strategyId: 'tem_draw_anchor_lean_homeaway2_draw6_cap22',
         version: 'v3',
         status: 'active',
         label: '平局锚点省注',
-        changed: ({ proxyMatches }) => `代理样本 ${proxyMatches} 场：固定保留 1-1/0-0；平局低位时加入两个最低赔非平局保护，并过滤 25 倍以上长尾。`,
+        changed: ({ proxyMatches }) => `代理样本 ${proxyMatches} 场：固定保留 1-1/0-0；平局低于 6 时加入两个最低赔非平局保护，并过滤 22 倍以上长尾。`,
       },
     ],
   },

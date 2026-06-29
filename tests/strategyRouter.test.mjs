@@ -37,7 +37,7 @@ const historicalResults = [
     ],
   },
   {
-    strategyId: 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25',
+    strategyId: 'tem_draw_anchor_lean_homeaway2_draw6_cap22',
     strategyName: '平局锚点省注',
     rows: [
       { date: '2026-06-13', time: '03:00', hitScore: '1-1', cost: 4, revenue: 5.3 },
@@ -84,7 +84,7 @@ test('routeStrategyForMatch chooses an available positive-history strategy and r
     historicalResults,
   });
 
-  assert.equal(route.strategyId, 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25');
+  assert.equal(route.strategyId, 'tem_draw_anchor_lean_homeaway2_draw6_cap22');
   assert.equal(route.strategyName, '平局锚点省注');
   assert.equal(route.roiLabel, '+103.75%');
   assert.match(route.reason, /滚动历史 ROI/);
@@ -259,7 +259,7 @@ test('routeStrategyForMatch only considers the production router candidate pool 
   });
 
   assert.deepEqual(routerCandidateStrategyIds, [
-    'tem_draw_anchor_lean_homeaway2_draw5_5_cap25',
+    'tem_draw_anchor_lean_homeaway2_draw6_cap22',
     'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006',
     'tem_source_consensus_poisson_context_v1_s2_c3_n3_cap6',
   ]);

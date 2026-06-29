@@ -86,7 +86,7 @@ test('filterKnockoutProxyMatches keeps completed group matches that resemble kno
   assert.match(filtered[1].reasons.join('，'), /末轮压力|保守盘/);
 });
 
-test('scoreKnockoutBacktestSummary combines ROI, hit rate, coverage, shape, and explainability', () => {
+test('scoreKnockoutBacktestSummary treats healthy score hit rate as a penalty gate', () => {
   const score = scoreKnockoutBacktestSummary({
     roiPercent: -20,
     hitMatches: 6,
@@ -95,11 +95,24 @@ test('scoreKnockoutBacktestSummary combines ROI, hit rate, coverage, shape, and 
     explanationScore: 80,
   });
 
-  assert.equal(score.total, 60.5);
+  assert.equal(score.total, 74.5);
   assert.equal(score.metrics.roi, 40);
-  assert.equal(score.metrics.hitRate, 30);
+  assert.equal(score.metrics.hitRate, 100);
   assert.equal(score.metrics.coverage, 100);
   assert.equal(score.metrics.shapeHealth, 90);
+});
+
+test('scoreKnockoutBacktestSummary penalizes hit rates below eight percent', () => {
+  const score = scoreKnockoutBacktestSummary({
+    roiPercent: 20,
+    hitMatches: 2,
+    settledMatches: 50,
+    averagePicks: 2.5,
+    explanationScore: 80,
+  });
+
+  assert.equal(score.metrics.hitRate, 50);
+  assert.equal(score.total, 80);
 });
 
 test('scoreKnockoutBacktestSummary caps lottery-like tail wins in proxy score', () => {

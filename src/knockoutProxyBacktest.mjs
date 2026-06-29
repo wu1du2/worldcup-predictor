@@ -74,7 +74,7 @@ export function scoreKnockoutBacktestSummary({
   const roiScore = clamp(Number(roiPercent) + 60);
   const metrics = {
     roi: Math.min(roiScore, getTailAdjustedRoiCap(maxHitOdds)),
-    hitRate: settledMatches > 0 ? clamp((Number(hitMatches) / Number(settledMatches)) * 100) : 0,
+    hitRate: getHitRatePenaltyScore({ hitMatches, settledMatches }),
     coverage: proxyMatches > 0 ? clamp((Number(settledMatches) / Number(proxyMatches)) * 100) : 0,
     shapeHealth: Math.min(getShapeHealth(averagePicks), getTailShapeCap(maxHitOdds)),
     explainability: clamp(explanationScore),
@@ -85,6 +85,12 @@ export function scoreKnockoutBacktestSummary({
     total: roundMetric(total),
     metrics: Object.fromEntries(Object.entries(metrics).map(([key, value]) => [key, roundMetric(value)])),
   };
+}
+
+function getHitRatePenaltyScore({ hitMatches, settledMatches }) {
+  if (!Number(settledMatches)) return 0;
+  const hitRatePercent = (Number(hitMatches) / Number(settledMatches)) * 100;
+  return clamp((hitRatePercent / 8) * 100);
 }
 
 export function enrichKnockoutProxyBacktestResult(result, {

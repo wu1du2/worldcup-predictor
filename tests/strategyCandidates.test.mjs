@@ -79,7 +79,7 @@ test('candidate strategy set contains final3 production candidates and offline s
     'context_poisson_ev_v3',
     'tem_hybrid_draw_poisson_v2_d1_n2',
     'tem_draw_anchor_3_max5_5',
-    'tem_draw_anchor_lean_homeaway2_draw5_5_cap25',
+    'tem_draw_anchor_lean_homeaway2_draw6_cap22',
   ]);
   const consensusV3 = candidateStrategies.find((strategy) => strategy.id === 'tem_consensus_n3_cap7');
   assert.equal(consensusV3.family, 'market_consensus');
@@ -99,10 +99,11 @@ test('candidate strategy set contains final3 production candidates and offline s
   assert.equal(consensusV4.parameters.sourceCount, 2);
   assert.equal(consensusV4.parameters.consensusCount, 3);
   assert.equal(consensusV4.parameters.maxPicks, 3);
-  const drawV4 = candidateStrategies.find((strategy) => strategy.id === 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25');
+  const drawV4 = candidateStrategies.find((strategy) => strategy.id === 'tem_draw_anchor_lean_homeaway2_draw6_cap22');
   assert.equal(drawV4.family, 'draw_anchor');
   assert.equal(drawV4.style, 'balanced');
-  assert.equal(drawV4.parameters.maxPickOdds, 25);
+  assert.equal(drawV4.parameters.drawMaxOdds, 6);
+  assert.equal(drawV4.parameters.maxPickOdds, 22);
   assert.equal(drawV4.parameters.extraMode, 'homeAwayLow2');
 });
 
@@ -174,10 +175,10 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.equal(drawFinal.settledMatches, 2);
   assert.deepEqual(drawFinal.rows[0].picks.map((pick) => pick.score), ['1-1', '0-0']);
 
-  const cappedDraw = results.find((result) => result.strategyId === 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25');
+  const cappedDraw = results.find((result) => result.strategyId === 'tem_draw_anchor_lean_homeaway2_draw6_cap22');
   assert.equal(cappedDraw.settledMatches, 2);
-  assert.deepEqual(cappedDraw.rows[0].picks.map((pick) => pick.score), ['1-1', '0-0']);
-  assert.ok(cappedDraw.rows.every((row) => row.picks.every((pick) => pick.odds <= 25)));
+  assert.deepEqual(cappedDraw.rows[0].picks.map((pick) => pick.score), ['1-1', '0-0', '2-1', '1-0']);
+  assert.ok(cappedDraw.rows.every((row) => row.picks.every((pick) => pick.odds <= 22)));
 
   const summary = formatCandidateStrategySummary(results);
   assert.match(summary, /候选策略回测/);
@@ -191,5 +192,5 @@ test('runCandidateStrategyBacktests settles every candidate with consistent ROI 
   assert.match(summary, /context_poisson_ev_v3/);
   assert.match(summary, /tem_hybrid_draw_poisson_v2_d1_n2/);
   assert.match(summary, /tem_draw_anchor_3_max5_5/);
-  assert.match(summary, /tem_draw_anchor_lean_homeaway2_draw5_5_cap25/);
+  assert.match(summary, /tem_draw_anchor_lean_homeaway2_draw6_cap22/);
 });

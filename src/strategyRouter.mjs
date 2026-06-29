@@ -9,7 +9,7 @@ const dynamicCandidateMinHitMatches = 3;
 const dynamicCandidateMinRoiPercent = 0;
 const dynamicCandidateMaxAveragePicks = 4.5;
 export const routerCandidateStrategyIds = [
-  'tem_draw_anchor_lean_homeaway2_draw5_5_cap25',
+  'tem_draw_anchor_lean_homeaway2_draw6_cap22',
   'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006',
   'tem_source_consensus_poisson_context_v1_s2_c3_n3_cap6',
 ];
@@ -251,8 +251,8 @@ function getStrategyPickStandard(strategyId) {
   if (strategyId === 'tem_draw_anchor_3_max5_5') {
     return '标准是平局赔率低时围绕平局，并加一个低比分保护。';
   }
-  if (strategyId === 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25') {
-    return '标准是固定保留 1-1/0-0；平局低位时加入两个最低赔非平局保护，并过滤 25 倍以上长尾。';
+  if (strategyId === 'tem_draw_anchor_lean_homeaway2_draw6_cap22') {
+    return '标准是固定保留 1-1/0-0；平局低位时加入两个最低赔非平局保护，并过滤 22 倍以上长尾。';
   }
   if (strategyId === 'tem_hybrid_draw_poisson_v2_d1_n2') {
     return '标准是先保 1-1，再用赛前泊松 EV 补位。';
@@ -299,7 +299,7 @@ function describePickedScore({ strategyId, pick, scoreOptions }) {
     return `${score} 低比分保护，${oddsText}`;
   }
 
-  if (strategyId === 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25') {
+  if (strategyId === 'tem_draw_anchor_lean_homeaway2_draw6_cap22') {
     if (score === '1-1') return `${score} 核心平局，${oddsText}`;
     if (score === '0-0') return `${score} 低节奏平局，${oddsText}`;
     return `${score} 低赔非平局保护，${oddsText}`;
@@ -388,7 +388,7 @@ function scoreStrategyFeatures({ strategy, odds, match = null }) {
   if (strategy.id === 'context_poisson_ev_v3') return market.hasCompleteScoreBoard ? 0.75 : 0.2;
   if (strategy.id === 'tem_hybrid_draw_poisson_v2_d1_n2') return market.hasCompleteScoreBoard && market.drawLean ? 0.95 : 0.35;
   if (strategy.id === 'tem_draw_anchor_3_max5_5') return market.drawLean ? 1 : 0.2;
-  if (strategy.id === 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25') return market.drawLean ? 1.08 : 0.22;
+  if (strategy.id === 'tem_draw_anchor_lean_homeaway2_draw6_cap22') return market.drawLean ? 1.08 : 0.22;
   return 0;
 }
 

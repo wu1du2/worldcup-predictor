@@ -193,19 +193,19 @@ export const candidateStrategies = [
     selectPicks: ({ odds }) => pickFinalDrawAnchor(odds),
   },
   {
-    id: 'tem_draw_anchor_lean_homeaway2_draw5_5_cap25',
+    id: 'tem_draw_anchor_lean_homeaway2_draw6_cap22',
     name: '平局锚点省注',
     family: 'draw_anchor',
     style: 'balanced',
     parameters: {
       baseScores: ['1-1', '0-0'],
-      drawMaxOdds: 5.5,
-      maxPickOdds: 25,
+      drawMaxOdds: 6,
+      maxPickOdds: 22,
       extraMode: 'homeAwayLow2',
     },
-    description: '稳定型 v4：固定保留 1-1/0-0；平局低于 5.5 时加入两个最低赔非平局比分，并过滤 25 以上长尾。',
+    description: '稳定型 v5：固定保留 1-1/0-0；平局低于 6 时加入两个最低赔非平局比分，并过滤 22 以上长尾。',
     explanation: '减少 2-2 等成本项，用市场最低的非平局比分做小胜保护，保持低比分底座。',
-    selectPicks: ({ odds }) => pickLeanDrawAnchorHomeAway2(odds),
+    selectPicks: ({ odds }) => pickLeanDrawAnchorHomeAway2(odds, { drawMaxOdds: 6, maxPickOdds: 22 }),
   },
 ];
 
@@ -351,12 +351,12 @@ function pickConsensusPoissonContextV1(odds, context) {
   ]).slice(0, 4);
 }
 
-function pickLeanDrawAnchorHomeAway2(odds) {
+function pickLeanDrawAnchorHomeAway2(odds, { drawMaxOdds = 5.5, maxPickOdds = 25 } = {}) {
   const base = pickFixedScores(odds, ['1-1', '0-0'])
-    .filter((pick) => pick.odds <= 25);
-  if (minOddsForOutcome(odds, 'draw') > 5.5) return base;
+    .filter((pick) => pick.odds <= maxPickOdds);
+  if (minOddsForOutcome(odds, 'draw') > drawMaxOdds) return base;
   const nonDraw = sortByOdds(odds)
-    .filter((pick) => getScoreOutcome(pick.score) !== 'draw' && pick.odds <= 25)
+    .filter((pick) => getScoreOutcome(pick.score) !== 'draw' && pick.odds <= maxPickOdds)
     .slice(0, 2);
   return uniquePicks([...base, ...nonDraw]);
 }
