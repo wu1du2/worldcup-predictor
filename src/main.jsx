@@ -205,10 +205,7 @@ function App() {
     void loadD1LiveBoard({ client: d1Client, from: liveWindow.from, to: liveWindow.to })
       .then((liveBoard) => {
         setMatches((currentMatches) => mergeLiveBoardSnapshot({ matches: currentMatches }, liveBoard).matches);
-        setScoreOddsByMatch((currentOdds) => ({
-          ...currentOdds,
-          ...(liveBoard.scoreOddsByMatch || {}),
-        }));
+        setScoreOddsByMatch((currentOdds) => mergeLiveBoardSnapshot({ scoreOddsByMatch: currentOdds }, liveBoard).scoreOddsByMatch);
         setAiRecommendationsByMatch((currentRecommendations) => ({
           ...currentRecommendations,
           ...(liveBoard.aiRecommendationsByMatch || {}),
