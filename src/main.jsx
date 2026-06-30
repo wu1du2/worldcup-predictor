@@ -29,6 +29,7 @@ import {
   saveGroupPredictions,
   submitAiUserStrategy,
 } from './supabaseData.mjs';
+import { createD1BrowserClient, loadD1GroupState } from './d1Data.mjs';
 import { formatReportJobTitle, formatReportStatusText } from './importReports.mjs';
 import {
   getAiReasonPreview,
@@ -95,15 +96,10 @@ function App() {
   const [knockoutStrategyOpen, setKnockoutStrategyOpen] = useState(false);
   const selectedDateButtonRef = useRef(null);
   const client = useMemo(() => createSupabaseBrowserClient(), []);
+  const d1Client = useMemo(() => createD1BrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
 
   async function refreshGroupState() {
-    if (!client) {
-      setLoadStatus('error');
-      setErrorMessage('Supabase 配置缺失');
-      return;
-    }
-
     setLoadStatus('loading');
     setErrorMessage('');
 
@@ -139,7 +135,13 @@ function App() {
 
       let loaded;
       try {
-        loaded = await loadGroupState({ client, groupCode });
+        if (d1Client) loaded = await loadD1GroupState({ client: d1Client, groupCode });
+      } catch (error) {
+        console.warn('Failed to load D1 group state', error);
+      }
+
+      try {
+        if (!loaded && client) loaded = await loadGroupState({ client, groupCode });
       } catch (error) {
         if (staticGroupSnapshot || snapshot?.matches.length) {
           console.warn('Failed to load group state; using static cache only', error);
@@ -148,7 +150,13 @@ function App() {
         throw error;
       }
 
-      const loadedMatches = snapshot?.matches.length ? snapshot.matches : await loadMatches({ client });
+      if (!loaded) {
+        if (staticGroupSnapshot || snapshot?.matches.length) return;
+        throw new Error('D1 和 Supabase 配置缺失');
+      }
+
+      const loadedMatches = snapshot?.matches.length ? snapshot.matches : (client ? await loadMatches({ client }) : []);
+      if (!loadedMatches.length) throw new Error('赛程快照缺失');
       const availableDates = new Set(loadedMatches.map((match) => match.date));
       setGroup(loaded.group);
       setPlayers(loaded.players);
