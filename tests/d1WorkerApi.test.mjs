@@ -104,6 +104,68 @@ test('D1 worker upserts predictions for a group player', async () => {
   ]);
 });
 
+test('D1 worker returns a small live board window with odds and recommendations', async () => {
+  const db = fakeLiveBoardDb();
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/live-board?from=2026-06-30&to=2026-07-02'), { DB: db });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body.window, { from: '2026-06-30', to: '2026-07-02' });
+  assert.deepEqual(body.matches, [
+    {
+      id: 'espn-1',
+      matchCode: 'espn-1',
+      date: '2026-06-30',
+      time: '01:00',
+      home: '巴西',
+      away: '日本',
+      homeScore: 2,
+      awayScore: 1,
+      status: 'post',
+      statusDetail: 'Final',
+      venue: '',
+      stage: 'Round of 32',
+    },
+  ]);
+  assert.deepEqual(body.scoreOddsByMatch['espn-1'], [
+    {
+      score: '2-1',
+      odds: 5.8,
+      trend: {
+        firstOdds: 6.5,
+        latestOdds: 5.8,
+        changePct: -10.8,
+        snapshotsCount: 3,
+      },
+    },
+  ]);
+  assert.deepEqual(body.aiRecommendationsByMatch['espn-1'].scores, ['2-1']);
+});
+
+test('D1 worker keeps pre-match null scores as null in live board responses', async () => {
+  const db = fakeLiveBoardDb({
+    matches: [{
+      match_code: 'espn-pre',
+      match_date_cn: '2026-07-01',
+      time_cn: '01:00',
+      home_cn: '科特迪瓦',
+      away_cn: '挪威',
+      home_score: null,
+      away_score: null,
+      status: 'pre',
+      status_detail: 'Scheduled',
+      stage: 'Round of 32',
+    }],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/live-board?from=2026-07-01&to=2026-07-01'), { DB: db });
+  const body = await response.json();
+
+  assert.equal(body.matches[0].homeScore, null);
+  assert.equal(body.matches[0].awayScore, null);
+});
+
 function fakeDb({ group = null, players = [], predictions = [] } = {}) {
   return {
     prepare(sql) {
@@ -199,6 +261,88 @@ function fakeStatefulDb(initial = {}) {
             return { success: true };
           }
           throw new Error(`Unexpected run query: ${sql}`);
+        },
+      };
+    },
+  };
+}
+
+function fakeLiveBoardDb(overrides = {}) {
+  const liveMatches = overrides.matches || [{
+    match_code: 'espn-1',
+    match_date_cn: '2026-06-30',
+    time_cn: '01:00',
+    home_cn: '巴西',
+    away_cn: '日本',
+    home_score: 2,
+    away_score: 1,
+    status: 'post',
+    status_detail: 'Final',
+    stage: 'Round of 32',
+  }];
+  return {
+    prepare(sql) {
+      return {
+        bound: [],
+        bind(...values) {
+          this.bound = values;
+          return this;
+        },
+        async all() {
+          if (sql.includes('from matches')) {
+            return {
+              results: liveMatches,
+            };
+          }
+          if (sql.includes('from score_odds_trends')) {
+            return {
+              results: [{
+                home: '巴西',
+                away: '日本',
+                kickoff_label: '06-30 01:00',
+                score: '2-1',
+                first_odds: 6.5,
+                latest_odds: 5.8,
+                change_pct: -10.8,
+                snapshots_count: 3,
+              }],
+            };
+          }
+          if (sql.includes('from score_odds')) {
+            return {
+              results: [{
+                home: '巴西',
+                away: '日本',
+                kickoff_label: '06-30 01:00',
+                score: '2-1',
+                odds: 5.8,
+              }],
+            };
+          }
+          if (sql.includes('from ai_recommendations')) {
+            return {
+              results: [{
+                match_id: 'espn-1',
+                scores: '["2-1"]',
+                score_labels: '["2-1(5.8)"]',
+                strategy_id: 's1',
+                strategy_name: '稳定型',
+                strategy_roi: 12.3,
+                strategy_roi_label: '+12.3%',
+                strategy_feature: '低比分',
+                router_reason: '窗口测试',
+                match_reason_summary: '巴西优势',
+                match_reason_detail: '预计概率和赔率匹配。',
+                prediction_summary: '推荐 2-1。',
+                prediction_run_id: 'run-1',
+                predicted_at: '2026-06-30T00:00:00.000Z',
+              }],
+            };
+          }
+          if (sql.includes('from import_reports')) {
+            return { results: [] };
+          }
+          throw new Error(`Unexpected all query: ${sql}`);
         },
       };
     },

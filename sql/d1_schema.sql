@@ -70,6 +70,10 @@ create table if not exists score_odds (
 create index if not exists score_odds_match_idx
   on score_odds(source, home, away, kickoff_label);
 
+create index if not exists score_odds_kickoff_at_cn_idx
+  on score_odds(kickoff_at_cn, score)
+  where kickoff_at_cn is not null;
+
 create table if not exists score_odds_trends (
   id text primary key,
   source text not null,
@@ -92,6 +96,10 @@ create table if not exists score_odds_trends (
 
 create index if not exists score_odds_trends_match_idx
   on score_odds_trends(source, home, away, kickoff_label);
+
+create index if not exists score_odds_trends_kickoff_at_cn_idx
+  on score_odds_trends(kickoff_at_cn, score)
+  where kickoff_at_cn is not null;
 
 create table if not exists ai_recommendations (
   match_id text primary key,

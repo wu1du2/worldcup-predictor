@@ -32,6 +32,26 @@ export async function loadD1GroupState({ client, groupCode }) {
   return normalizeD1GroupState(await response.json(), { groupCode });
 }
 
+export async function loadD1LiveBoard({ client, from, to }) {
+  if (!client) throw new Error('D1 API 配置缺失');
+  const params = new URLSearchParams();
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  const response = await (0, client.fetchImpl)(`${client.baseUrl}/api/live-board?${params.toString()}`);
+  if (!response.ok) {
+    let errorText = response.statusText;
+    try {
+      const body = await response.json();
+      errorText = body.error || body.message || errorText;
+    } catch {
+      // Keep status text when the Worker response is not JSON.
+    }
+    throw new Error(`D1 live board failed: ${response.status} ${errorText}`.trim());
+  }
+
+  return normalizeD1LiveBoard(await response.json());
+}
+
 export async function createD1GroupPlayer({ client, groupCode, name }) {
   if (!client) throw new Error('D1 API 配置缺失');
   const trimmedName = String(name || '').trim();
@@ -103,6 +123,22 @@ export function normalizeD1GroupState(payload, { groupCode } = {}) {
     },
     players: mergePlayers(Array.isArray(payload.players) ? payload.players : []),
     predictions: mapPredictionsByPlayer(Array.isArray(payload.predictions) ? payload.predictions : []),
+  };
+}
+
+export function normalizeD1LiveBoard(payload) {
+  if (!payload || typeof payload !== 'object') throw new Error('D1 live board payload is invalid');
+  return {
+    generatedAt: payload.generatedAt || '',
+    window: payload.window || null,
+    matches: Array.isArray(payload.matches) ? payload.matches : [],
+    scoreOddsByMatch: payload.scoreOddsByMatch && typeof payload.scoreOddsByMatch === 'object'
+      ? payload.scoreOddsByMatch
+      : {},
+    aiRecommendationsByMatch: payload.aiRecommendationsByMatch && typeof payload.aiRecommendationsByMatch === 'object'
+      ? payload.aiRecommendationsByMatch
+      : {},
+    importReports: Array.isArray(payload.importReports) ? payload.importReports : [],
   };
 }
 

@@ -32,10 +32,12 @@ import {
 import {
   createD1BrowserClient,
   createD1GroupPlayer,
+  loadD1LiveBoard,
   loadD1GroupState,
   saveD1GroupPredictions,
 } from './d1Data.mjs';
 import { formatReportJobTitle, formatReportStatusText } from './importReports.mjs';
+import { buildLiveDateWindow } from './liveWindow.mjs';
 import {
   getAiReasonPreview,
   getAiRecommendationForMatch,
@@ -63,6 +65,7 @@ import {
   getAiStrategyHitDetail,
 } from './aiStrategyHitDetails.mjs';
 import { getStaticAiStrategyStatsPage, loadStaticGroupSnapshot, loadStaticSnapshot } from './staticSnapshot.mjs';
+import { mergeLiveBoardSnapshot } from './liveBoard.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
@@ -179,6 +182,7 @@ function App() {
         selectedDate: availableDates.has(current.selectedDate) ? current.selectedDate : getDefaultMatchDateCn(loadedMatches),
       }));
       setLoadStatus('ready');
+      hydrateLiveBoardFromD1();
       if (!snapshot?.matches.length) {
         void loadScoreOdds({ client, matches: loadedMatches, oddsWindow: buildFutureScoreOddsWindow() })
           .then(setScoreOddsByMatch)
@@ -191,6 +195,30 @@ function App() {
       setLoadStatus('error');
       setErrorMessage(error.message || '加载失败');
     }
+  }
+
+  function hydrateLiveBoardFromD1() {
+    if (!d1Client) return;
+    const liveWindow = buildLiveDateWindow(new Date(), 2);
+    void loadD1LiveBoard({ client: d1Client, from: liveWindow.from, to: liveWindow.to })
+      .then((liveBoard) => {
+        setMatches((currentMatches) => mergeLiveBoardSnapshot({ matches: currentMatches }, liveBoard).matches);
+        setScoreOddsByMatch((currentOdds) => ({
+          ...currentOdds,
+          ...(liveBoard.scoreOddsByMatch || {}),
+        }));
+        setAiRecommendationsByMatch((currentRecommendations) => ({
+          ...currentRecommendations,
+          ...(liveBoard.aiRecommendationsByMatch || {}),
+        }));
+        if (liveBoard.importReports?.length) {
+          setStaticSnapshot((current) => current ? {
+            ...current,
+            importReports: liveBoard.importReports,
+          } : current);
+        }
+      })
+      .catch((error) => console.warn('Failed to hydrate D1 live board', error));
   }
 
   useEffect(() => {

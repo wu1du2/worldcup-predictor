@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   createD1GroupPlayer,
   createD1ApiClient,
+  loadD1LiveBoard,
   loadD1GroupState,
   saveD1GroupPredictions,
 } from '../src/d1Data.mjs';
@@ -104,4 +105,27 @@ test('saveD1GroupPredictions posts selected score entries to the Worker', async 
   });
 
   assert.deepEqual(result, { ok: true, rowsWritten: 1 });
+});
+
+test('loadD1LiveBoard reads a dated live window from the Worker', async () => {
+  const client = createD1ApiClient({
+    baseUrl: 'https://worldcup-api.example.workers.dev',
+    fetchImpl: async (url) => {
+      assert.equal(url, 'https://worldcup-api.example.workers.dev/api/live-board?from=2026-06-30&to=2026-07-02');
+      return new Response(JSON.stringify({
+        generatedAt: '2026-06-30T10:00:00.000Z',
+        window: { from: '2026-06-30', to: '2026-07-02' },
+        matches: [{ id: 'm1', date: '2026-06-30', time: '01:00', home: '巴西', away: '日本' }],
+        scoreOddsByMatch: { m1: [{ score: '1-0', odds: 7.2 }] },
+        aiRecommendationsByMatch: { m1: { scores: ['1-0'] } },
+        importReports: [{ id: 'r1', jobName: 'live-d1' }],
+      }), { status: 200 });
+    },
+  });
+
+  const liveBoard = await loadD1LiveBoard({ client, from: '2026-06-30', to: '2026-07-02' });
+
+  assert.deepEqual(liveBoard.matches, [{ id: 'm1', date: '2026-06-30', time: '01:00', home: '巴西', away: '日本' }]);
+  assert.deepEqual(liveBoard.scoreOddsByMatch.m1, [{ score: '1-0', odds: 7.2 }]);
+  assert.deepEqual(liveBoard.importReports, [{ id: 'r1', jobName: 'live-d1' }]);
 });
