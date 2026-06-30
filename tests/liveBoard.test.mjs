@@ -34,3 +34,28 @@ test('mergeLiveBoardSnapshot replaces only the live-window matches and keeps sta
   assert.deepEqual(merged.aiRecommendationsByMatch['live-1'].scores, ['2-1']);
   assert.deepEqual(merged.importReports, [{ id: 'r1', jobName: 'live-d1' }]);
 });
+
+test('mergeLiveBoardSnapshot keeps static odds trends when live odds omit trend metadata', () => {
+  const merged = mergeLiveBoardSnapshot({
+    matches: [{ id: 'm1', date: '2026-07-01', time: '01:00', status: 'pre' }],
+    scoreOddsByMatch: {
+      m1: [
+        { score: '1-0', odds: 12, trend: { firstOdds: 10, latestOdds: 12, changePct: 20, snapshotsCount: 5 } },
+        { score: '0-0', odds: 8, trend: { firstOdds: 8, latestOdds: 8, changePct: 0, snapshotsCount: 5 } },
+      ],
+    },
+  }, {
+    matches: [{ id: 'm1', date: '2026-07-01', time: '01:00', status: 'pre' }],
+    scoreOddsByMatch: {
+      m1: [
+        { score: '1-0', odds: 13 },
+        { score: '0-0', odds: 7.5, trend: { firstOdds: 8, latestOdds: 7.5, changePct: -6.25, snapshotsCount: 6 } },
+      ],
+    },
+  });
+
+  assert.deepEqual(merged.scoreOddsByMatch.m1, [
+    { score: '1-0', odds: 13, trend: { firstOdds: 10, latestOdds: 12, changePct: 20, snapshotsCount: 5 } },
+    { score: '0-0', odds: 7.5, trend: { firstOdds: 8, latestOdds: 7.5, changePct: -6.25, snapshotsCount: 6 } },
+  ]);
+});

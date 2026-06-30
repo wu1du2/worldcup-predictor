@@ -14,10 +14,7 @@ export function mergeLiveBoardSnapshot(currentSnapshot, liveSnapshot) {
     generatedAt: live.generatedAt || current.generatedAt || '',
     liveWindow: live.window || current.liveWindow || null,
     matches,
-    scoreOddsByMatch: {
-      ...(current.scoreOddsByMatch || {}),
-      ...(live.scoreOddsByMatch || {}),
-    },
+    scoreOddsByMatch: mergeScoreOddsByMatch(current.scoreOddsByMatch, live.scoreOddsByMatch),
     aiRecommendationsByMatch: {
       ...(current.aiRecommendationsByMatch || {}),
       ...(live.aiRecommendationsByMatch || {}),
@@ -26,4 +23,22 @@ export function mergeLiveBoardSnapshot(currentSnapshot, liveSnapshot) {
       ? live.importReports
       : (current.importReports || []),
   };
+}
+
+function mergeScoreOddsByMatch(currentOddsByMatch = {}, liveOddsByMatch = {}) {
+  const merged = { ...currentOddsByMatch };
+  for (const [matchId, liveOptions] of Object.entries(liveOddsByMatch || {})) {
+    if (!Array.isArray(liveOptions) || liveOptions.length === 0) continue;
+    const currentByScore = new Map(
+      (Array.isArray(currentOddsByMatch?.[matchId]) ? currentOddsByMatch[matchId] : [])
+        .map((option) => [option?.score, option])
+        .filter(([score]) => score),
+    );
+    merged[matchId] = liveOptions.map((option) => {
+      const currentOption = currentByScore.get(option?.score);
+      if (option?.trend || !currentOption?.trend) return option;
+      return { ...option, trend: currentOption.trend };
+    });
+  }
+  return merged;
 }
