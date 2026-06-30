@@ -56,7 +56,7 @@ import {
   formatHitDetailRoi,
   getAiStrategyHitDetail,
 } from './aiStrategyHitDetails.mjs';
-import { getStaticAiStrategyStatsPage, loadStaticSnapshot } from './staticSnapshot.mjs';
+import { getStaticAiStrategyStatsPage, loadStaticGroupSnapshot, loadStaticSnapshot } from './staticSnapshot.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
@@ -124,12 +124,25 @@ function App() {
         }));
       }
 
+      const staticGroupSnapshot = await loadStaticGroupSnapshot(groupCode);
+      if (staticGroupSnapshot) {
+        setGroup(staticGroupSnapshot.group);
+        setPlayers(staticGroupSnapshot.players);
+        updateState((current) => ({
+          ...current,
+          selectedPlayerId: current.groupCode === groupCode ? current.selectedPlayerId : '',
+          draftPicks: current.groupCode === groupCode ? current.draftPicks : {},
+          predictions: staticGroupSnapshot.predictions,
+          groupCode,
+        }));
+      }
+
       let loaded;
       try {
         loaded = await loadGroupState({ client, groupCode });
       } catch (error) {
-        if (snapshot?.matches.length) {
-          console.warn('Failed to load group state; using static snapshot only', error);
+        if (staticGroupSnapshot || snapshot?.matches.length) {
+          console.warn('Failed to load group state; using static cache only', error);
           return;
         }
         throw error;

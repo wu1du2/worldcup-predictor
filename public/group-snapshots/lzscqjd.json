@@ -1,0 +1,2325 @@
+{
+  "generatedAt": "2026-06-30T07:58:37.623Z",
+  "source": "local-backup",
+  "group": {
+    "id": "07adfaa5-6f5e-4ae1-a214-98b6e2cfc130",
+    "code": "lzscqjd",
+    "name": "lzscqjd"
+  },
+  "players": [
+    {
+      "id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "name": "yao"
+    },
+    {
+      "id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "name": "zcd"
+    },
+    {
+      "id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "name": "zyy"
+    },
+    {
+      "id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "name": "qc"
+    },
+    {
+      "id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "name": "mendru"
+    },
+    {
+      "id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "name": "zzy"
+    },
+    {
+      "id": "bf2ba6ae-136b-4269-8c3c-bda29979a910",
+      "name": "hjj"
+    },
+    {
+      "id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "name": "zyj"
+    },
+    {
+      "id": "cff20b57-999f-40d3-8ad3-4d214052450b",
+      "name": "hjt"
+    },
+    {
+      "id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "name": "AI推荐"
+    }
+  ],
+  "predictions": [
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760432",
+      "scores": [
+        "3-0",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760429",
+      "scores": [
+        "0-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760466",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760433",
+      "scores": [
+        "3-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760442",
+      "scores": [
+        "2-1",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760489",
+      "scores": [
+        "0-1",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760455",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760463",
+      "scores": [
+        "0-0",
+        "1-1",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760428",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760460",
+      "scores": [
+        "0-1",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760426",
+      "scores": [
+        "2-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760422",
+      "scores": [
+        "4-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "match_id": "espn-760455",
+      "scores": [
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760425",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760448",
+      "scores": [
+        "1-0",
+        "5-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760461",
+      "scores": [
+        "1-1",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760461",
+      "scores": [
+        "3-0",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760448",
+      "scores": [
+        "2-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760439",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760464",
+      "scores": [
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760449",
+      "scores": [
+        "0-2",
+        "1-3"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760440",
+      "scores": [
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760456",
+      "scores": [
+        "1-1",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "match_id": "espn-760427",
+      "scores": [
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760439",
+      "scores": [
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760435",
+      "scores": [
+        "4-0",
+        "4-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760449",
+      "scores": [
+        "1-2",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760437",
+      "scores": [
+        "3-1",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760422",
+      "scores": [
+        "3-1",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760453",
+      "scores": [
+        "4-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760442",
+      "scores": [
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760415",
+      "scores": [
+        "2-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760488",
+      "scores": [
+        "1-1",
+        "0-2",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760465",
+      "scores": [
+        "1-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760444",
+      "scores": [
+        "3-0",
+        "胜其他"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760465",
+      "scores": [
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760427",
+      "scores": [
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760416",
+      "scores": [
+        "1-1",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760429",
+      "scores": [
+        "1-0",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760456",
+      "scores": [
+        "3-1",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bf2ba6ae-136b-4269-8c3c-bda29979a910",
+      "match_id": "espn-760430",
+      "scores": [
+        "0-2",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760435",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760476",
+      "scores": [
+        "1-1",
+        "2-2",
+        "0-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760417",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760417",
+      "scores": [
+        "3-0",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760438",
+      "scores": [
+        "1-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760432",
+      "scores": [
+        "3-0",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760457",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760472",
+      "scores": [
+        "1-0",
+        "0-0",
+        "1-1",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760486",
+      "scores": [
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760456",
+      "scores": [
+        "0-2",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760459",
+      "scores": [
+        "2-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760475",
+      "scores": [
+        "1-0",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760452",
+      "scores": [
+        "0-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760451",
+      "scores": [
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "match_id": "espn-760454",
+      "scores": [
+        "4-1",
+        "4-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760420",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760450",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760429",
+      "scores": [
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760459",
+      "scores": [
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760433",
+      "scores": [
+        "0-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760427",
+      "scores": [
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760467",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "match_id": "espn-760457",
+      "scores": [
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760436",
+      "scores": [
+        "2-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760431",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760419",
+      "scores": [
+        "0-2",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "bf2ba6ae-136b-4269-8c3c-bda29979a910",
+      "match_id": "espn-760433",
+      "scores": [
+        "1-0",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760419",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760441",
+      "scores": [
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760435",
+      "scores": [
+        "2-1",
+        "1-3"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760456",
+      "scores": [
+        "0-0",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760428",
+      "scores": [
+        "4-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760447",
+      "scores": [
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760418",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760438",
+      "scores": [
+        "0-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760463",
+      "scores": [
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760430",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760416",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760455",
+      "scores": [
+        "0-1",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760492",
+      "scores": [
+        "0-0",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760446",
+      "scores": [
+        "2-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760434",
+      "scores": [
+        "2-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760426",
+      "scores": [
+        "3-1",
+        "3-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760450",
+      "scores": [
+        "2-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760425",
+      "scores": [
+        "1-2",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760417",
+      "scores": [
+        "1-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760440",
+      "scores": [
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760444",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760484",
+      "scores": [
+        "1-1",
+        "2-2",
+        "0-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760419",
+      "scores": [
+        "0-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760438",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bf2ba6ae-136b-4269-8c3c-bda29979a910",
+      "match_id": "espn-760431",
+      "scores": [
+        "2-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760435",
+      "scores": [
+        "1-0",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760458",
+      "scores": [
+        "3-0",
+        "4-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760455",
+      "scores": [
+        "0-0",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760445",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760462",
+      "scores": [
+        "0-1",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760440",
+      "scores": [
+        "1-1",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760421",
+      "scores": [
+        "1-1",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760443",
+      "scores": [
+        "1-1",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760443",
+      "scores": [
+        "1-1",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760485",
+      "scores": [
+        "1-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760430",
+      "scores": [
+        "0-3",
+        "负其他",
+        "0-4"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760422",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760428",
+      "scores": [
+        "2-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760429",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760427",
+      "scores": [
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760460",
+      "scores": [
+        "0-0",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760415",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760451",
+      "scores": [
+        "1-1",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760448",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760446",
+      "scores": [
+        "0-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760416",
+      "scores": [
+        "2-0",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760429",
+      "scores": [
+        "0-1",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760430",
+      "scores": [
+        "0-4"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760445",
+      "scores": [
+        "3-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760441",
+      "scores": [
+        "0-0",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760422",
+      "scores": [
+        "其他",
+        "5-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760474",
+      "scores": [
+        "0-1",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760467",
+      "scores": [
+        "0-0",
+        "1-1",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760491",
+      "scores": [
+        "1-1",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760458",
+      "scores": [
+        "1-1",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760465",
+      "scores": [
+        "2-1",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760459",
+      "scores": [
+        "1-1",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760441",
+      "scores": [
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760456",
+      "scores": [
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760482",
+      "scores": [
+        "0-2",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "match_id": "espn-760426",
+      "scores": [
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760442",
+      "scores": [
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760427",
+      "scores": [
+        "2-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760455",
+      "scores": [
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760449",
+      "scores": [
+        "0-2",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760441",
+      "scores": [
+        "1-0",
+        "2-1",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760457",
+      "scores": [
+        "4-1",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760427",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760434",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "match_id": "espn-760429",
+      "scores": [
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760457",
+      "scores": [
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760446",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760493",
+      "scores": [
+        "1-1",
+        "0-0",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760423",
+      "scores": [
+        "2-1",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760450",
+      "scores": [
+        "1-0",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760479",
+      "scores": [
+        "2-4"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760414",
+      "scores": [
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760428",
+      "scores": [
+        "4-0",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760469",
+      "scores": [
+        "1-1",
+        "2-2",
+        "0-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760431",
+      "scores": [
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760485",
+      "scores": [
+        "1-3"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760437",
+      "scores": [
+        "3-2",
+        "2-3"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760462",
+      "scores": [
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760424",
+      "scores": [
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760421",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "match_id": "espn-760428",
+      "scores": [
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760487",
+      "scores": [
+        "2-1",
+        "3-1",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760437",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760432",
+      "scores": [
+        "3-0",
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760432",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760434",
+      "scores": [
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760454",
+      "scores": [
+        "1-2",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760420",
+      "scores": [
+        "1-0",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760445",
+      "scores": [
+        "1-2",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760438",
+      "scores": [
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "bf2ba6ae-136b-4269-8c3c-bda29979a910",
+      "match_id": "espn-760432",
+      "scores": [
+        "0-1",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760420",
+      "scores": [
+        "0-2",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760458",
+      "scores": [
+        "4-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760468",
+      "scores": [
+        "2-0",
+        "0-0",
+        "1-0",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760460",
+      "scores": [
+        "0-1",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760437",
+      "scores": [
+        "3-1",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760479",
+      "scores": [
+        "2-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760446",
+      "scores": [
+        "0-0",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760421",
+      "scores": [
+        "1-3"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760457",
+      "scores": [
+        "3-1",
+        "4-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760451",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760458",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760433",
+      "scores": [
+        "1-0",
+        "0-0",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760454",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760457",
+      "scores": [
+        "3-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760471",
+      "scores": [
+        "0-0",
+        "0-2",
+        "0-1",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760453",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760441",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760463",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760447",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760448",
+      "scores": [
+        "2-1",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760439",
+      "scores": [
+        "1-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760445",
+      "scores": [
+        "0-2",
+        "0-3"
+      ]
+    },
+    {
+      "player_id": "fffb901e-8a6c-46ef-947c-54596f2e08f4",
+      "match_id": "espn-760456",
+      "scores": [
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760423",
+      "scores": [
+        "1-0",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760448",
+      "scores": [
+        "1-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760495",
+      "scores": [
+        "0-1",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760442",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760477",
+      "scores": [
+        "1-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760447",
+      "scores": [
+        "1-2",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760431",
+      "scores": [
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760426",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760470",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760462",
+      "scores": [
+        "0-2",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760433",
+      "scores": [
+        "0-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760430",
+      "scores": [
+        "1-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760426",
+      "scores": [
+        "2-1",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760444",
+      "scores": [
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760460",
+      "scores": [
+        "1-1",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760432",
+      "scores": [
+        "5-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760454",
+      "scores": [
+        "0-0",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760452",
+      "scores": [
+        "0-1",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760423",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760483",
+      "scores": [
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760455",
+      "scores": [
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760437",
+      "scores": [
+        "2-0",
+        "0-3"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760426",
+      "scores": [
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760438",
+      "scores": [
+        "2-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760433",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760428",
+      "scores": [
+        "5-0",
+        "胜其他"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760449",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760464",
+      "scores": [
+        "0-1",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760460",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760461",
+      "scores": [
+        "1-1",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760459",
+      "scores": [
+        "2-0",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760461",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760418",
+      "scores": [
+        "0-3",
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760467",
+      "scores": [
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760424",
+      "scores": [
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760428",
+      "scores": [
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760425",
+      "scores": [
+        "0-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760490",
+      "scores": [
+        "0-0",
+        "2-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760486",
+      "scores": [
+        "1-1",
+        "2-0",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760440",
+      "scores": [
+        "2-0",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760429",
+      "scores": [
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760481",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760483",
+      "scores": [
+        "1-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760443",
+      "scores": [
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760436",
+      "scores": [
+        "0-2",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760426",
+      "scores": [
+        "2-2",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760414",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760480",
+      "scores": [
+        "1-1",
+        "2-2",
+        "0-0",
+        "1-0"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760459",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760466",
+      "scores": [
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760452",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760447",
+      "scores": [
+        "3-1",
+        "3-2"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760454",
+      "scores": [
+        "0-2",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760425",
+      "scores": [
+        "2-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "ceb8c253-91ad-4168-a7d7-a38a4fd905cc",
+      "match_id": "espn-760454",
+      "scores": [
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760439",
+      "scores": [
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760473",
+      "scores": [
+        "1-0",
+        "2-1",
+        "0-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760427",
+      "scores": [
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760443",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760457",
+      "scores": [
+        "4-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760478",
+      "scores": [
+        "1-1",
+        "0-0",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760424",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760494",
+      "scores": [
+        "0-0",
+        "0-1"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760436",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760439",
+      "scores": [
+        "1-0",
+        "1-1",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760466",
+      "scores": [
+        "0-0",
+        "1-1",
+        "2-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760418",
+      "scores": [
+        "0-2",
+        "0-3"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760449",
+      "scores": [
+        "0-2",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760464",
+      "scores": [
+        "0-1",
+        "0-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760434",
+      "scores": [
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760447",
+      "scores": [
+        "2-1",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760456",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760424",
+      "scores": [
+        "2-0",
+        "2-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760449",
+      "scores": [
+        "0-3",
+        "0-4"
+      ]
+    },
+    {
+      "player_id": "0e300abb-0953-4090-9212-c7d6bf44d6be",
+      "match_id": "espn-760446",
+      "scores": [
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "e055bbf8-e43e-4e37-9974-d48cea55b59f",
+      "match_id": "espn-760435",
+      "scores": [
+        "4-0",
+        "4-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760423",
+      "scores": [
+        "0-2"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760421",
+      "scores": [
+        "1-2",
+        "1-3"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760431",
+      "scores": [
+        "0-2",
+        "1-2"
+      ]
+    },
+    {
+      "player_id": "958515de-d445-435c-a6b5-ba1b9132de6c",
+      "match_id": "espn-760440",
+      "scores": [
+        "0-0",
+        "0-1",
+        "1-0",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760481",
+      "scores": [
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760458",
+      "scores": [
+        "胜其他",
+        "3-0"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760453",
+      "scores": [
+        "2-1",
+        "3-1"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760436",
+      "scores": [
+        "2-1",
+        "1-1"
+      ]
+    },
+    {
+      "player_id": "80759147-bef6-4466-aaf4-2835450923c1",
+      "match_id": "espn-760461",
+      "scores": [
+        "2-0",
+        "胜其他"
+      ]
+    },
+    {
+      "player_id": "bbc69a28-9a02-4492-bfce-0d33f55b0fc4",
+      "match_id": "espn-760444",
+      "scores": [
+        "4-0",
+        "5-0"
+      ]
+    },
+    {
+      "player_id": "c938b8e1-f6f0-4655-9276-fd580e9e7824",
+      "match_id": "espn-760418",
+      "scores": [
+        "0-2"
+      ]
+    }
+  ]
+}

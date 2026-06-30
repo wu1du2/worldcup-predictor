@@ -2,9 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  buildStaticGroupSnapshotsFromBackupTables,
   buildStaticSnapshotFromBackupTables,
   getStaticAiStrategyStatsPage,
+  loadStaticGroupSnapshot,
   loadStaticSnapshot,
+  normalizeStaticGroupSnapshot,
   normalizeStaticSnapshot,
 } from '../src/staticSnapshot.mjs';
 
@@ -33,6 +36,71 @@ test('loadStaticSnapshot returns null when the static file is unavailable', asyn
   });
 
   assert.equal(snapshot, null);
+});
+
+test('loadStaticGroupSnapshot returns current group players and predictions from a local cache file', async () => {
+  const snapshot = await loadStaticGroupSnapshot('lzscqjd', {
+    fetchImpl: async (url) => {
+      assert.match(url, /^\/group-snapshots\/lzscqjd\.json\?v=\d+$/);
+      return new Response(JSON.stringify({
+        generatedAt: '2026-06-30T00:00:00.000Z',
+        group: { id: 'g1', code: 'lzscqjd', name: 'lzscqjd' },
+        players: [{ id: 'p1', name: '张三' }],
+        predictions: [{ player_id: 'p1', match_id: 'm1', scores: ['1-0', 2, '2-1'] }],
+      }), { status: 200 });
+    },
+  });
+
+  assert.deepEqual(snapshot, {
+    generatedAt: '2026-06-30T00:00:00.000Z',
+    group: { id: 'g1', code: 'lzscqjd', name: 'lzscqjd' },
+    players: [
+      { id: 'ai-player', name: 'AI推荐', isAi: true },
+      { id: 'p1', name: '张三' },
+    ],
+    predictions: { p1: { m1: ['1-0', '2-1'] } },
+  });
+});
+
+test('normalizeStaticGroupSnapshot rejects snapshots for another group code', () => {
+  const snapshot = normalizeStaticGroupSnapshot({
+    group: { id: 'g1', code: 'other', name: 'other' },
+    players: [],
+    predictions: [],
+  }, { groupCode: 'lzscqjd' });
+
+  assert.equal(snapshot, null);
+});
+
+test('buildStaticGroupSnapshotsFromBackupTables writes one cache payload per group code', () => {
+  const snapshots = buildStaticGroupSnapshotsFromBackupTables({
+    now: new Date('2026-06-30T00:00:00.000Z'),
+    tables: {
+      groups: [
+        { id: 'g1', code: 'a1b2c3', name: '群A', created_at: '2026-06-12T00:00:00Z' },
+        { id: 'g2', code: 'z9y8x7', name: '群B', created_at: '2026-06-13T00:00:00Z' },
+      ],
+      players: [
+        { id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T01:00:00Z' },
+        { id: 'p2', group_id: 'g2', name: '李四', created_at: '2026-06-13T01:00:00Z' },
+      ],
+      predictions: [
+        { group_id: 'g1', player_id: 'p1', match_id: 'm1', scores: ['1-0'] },
+        { group_id: 'g2', player_id: 'p2', match_id: 'm1', scores: ['2-0'] },
+      ],
+    },
+  });
+
+  assert.deepEqual(Object.keys(snapshots).sort(), ['a1b2c3', 'z9y8x7']);
+  assert.equal(snapshots.a1b2c3.group.id, 'g1');
+  assert.deepEqual(snapshots.a1b2c3.players, [{ id: 'p1', name: '张三' }]);
+  assert.deepEqual(snapshots.a1b2c3.predictions, [
+    { player_id: 'p1', match_id: 'm1', scores: ['1-0'] },
+  ]);
+  assert.equal(snapshots.z9y8x7.group.id, 'g2');
+  assert.deepEqual(snapshots.z9y8x7.predictions, [
+    { player_id: 'p2', match_id: 'm1', scores: ['2-0'] },
+  ]);
 });
 
 test('buildStaticSnapshotFromBackupTables converts backup rows into public static app data', () => {

@@ -5,11 +5,14 @@ import {
   loadMatches,
   loadScoreOdds,
   mapAiRecommendationsByMatch,
+  mapPredictionsByPlayer,
   mapScoreOddsByMatch,
+  mergePlayers,
 } from './supabaseData.mjs';
 import { toAppMatch } from './matchSchedule.mjs';
 
 export const staticSnapshotPath = '/data-snapshot.json';
+export const staticGroupSnapshotDirectory = '/group-snapshots';
 
 export async function loadStaticSnapshot({
   fetchImpl = fetch,
@@ -40,6 +43,44 @@ export function normalizeStaticSnapshot(snapshot) {
       : {},
     aiStrategyStats: Array.isArray(snapshot.aiStrategyStats) ? snapshot.aiStrategyStats : [],
     importReports: Array.isArray(snapshot.importReports) ? snapshot.importReports : [],
+  };
+}
+
+export function getStaticGroupSnapshotPath(groupCode) {
+  return `${staticGroupSnapshotDirectory}/${encodeURIComponent(groupCode)}.json`;
+}
+
+export async function loadStaticGroupSnapshot(groupCode, {
+  fetchImpl = fetch,
+  path = getStaticGroupSnapshotPath(groupCode),
+} = {}) {
+  if (!groupCode) return null;
+
+  try {
+    const response = await fetchImpl(`${path}?v=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) return null;
+    const snapshot = await response.json();
+    return normalizeStaticGroupSnapshot(snapshot, { groupCode });
+  } catch {
+    return null;
+  }
+}
+
+export function normalizeStaticGroupSnapshot(snapshot, { groupCode } = {}) {
+  if (!snapshot || typeof snapshot !== 'object') return null;
+  const group = snapshot.group && typeof snapshot.group === 'object' ? snapshot.group : null;
+  if (!group?.id || !group?.code) return null;
+  if (groupCode && group.code !== groupCode) return null;
+
+  return {
+    generatedAt: snapshot.generatedAt || '',
+    group: {
+      id: group.id,
+      code: group.code,
+      name: group.name || group.code,
+    },
+    players: mergePlayers(Array.isArray(snapshot.players) ? snapshot.players : []),
+    predictions: mapPredictionsByPlayer(Array.isArray(snapshot.predictions) ? snapshot.predictions : []),
   };
 }
 
@@ -83,6 +124,53 @@ export function buildStaticSnapshotFromBackupTables({ tables, now = new Date(), 
     aiStrategyStats: mapStaticAiStrategyStats(tables.ai_strategy_stats || []),
     importReports,
   };
+}
+
+export function buildStaticGroupSnapshotsFromBackupTables({ tables, now = new Date() }) {
+  const generatedAt = now.toISOString();
+  const groups = Array.isArray(tables.groups) ? tables.groups : [];
+  const players = Array.isArray(tables.players) ? tables.players : [];
+  const predictions = Array.isArray(tables.predictions) ? tables.predictions : [];
+  const snapshots = {};
+
+  for (const groupRow of groups) {
+    if (!groupRow?.id || !groupRow?.code) continue;
+    const groupPlayers = players
+      .filter((player) => player.group_id === groupRow.id && player.id && player.name)
+      .sort((a, b) => String(a.created_at || '').localeCompare(String(b.created_at || '')))
+      .map((player) => ({
+        id: player.id,
+        name: player.name,
+      }));
+    const playerIds = new Set(groupPlayers.map((player) => player.id));
+    const groupPredictions = predictions
+      .filter((prediction) => (
+        prediction.group_id === groupRow.id
+        && playerIds.has(prediction.player_id)
+        && prediction.match_id
+      ))
+      .map((prediction) => ({
+        player_id: prediction.player_id,
+        match_id: prediction.match_id,
+        scores: Array.isArray(prediction.scores)
+          ? prediction.scores.filter((score) => typeof score === 'string')
+          : [],
+      }));
+
+    snapshots[groupRow.code] = {
+      generatedAt,
+      source: 'local-backup',
+      group: {
+        id: groupRow.id,
+        code: groupRow.code,
+        name: groupRow.name || groupRow.code,
+      },
+      players: groupPlayers,
+      predictions: groupPredictions,
+    };
+  }
+
+  return snapshots;
 }
 
 export function getStaticAiStrategyStatsPage(rows, { page = 0, pageSize = 6 } = {}) {
