@@ -278,7 +278,7 @@ function App() {
   }
 
   async function submitAll() {
-    if (!state.selectedPlayerId || !group || (!d1Client && !client)) return;
+    if (!state.selectedPlayerId || (!d1Client && (!group || !client))) return;
 
     const entries = visibleMatches
       .map((match) => ({ matchId: match.id, scores: selectedScores(match.id) }))
@@ -503,7 +503,7 @@ function App() {
   }
 
   async function confirmAddPlayer() {
-    if (!group || (!d1Client && !client)) return;
+    if (!d1Client && (!group || !client)) return;
 
     try {
       const player = d1Client
