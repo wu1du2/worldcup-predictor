@@ -56,7 +56,7 @@ import {
   formatHitDetailRoi,
   getAiStrategyHitDetail,
 } from './aiStrategyHitDetails.mjs';
-import { loadStaticSnapshot } from './staticSnapshot.mjs';
+import { getStaticAiStrategyStatsPage, loadStaticSnapshot } from './staticSnapshot.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
@@ -87,6 +87,7 @@ function App() {
   const [createdHintOpen, setCreatedHintOpen] = useState(false);
   const [aiRecommendationDialog, setAiRecommendationDialog] = useState(null);
   const [aiRecommendationsByMatch, setAiRecommendationsByMatch] = useState({});
+  const [staticSnapshot, setStaticSnapshot] = useState(null);
   const [aiStrategyOpen, setAiStrategyOpen] = useState(false);
   const [aiStrategyForm, setAiStrategyForm] = useState({ authorName: '', strategyName: '', strategyPrompt: '', status: 'idle', error: '' });
   const [strategyRankDialog, setStrategyRankDialog] = useState({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' });
@@ -109,6 +110,7 @@ function App() {
     try {
       const snapshot = await loadStaticSnapshot();
       if (snapshot?.matches.length) {
+        setStaticSnapshot(snapshot);
         setMatches(snapshot.matches);
         setScoreOddsByMatch(snapshot.scoreOddsByMatch);
         setAiRecommendationsByMatch(snapshot.aiRecommendationsByMatch);
@@ -316,6 +318,16 @@ function App() {
 
   async function showBackendReports() {
     setMoreMenuOpen(false);
+    if (staticSnapshot?.importReports?.length) {
+      setReportDialog({
+        open: true,
+        status: 'ready',
+        reports: staticSnapshot.importReports.slice(0, 8),
+        error: '',
+      });
+      return;
+    }
+
     if (!client) {
       setReportDialog({ open: true, status: 'error', reports: [], error: 'Supabase 配置缺失' });
       return;
@@ -338,6 +350,19 @@ function App() {
 
   async function showAiStrategyLeaderboard(page = 0) {
     setMoreMenuOpen(false);
+    if (staticSnapshot?.aiStrategyStats?.length) {
+      const result = getStaticAiStrategyStatsPage(staticSnapshot.aiStrategyStats, { page, pageSize: 6 });
+      setStrategyRankDialog({
+        open: true,
+        status: 'ready',
+        rows: result.rows,
+        page: result.page,
+        hasNext: result.hasNext,
+        error: '',
+      });
+      return;
+    }
+
     if (!client) {
       setStrategyRankDialog({ open: true, status: 'error', rows: [], page, hasNext: false, error: 'Supabase 配置缺失' });
       return;

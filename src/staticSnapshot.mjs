@@ -1,8 +1,13 @@
 import {
   loadAiRecommendations,
+  loadAiStrategyStats,
+  loadImportReports,
   loadMatches,
   loadScoreOdds,
+  mapAiRecommendationsByMatch,
+  mapScoreOddsByMatch,
 } from './supabaseData.mjs';
+import { toAppMatch } from './matchSchedule.mjs';
 
 export const staticSnapshotPath = '/data-snapshot.json';
 
@@ -33,14 +38,18 @@ export function normalizeStaticSnapshot(snapshot) {
     aiRecommendationsByMatch: snapshot.aiRecommendationsByMatch && typeof snapshot.aiRecommendationsByMatch === 'object'
       ? snapshot.aiRecommendationsByMatch
       : {},
+    aiStrategyStats: Array.isArray(snapshot.aiStrategyStats) ? snapshot.aiStrategyStats : [],
+    importReports: Array.isArray(snapshot.importReports) ? snapshot.importReports : [],
   };
 }
 
 export async function buildStaticSnapshot({ client, now = new Date() }) {
   const matches = await loadMatches({ client });
-  const [scoreOddsByMatch, aiRecommendationsByMatch] = await Promise.all([
+  const [scoreOddsByMatch, aiRecommendationsByMatch, strategyStatsResult, importReports] = await Promise.all([
     loadScoreOdds({ client, matches }),
     loadAiRecommendations({ client }),
+    loadAiStrategyStats({ client, page: 0, pageSize: 50 }),
+    loadImportReports({ client, limit: 20 }),
   ]);
   return {
     generatedAt: now.toISOString(),
@@ -48,5 +57,74 @@ export async function buildStaticSnapshot({ client, now = new Date() }) {
     matches,
     scoreOddsByMatch,
     aiRecommendationsByMatch,
+    aiStrategyStats: strategyStatsResult.rows,
+    importReports,
+  };
+}
+
+export function buildStaticSnapshotFromBackupTables({ tables, now = new Date(), importReportLimit = 20 }) {
+  const matches = (tables.matches || [])
+    .filter((row) => row.active !== false)
+    .map(toAppMatch)
+    .filter((match) => match.id && match.date && match.time && match.home && match.away)
+    .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
+  const importReports = (tables.import_reports || [])
+    .map(toAppImportReport)
+    .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+    .slice(0, importReportLimit);
+
+  return {
+    generatedAt: now.toISOString(),
+    source: 'local-backup',
+    oddsWindow: null,
+    matches,
+    scoreOddsByMatch: mapScoreOddsByMatch(matches, tables.score_odds || [], tables.score_odds_trends || []),
+    aiRecommendationsByMatch: mapAiRecommendationsByMatch(tables.ai_recommendations || []),
+    aiStrategyStats: mapStaticAiStrategyStats(tables.ai_strategy_stats || []),
+    importReports,
+  };
+}
+
+export function getStaticAiStrategyStatsPage(rows, { page = 0, pageSize = 6 } = {}) {
+  const safePage = Math.max(0, Number(page) || 0);
+  const safePageSize = Math.max(1, Number(pageSize) || 6);
+  const sortedRows = [...(rows || [])].sort((a, b) => Number(b.roi || 0) - Number(a.roi || 0));
+  const from = safePage * safePageSize;
+  return {
+    rows: sortedRows.slice(from, from + safePageSize),
+    page: safePage,
+    pageSize: safePageSize,
+    hasNext: sortedRows.length > from + safePageSize,
+  };
+}
+
+function mapStaticAiStrategyStats(rows) {
+  return (rows || [])
+    .map((row) => ({
+      strategyId: row.strategy_id,
+      strategyName: row.strategy_name || '',
+      matchesCount: Number(row.matches_count) || 0,
+      cost: Number(row.cost) || 0,
+      revenue: Number(row.revenue) || 0,
+      profit: Number(row.profit) || 0,
+      roi: Number(row.roi) || 0,
+      updatedAt: row.updated_at || '',
+    }))
+    .sort((a, b) => b.roi - a.roi);
+}
+
+function toAppImportReport(row) {
+  return {
+    id: row.id,
+    jobName: row.job_name,
+    status: row.status,
+    startedAt: row.started_at,
+    finishedAt: row.finished_at,
+    rowsWritten: row.rows_written,
+    itemsSeen: row.items_seen,
+    message: row.message || '',
+    errorDetail: row.error_detail || '',
+    runUrl: row.run_url || '',
+    createdAt: row.created_at,
   };
 }
