@@ -39,6 +39,10 @@ const browser = await chromium.launch({ headless: true });
 const context = await browser.newContext({ ...devices['iPhone 13'] });
 const page = await context.newPage();
 
+await page.route('**/data-snapshot.json**', async (route) => {
+  await route.fulfill({ status: 404, body: '' });
+});
+
 await page.route('**/rest/v1/**', async (route) => {
   const url = new URL(route.request().url());
   const table = url.pathname.split('/').at(-1);

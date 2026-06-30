@@ -56,6 +56,7 @@ import {
   formatHitDetailRoi,
   getAiStrategyHitDetail,
 } from './aiStrategyHitDetails.mjs';
+import { loadStaticSnapshot } from './staticSnapshot.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
@@ -106,16 +107,41 @@ function App() {
     setErrorMessage('');
 
     try {
-      const [loadedMatches, loaded] = await Promise.all([
-        loadMatches({ client }),
-        loadGroupState({ client, groupCode }),
-      ]);
+      const snapshot = await loadStaticSnapshot();
+      if (snapshot?.matches.length) {
+        setMatches(snapshot.matches);
+        setScoreOddsByMatch(snapshot.scoreOddsByMatch);
+        setAiRecommendationsByMatch(snapshot.aiRecommendationsByMatch);
+        setLoadStatus('ready');
+        updateState((current) => ({
+          ...current,
+          groupCode,
+          selectedDate: new Set(snapshot.matches.map((match) => match.date)).has(current.selectedDate)
+            ? current.selectedDate
+            : getDefaultMatchDateCn(snapshot.matches),
+        }));
+      }
+
+      let loaded;
+      try {
+        loaded = await loadGroupState({ client, groupCode });
+      } catch (error) {
+        if (snapshot?.matches.length) {
+          console.warn('Failed to load group state; using static snapshot only', error);
+          return;
+        }
+        throw error;
+      }
+
+      const loadedMatches = snapshot?.matches.length ? snapshot.matches : await loadMatches({ client });
       const availableDates = new Set(loadedMatches.map((match) => match.date));
       setGroup(loaded.group);
       setPlayers(loaded.players);
       setMatches(loadedMatches);
-      setScoreOddsByMatch({});
-      setAiRecommendationsByMatch({});
+      if (!snapshot?.matches.length) {
+        setScoreOddsByMatch({});
+        setAiRecommendationsByMatch({});
+      }
       updateState((current) => ({
         ...current,
         selectedPlayerId: current.groupCode === groupCode ? current.selectedPlayerId : '',
@@ -125,12 +151,14 @@ function App() {
         selectedDate: availableDates.has(current.selectedDate) ? current.selectedDate : getDefaultMatchDateCn(loadedMatches),
       }));
       setLoadStatus('ready');
-      void loadScoreOdds({ client, matches: loadedMatches, oddsWindow: buildFutureScoreOddsWindow() })
-        .then(setScoreOddsByMatch)
-        .catch((error) => console.warn('Failed to load score odds', error));
-      void loadAiRecommendations({ client })
-        .then(setAiRecommendationsByMatch)
-        .catch((error) => console.warn('Failed to load AI recommendations', error));
+      if (!snapshot?.matches.length) {
+        void loadScoreOdds({ client, matches: loadedMatches, oddsWindow: buildFutureScoreOddsWindow() })
+          .then(setScoreOddsByMatch)
+          .catch((error) => console.warn('Failed to load score odds', error));
+        void loadAiRecommendations({ client })
+          .then(setAiRecommendationsByMatch)
+          .catch((error) => console.warn('Failed to load AI recommendations', error));
+      }
     } catch (error) {
       setLoadStatus('error');
       setErrorMessage(error.message || '加载失败');

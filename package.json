@@ -36,7 +36,9 @@
     "prematch:sources": "node scripts/backfillPrematchSources.mjs",
     "prematch:sources:dry": "node scripts/backfillPrematchSources.mjs --dry-run",
     "backfill:odds-trends": "node scripts/backfillScoreOddsTrends.mjs",
-    "backfill:odds-trends:dry": "node scripts/backfillScoreOddsTrends.mjs --dry-run"
+    "backfill:odds-trends:dry": "node scripts/backfillScoreOddsTrends.mjs --dry-run",
+    "snapshot:build": "node scripts/buildStaticSnapshot.mjs",
+    "snapshot:emergency": "node scripts/buildEmergencyStaticSnapshot.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",
