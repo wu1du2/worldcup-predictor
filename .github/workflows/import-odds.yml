@@ -12,33 +12,10 @@ concurrency:
 jobs:
   import-odds:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    timeout-minutes: 2
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
-
-      - name: Import odds
-        run: npm run import:odds
-
-      - name: Backfill odds trends
-        run: npm run backfill:odds-trends
-
-      - name: Report workflow failure
-        if: failure()
-        run: node scripts/reportActionFailure.mjs --job=odds --message="Odds workflow failed before import completed."
+      - name: Odds import paused
+        run: |
+          echo "Sporttery odds import is paused to reduce Supabase egress."
+          echo "This workflow intentionally does not write Supabase."

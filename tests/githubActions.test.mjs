@@ -15,16 +15,15 @@ test('match import workflow supports off-peak hourly schedule and manual runs wi
   assert.match(workflow, /node scripts\/reportActionFailure\.mjs --job=matches/);
 });
 
-test('odds import workflow supports off-peak hourly schedule, manual runs, and failure reports', async () => {
+test('odds import workflow is paused as a Supabase no-op', async () => {
   const workflow = await readFile(new URL('../.github/workflows/import-odds.yml', import.meta.url), 'utf8');
 
   assert.match(workflow, /workflow_dispatch:/);
   assert.match(workflow, /cron: '43 \* \* \* \*'/);
   assert.match(workflow, /concurrency:\n  group: import-odds\n  cancel-in-progress: false/);
-  assert.match(workflow, /SUPABASE_URL: \$\{\{ secrets\.SUPABASE_URL \}\}/);
-  assert.match(workflow, /SUPABASE_SERVICE_ROLE_KEY: \$\{\{ secrets\.SUPABASE_SERVICE_ROLE_KEY \}\}/);
-  assert.match(workflow, /npm run import:odds/);
-  assert.match(workflow, /npm run backfill:odds-trends/);
-  assert.match(workflow, /if: failure\(\)/);
-  assert.match(workflow, /node scripts\/reportActionFailure\.mjs --job=odds/);
+  assert.match(workflow, /Odds import paused/);
+  assert.doesNotMatch(workflow, /SUPABASE_SERVICE_ROLE_KEY/);
+  assert.doesNotMatch(workflow, /npm run import:odds/);
+  assert.doesNotMatch(workflow, /npm run backfill:odds-trends/);
+  assert.match(workflow, /intentionally does not write Supabase/);
 });
