@@ -4,10 +4,25 @@ import assert from 'node:assert/strict';
 import {
   createD1GroupPlayer,
   createD1ApiClient,
+  createD1BrowserClientFromEnv,
   loadD1LiveBoard,
   loadD1GroupState,
   saveD1GroupPredictions,
 } from '../src/d1Data.mjs';
+
+test('createD1BrowserClientFromEnv keeps D1 disabled unless explicitly enabled', () => {
+  assert.equal(createD1BrowserClientFromEnv({
+    VITE_D1_API_URL: 'https://worldcup-api.example.workers.dev',
+  }), null);
+
+  assert.deepEqual(createD1BrowserClientFromEnv({
+    VITE_D1_ENABLED: 'true',
+    VITE_D1_API_URL: 'https://worldcup-api.example.workers.dev',
+  }), {
+    baseUrl: 'https://worldcup-api.example.workers.dev',
+    fetchImpl: fetch,
+  });
+});
 
 test('loadD1GroupState normalizes Worker group state into app players and predictions', async () => {
   const client = createD1ApiClient({

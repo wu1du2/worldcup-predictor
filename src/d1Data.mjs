@@ -1,7 +1,12 @@
 import { mapPredictionsByPlayer, mergePlayers } from './supabaseData.mjs';
 
 export function createD1BrowserClient() {
-  const baseUrl = import.meta.env.VITE_D1_API_URL;
+  return createD1BrowserClientFromEnv(import.meta.env);
+}
+
+export function createD1BrowserClientFromEnv(env = {}) {
+  if (env.VITE_D1_ENABLED !== 'true') return null;
+  const baseUrl = env.VITE_D1_API_URL;
   if (!baseUrl) return null;
   return createD1ApiClient({ baseUrl });
 }
