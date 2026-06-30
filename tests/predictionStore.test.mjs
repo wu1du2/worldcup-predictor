@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   addCustomPlayer,
+  buildScoreOptionsForMatch,
   buildPredictionResultRows,
   createInitialState,
   exportAllTimeStatsText,
@@ -131,6 +132,27 @@ test('getScoreTrendDirection classifies odds movement for UI color', () => {
   assert.equal(getScoreTrendDirection({ trend: { changePct: -20 } }), 'down');
   assert.equal(getScoreTrendDirection({ trend: { changePct: 0.01 } }), 'flat');
   assert.equal(getScoreTrendDirection({}), 'flat');
+});
+
+test('buildScoreOptionsForMatch always preserves the fixed Sporttery score template', () => {
+  const options = buildScoreOptionsForMatch([
+    { score: '1-1', odds: 6.5, trend: { changePct: 12.5 } },
+    { score: '胜其他', odds: 100 },
+  ]);
+
+  assert.equal(options.length, 31);
+  assert.deepEqual(options.slice(0, 3).map((option) => option.score), ['1-0', '2-0', '2-1']);
+  assert.deepEqual(options.slice(-3).map((option) => option.score), ['1-5', '2-5', '负其他']);
+  assert.deepEqual(options.find((option) => option.score === '1-1'), {
+    score: '1-1',
+    odds: 6.5,
+    trend: { changePct: 12.5 },
+  });
+  assert.deepEqual(options.find((option) => option.score === '胜其他'), {
+    score: '胜其他',
+    odds: 100,
+  });
+  assert.deepEqual(options.find((option) => option.score === '0-0'), { score: '0-0' });
 });
 
 test('isCorrectScoreOption recognizes exact completed scores', () => {

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import {
+  buildScoreOptionsForMatch,
   createInitialState,
   exportAllTimeStatsText,
   exportPredictionsText,
@@ -54,12 +55,10 @@ import {
   formatHitDetailRoi,
   getAiStrategyHitDetail,
 } from './aiStrategyHitDetails.mjs';
-import { sportteryScoreTemplate } from './scoreTemplate.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
 
-const fallbackScoreOptions = sportteryScoreTemplate.map((score) => ({ score }));
 let aiStrategyHitDetailsIndexCache = null;
 
 function loadState() {
@@ -519,7 +518,7 @@ function App() {
               selectedPlayerId={state.selectedPlayerId}
               recommendedScores={recommendation?.scores || aiPredictions[match.id] || []}
               aiRecommendation={recommendation}
-              scoreOptions={scoreOddsByMatch[match.id] || fallbackScoreOptions}
+              scoreOptions={buildScoreOptionsForMatch(scoreOddsByMatch[match.id])}
               onToggle={toggleMatchScore}
               onOpenAiRecommendation={setAiRecommendationDialog}
             />

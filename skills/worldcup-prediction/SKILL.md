@@ -30,6 +30,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Low-frequency actions live in compact header controls.
 - Buttons, score chips, and match rows use stable dimensions; text must not overlap or resize the layout.
 - Correct-score chips display odds inline as `1:1(6.5)`, but stored prediction values remain plain scores like `1-1`. The score template should match the Sporttery correct-score market: 28 exact scores plus `胜其他` / `平其他` / `负其他`, each with odds when available.
+- Score-chip rendering must always start from the fixed Sporttery template and then merge odds/trend metadata by score. Never render directly from `score_odds` rows, because a partial odds import would make valid prediction buttons disappear.
 - Completed match score chips should highlight the winning option with a non-green amber/gold border only, so it remains visually distinct from the user's green selected state. Exact scores compare directly; `胜其他` / `平其他` / `负其他` are correct only when the final score is outside the fixed Sporttery exact-score template and has the matching result direction.
 - Use “比分预测” in user-facing titles and export headers. Avoid “波胆预测” in visible copy.
 - Match cards show Chinese team names and the match score/status. Do not show venue text or per-match prediction counts in the card.

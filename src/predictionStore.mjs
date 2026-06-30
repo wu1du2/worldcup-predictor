@@ -1,4 +1,4 @@
-import { exactSportteryScores } from './scoreTemplate.mjs';
+import { exactSportteryScores, sportteryScoreTemplate } from './scoreTemplate.mjs';
 
 export function createInitialState() {
   return {
@@ -54,6 +54,19 @@ export function formatScoreOptionLabel(option) {
   const displayScore = option.score.replace(/^(\d+)-(\d+)$/, '$1:$2');
   if (!option.odds) return displayScore;
   return `${displayScore}(${option.odds})`;
+}
+
+export function buildScoreOptionsForMatch(scoreOdds = []) {
+  const oddsByScore = new Map(
+    (scoreOdds || [])
+      .filter((option) => sportteryScoreTemplate.includes(option?.score))
+      .map((option) => [option.score, option]),
+  );
+
+  return sportteryScoreTemplate.map((score) => {
+    const option = oddsByScore.get(score);
+    return option ? { ...option, score } : { score };
+  });
 }
 
 export function formatScoreTrendLabel(option) {
