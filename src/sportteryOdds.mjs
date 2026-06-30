@@ -89,6 +89,7 @@ export function toScoreOptionRows(matches, updatedAt = new Date().toISOString())
       home,
       away,
       kickoff_label: match.kickoffLabel,
+      kickoff_at_cn: toChinaKickoffIso(match.kickoffLabel, updatedAt),
       score: scoreOption.score,
       odds: scoreOption.odds,
       updated_at: updatedAt,
@@ -133,6 +134,14 @@ export function dedupeScoreOptionRows(rows) {
   }
 
   return [...byKey.values()];
+}
+
+export function toChinaKickoffIso(kickoffLabel, referenceIso = new Date().toISOString()) {
+  const match = String(kickoffLabel || '').match(/^([0-9]{2})-([0-9]{2})\s+([0-9]{2}):([0-9]{2})$/);
+  if (!match) return null;
+  const year = String(referenceIso || '').match(/^([0-9]{4})/)?.[1] || String(new Date().getUTCFullYear());
+  const [, month, day, hour, minute] = match;
+  return `${year}-${month}-${day}T${hour}:${minute}:00+08:00`;
 }
 
 export function validateParsedOddsMatches(matches) {

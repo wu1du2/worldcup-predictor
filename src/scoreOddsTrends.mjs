@@ -1,4 +1,5 @@
 import { normalizeSportteryTeamName } from './sportteryTeams.mjs';
+import { toChinaKickoffIso } from './sportteryOdds.mjs';
 
 export function buildAllScoreOddsTrendRows({ snapshots }) {
   if (!Array.isArray(snapshots)) throw new Error('Trend snapshots must be an array.');
@@ -68,6 +69,7 @@ export function buildScoreOddsTrendRows({ snapshots, matchKey }) {
     home: matchKey.home,
     away: matchKey.away,
     kickoff_label: matchKey.kickoffLabel,
+    kickoff_at_cn: toChinaKickoffIso(matchKey.kickoffLabel, trend.latestSeenAt),
     score: trend.score,
     first_odds: trend.firstOdds,
     latest_odds: trend.latestOdds,

@@ -66,11 +66,7 @@ try {
       }),
     });
 
-    const { error } = await client
-      .from('score_odds')
-      .upsert(rows, { onConflict: 'source,source_match_key,score' });
-
-    if (error) throw error;
+    await upsertScoreOddsRows(client, rows);
 
     console.log(`Upserted ${rows.length} score odds rows into Supabase.`);
     await reportImport({
@@ -168,4 +164,25 @@ async function reportImport({ client: reportClient, status, rowsWritten, itemsSe
       runUrl: getGithubRunUrl(),
     },
   });
+}
+
+async function upsertScoreOddsRows(client, rowsToWrite) {
+  const { error } = await client
+    .from('score_odds')
+    .upsert(rowsToWrite, { onConflict: 'source,source_match_key,score' });
+
+  if (!isMissingKickoffAtColumn(error)) {
+    if (error) throw error;
+    return;
+  }
+
+  const legacyRows = rowsToWrite.map(({ kickoff_at_cn, ...row }) => row);
+  const { error: legacyError } = await client
+    .from('score_odds')
+    .upsert(legacyRows, { onConflict: 'source,source_match_key,score' });
+  if (legacyError) throw legacyError;
+}
+
+function isMissingKickoffAtColumn(error) {
+  return error?.code === '42703' || /kickoff_at_cn/i.test(error?.message || '');
 }

@@ -71,6 +71,39 @@ export function generateGroupCode(random = Math.random) {
   return code;
 }
 
+export function buildFutureScoreOddsWindow(now = new Date(), daysAhead = 3) {
+  const dateParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now).split('-').map(Number);
+  const [year, month, day] = dateParts;
+  const startUtc = Date.UTC(year, month - 1, day) - (8 * 60 * 60 * 1000);
+  const endUtc = startUtc + ((Number(daysAhead) + 1) * 24 * 60 * 60 * 1000);
+  return {
+    from: formatChinaOffsetIso(new Date(startUtc)),
+    to: formatChinaOffsetIso(new Date(endUtc)),
+  };
+}
+
+function formatChinaOffsetIso(date) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date).reduce((acc, part) => {
+    acc[part.type] = part.value;
+    return acc;
+  }, {});
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}+08:00`;
+}
+
 export function mergePlayers(dbPlayers) {
   const players = dbPlayers || [];
   const aiPlayer = players.find((player) => player.name === aiPlayerName);
@@ -108,10 +141,10 @@ export async function loadMatches({ client }) {
   return (data || []).filter(isCompleteMatchRow).map(toAppMatch);
 }
 
-export async function loadScoreOdds({ client, matches }) {
+export async function loadScoreOdds({ client, matches, oddsWindow = null }) {
   const [rowsResult, trendRowsResult] = await Promise.allSettled([
-    loadAllScoreOddsRows(client),
-    loadAllScoreOddsTrendRows(client),
+    loadAllScoreOddsRows(client, oddsWindow),
+    loadAllScoreOddsTrendRows(client, oddsWindow),
   ]);
   if (rowsResult.status === 'rejected') throw rowsResult.reason;
   if (trendRowsResult.status === 'rejected') {
@@ -260,18 +293,27 @@ function toAppImportReport(row) {
   };
 }
 
-async function loadAllScoreOddsRows(client) {
+async function loadAllScoreOddsRows(client, oddsWindow = null) {
   const pageSize = 1000;
   const rows = [];
 
   for (let from = 0; ; from += pageSize) {
-    const { data, error } = await client
+    let query = client
       .from('score_odds')
       .select('home,away,kickoff_label,score,odds')
-      .order('source_match_key', { ascending: true })
+    if (oddsWindow?.from && oddsWindow?.to) {
+      query = query
+        .gte('kickoff_at_cn', oddsWindow.from)
+        .lt('kickoff_at_cn', oddsWindow.to)
+        .order('kickoff_at_cn', { ascending: true });
+    } else {
+      query = query.order('source_match_key', { ascending: true });
+    }
+    const { data, error } = await query
       .order('score', { ascending: true })
       .range(from, from + pageSize - 1);
 
+    if (isMissingKickoffAtColumn(error) && oddsWindow) return loadAllScoreOddsRows(client, null);
     if (error) throw error;
     rows.push(...(data || []));
     if (!data || data.length < pageSize) break;
@@ -280,24 +322,37 @@ async function loadAllScoreOddsRows(client) {
   return rows;
 }
 
-async function loadAllScoreOddsTrendRows(client) {
+async function loadAllScoreOddsTrendRows(client, oddsWindow = null) {
   const pageSize = 1000;
   const rows = [];
 
   for (let from = 0; ; from += pageSize) {
-    const { data, error } = await client
+    let query = client
       .from('score_odds_trends')
       .select('home,away,kickoff_label,score,first_odds,latest_odds,change_pct,snapshots_count')
-      .order('source_match_key', { ascending: true })
+    if (oddsWindow?.from && oddsWindow?.to) {
+      query = query
+        .gte('kickoff_at_cn', oddsWindow.from)
+        .lt('kickoff_at_cn', oddsWindow.to)
+        .order('kickoff_at_cn', { ascending: true });
+    } else {
+      query = query.order('source_match_key', { ascending: true });
+    }
+    const { data, error } = await query
       .order('score', { ascending: true })
       .range(from, from + pageSize - 1);
 
+    if (isMissingKickoffAtColumn(error) && oddsWindow) return loadAllScoreOddsTrendRows(client, null);
     if (error) throw error;
     rows.push(...(data || []));
     if (!data || data.length < pageSize) break;
   }
 
   return rows;
+}
+
+function isMissingKickoffAtColumn(error) {
+  return error?.code === '42703' || /kickoff_at_cn/i.test(error?.message || '');
 }
 
 export function mapScoreOddsByMatch(matches, oddsRows, trendRows = []) {

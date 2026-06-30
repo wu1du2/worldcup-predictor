@@ -35,11 +35,7 @@ if (dryRun) {
   console.log('Dry run: not writing Supabase.');
 } else {
   for (const chunk of chunkRows(rows, 500)) {
-    const { error } = await client
-      .from('score_odds_trends')
-      .upsert(chunk, { onConflict: 'source,source_match_key,score' });
-
-    if (error) throw error;
+    await upsertTrendRows(client, chunk);
   }
   console.log(`Upserted ${rows.length} score odds trend rows into Supabase.`);
 }
@@ -93,6 +89,27 @@ function chunkRows(rows, size) {
     chunks.push(rows.slice(index, index + size));
   }
   return chunks;
+}
+
+async function upsertTrendRows(client, rowsToWrite) {
+  const { error } = await client
+    .from('score_odds_trends')
+    .upsert(rowsToWrite, { onConflict: 'source,source_match_key,score' });
+
+  if (!isMissingKickoffAtColumn(error)) {
+    if (error) throw error;
+    return;
+  }
+
+  const legacyRows = rowsToWrite.map(({ kickoff_at_cn, ...row }) => row);
+  const { error: legacyError } = await client
+    .from('score_odds_trends')
+    .upsert(legacyRows, { onConflict: 'source,source_match_key,score' });
+  if (legacyError) throw legacyError;
+}
+
+function isMissingKickoffAtColumn(error) {
+  return error?.code === '42703' || /kickoff_at_cn/i.test(error?.message || '');
 }
 
 function buildSourceDateRange() {

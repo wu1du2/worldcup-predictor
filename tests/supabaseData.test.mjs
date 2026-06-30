@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   aiPlayerName,
+  buildFutureScoreOddsWindow,
   ensureAiPlayer,
   fetchWithTimeoutAndRetry,
   generateGroupCode,
@@ -52,6 +53,16 @@ test('generateGroupCode returns a six character lowercase letter and number code
   assert.match(generateGroupCode(() => 0), /^[a-z0-9]{6}$/);
   assert.equal(generateGroupCode(() => 0), 'aaaaaa');
   assert.equal(generateGroupCode(() => 0.999), '999999');
+});
+
+test('buildFutureScoreOddsWindow covers today plus the next three China dates', () => {
+  assert.deepEqual(
+    buildFutureScoreOddsWindow(new Date('2026-06-30T05:00:00.000Z')),
+    {
+      from: '2026-06-30T00:00:00+08:00',
+      to: '2026-07-04T00:00:00+08:00',
+    },
+  );
 });
 
 test('mergePlayers returns only group-specific database players', () => {
@@ -622,6 +633,67 @@ test('loadScoreOdds keeps score odds when trend loading fails', async () => {
   } finally {
     console.warn = originalWarn;
   }
+});
+
+test('loadScoreOdds can query only a kickoff_at_cn window', async () => {
+  const calls = [];
+  const client = {
+    from(table) {
+      calls.push(['from', table]);
+      return {
+        select(columns) {
+          calls.push(['select', columns]);
+          const query = {
+            gte(column, value) {
+              calls.push(['gte', column, value]);
+              return query;
+            },
+            lt(column, value) {
+              calls.push(['lt', column, value]);
+              return query;
+            },
+            order(columnName, options) {
+              calls.push(['order', columnName, options]);
+              return query;
+            },
+            range(from, to) {
+              calls.push(['range', from, to]);
+              const data = table === 'score_odds'
+                ? [{
+                    home: '科特迪瓦',
+                    away: '挪威',
+                    kickoff_label: '07-01 01:00',
+                    score: '1-0',
+                    odds: 5.5,
+                  }]
+                : [];
+              return Promise.resolve({ data, error: null });
+            },
+          };
+          return query;
+        },
+      };
+    },
+  };
+
+  const odds = await loadScoreOdds({
+    client,
+    matches: [{ id: 'm1', date: '2026-07-01', time: '01:00', home: '科特迪瓦', away: '挪威' }],
+    oddsWindow: {
+      from: '2026-06-30T00:00:00+08:00',
+      to: '2026-07-04T00:00:00+08:00',
+    },
+  });
+
+  assert.deepEqual(odds, {
+    m1: [{ score: '1-0', odds: 5.5 }],
+  });
+  assert.deepEqual(calls.filter((call) => call[0] === 'gte' || call[0] === 'lt'), [
+    ['gte', 'kickoff_at_cn', '2026-06-30T00:00:00+08:00'],
+    ['lt', 'kickoff_at_cn', '2026-07-04T00:00:00+08:00'],
+    ['gte', 'kickoff_at_cn', '2026-06-30T00:00:00+08:00'],
+    ['lt', 'kickoff_at_cn', '2026-07-04T00:00:00+08:00'],
+  ]);
 });
 
 test('loadScoreOdds paginates beyond Supabase default row limits', async () => {

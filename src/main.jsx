@@ -17,6 +17,7 @@ import {
 import {
   createGroupPlayer,
   createSupabaseBrowserClient,
+  buildFutureScoreOddsWindow,
   generateGroupCode,
   getGroupCodeFromSearch,
   loadAiRecommendations,
@@ -124,7 +125,7 @@ function App() {
         selectedDate: availableDates.has(current.selectedDate) ? current.selectedDate : getDefaultMatchDateCn(loadedMatches),
       }));
       setLoadStatus('ready');
-      void loadScoreOdds({ client, matches: loadedMatches })
+      void loadScoreOdds({ client, matches: loadedMatches, oddsWindow: buildFutureScoreOddsWindow() })
         .then(setScoreOddsByMatch)
         .catch((error) => console.warn('Failed to load score odds', error));
       void loadAiRecommendations({ client })
