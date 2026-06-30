@@ -24,6 +24,18 @@ test('createD1BrowserClientFromEnv keeps D1 disabled unless explicitly enabled',
   });
 });
 
+test('createD1ApiClient accepts same-origin api proxy base without duplicating api path', () => {
+  assert.deepEqual(createD1ApiClient({ baseUrl: '/api' }), {
+    baseUrl: '',
+    fetchImpl: fetch,
+  });
+
+  assert.deepEqual(createD1ApiClient({ baseUrl: 'https://app.example.com/api/' }), {
+    baseUrl: 'https://app.example.com',
+    fetchImpl: fetch,
+  });
+});
+
 test('loadD1GroupState normalizes Worker group state into app players and predictions', async () => {
   const client = createD1ApiClient({
     baseUrl: 'https://worldcup-api.example.workers.dev',

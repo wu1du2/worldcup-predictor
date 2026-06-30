@@ -12,12 +12,19 @@ export function createD1BrowserClientFromEnv(env = {}) {
 }
 
 export function createD1ApiClient({ baseUrl, fetchImpl = fetch }) {
-  const normalizedBaseUrl = String(baseUrl || '').replace(/\/+$/, '');
-  if (!normalizedBaseUrl) return null;
+  const normalizedBaseUrl = normalizeD1BaseUrl(baseUrl);
+  if (normalizedBaseUrl === null) return null;
   return {
     baseUrl: normalizedBaseUrl,
     fetchImpl,
   };
+}
+
+function normalizeD1BaseUrl(baseUrl) {
+  const trimmed = String(baseUrl ?? '').trim().replace(/\/+$/, '');
+  if (!trimmed) return null;
+  if (trimmed === '/api') return '';
+  return trimmed.endsWith('/api') ? trimmed.slice(0, -4) : trimmed;
 }
 
 export async function loadD1GroupState({ client, groupCode }) {
