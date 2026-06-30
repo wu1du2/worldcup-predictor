@@ -4,6 +4,8 @@ import { toAppMatch } from './matchSchedule.mjs';
 import { sportteryScoreTemplate } from './scoreTemplate.mjs';
 
 export const aiPlayerName = 'AI推荐';
+export const supabaseFetchTimeoutMs = 8000;
+export const supabaseFetchRetries = 1;
 
 export function createSupabaseBrowserClient() {
   const url = import.meta.env.VITE_SUPABASE_URL;
@@ -13,7 +15,44 @@ export function createSupabaseBrowserClient() {
     return null;
   }
 
-  return createClient(url, anonKey);
+  return createClient(url, anonKey, {
+    global: {
+      fetch: (input, init) => fetchWithTimeoutAndRetry(input, init, {
+        timeoutMs: supabaseFetchTimeoutMs,
+        retries: supabaseFetchRetries,
+      }),
+    },
+  });
+}
+
+export async function fetchWithTimeoutAndRetry(input, init = {}, {
+  timeoutMs = supabaseFetchTimeoutMs,
+  retries = supabaseFetchRetries,
+  fetchImpl = fetch,
+} = {}) {
+  const method = String(init?.method || input?.method || 'GET').toUpperCase();
+  const maxRetries = method === 'GET' || method === 'HEAD' ? Math.max(0, retries) : 0;
+  let lastError;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+    const controller = new AbortController();
+    const abortFromParent = () => controller.abort(init.signal?.reason);
+    if (init.signal?.aborted) abortFromParent();
+    init.signal?.addEventListener?.('abort', abortFromParent, { once: true });
+    const timeoutId = setTimeout(() => controller.abort(new Error('Supabase request timed out')), timeoutMs);
+
+    try {
+      return await fetchImpl(input, { ...init, signal: controller.signal });
+    } catch (error) {
+      lastError = error;
+      if (attempt >= maxRetries || init.signal?.aborted) throw error;
+    } finally {
+      clearTimeout(timeoutId);
+      init.signal?.removeEventListener?.('abort', abortFromParent);
+    }
+  }
+
+  throw lastError;
 }
 
 export function getGroupCodeFromSearch(search) {

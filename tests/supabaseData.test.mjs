@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   aiPlayerName,
   ensureAiPlayer,
+  fetchWithTimeoutAndRetry,
   generateGroupCode,
   getGroupByCode,
   getGroupCodeFromSearch,
@@ -18,6 +19,27 @@ import {
   mergePlayers,
   submitAiUserStrategy,
 } from '../src/supabaseData.mjs';
+
+test('fetchWithTimeoutAndRetry retries a hung browser fetch after timeout', async () => {
+  const signals = [];
+  const response = await fetchWithTimeoutAndRetry('https://example.test/rest/v1/matches', {}, {
+    timeoutMs: 10,
+    retries: 1,
+    fetchImpl(input, init) {
+      signals.push(init.signal);
+      if (signals.length === 1) {
+        return new Promise((resolve, reject) => {
+          init.signal.addEventListener('abort', () => reject(new DOMException('timeout', 'AbortError')));
+        });
+      }
+      return Promise.resolve(new Response('[]', { status: 200 }));
+    },
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(signals.length, 2);
+  assert.equal(signals[0].aborted, true);
+});
 
 test('getGroupCodeFromSearch reads group query param and falls back to default', () => {
   assert.equal(getGroupCodeFromSearch('?group=wx-football'), 'wx-football');
