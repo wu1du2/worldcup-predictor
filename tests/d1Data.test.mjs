@@ -31,6 +31,26 @@ test('loadD1GroupState normalizes Worker group state into app players and predic
   });
 });
 
+test('loadD1GroupState calls fetch without binding it to the client object', async () => {
+  let thisValue;
+  const fetchImpl = function fetchWithThisCheck() {
+    thisValue = this;
+    return Promise.resolve(new Response(JSON.stringify({
+      group: { id: 'g1', code: 'lzscqjd', name: 'lzscqjd' },
+      players: [],
+      predictions: [],
+    }), { status: 200 }));
+  };
+  const client = createD1ApiClient({
+    baseUrl: 'https://worldcup-api.example.workers.dev',
+    fetchImpl,
+  });
+
+  await loadD1GroupState({ client, groupCode: 'lzscqjd' });
+
+  assert.equal(thisValue, undefined);
+});
+
 test('loadD1GroupState throws a readable error when Worker returns non-2xx', async () => {
   const client = createD1ApiClient({
     baseUrl: 'https://worldcup-api.example.workers.dev/',

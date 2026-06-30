@@ -17,7 +17,7 @@ export function createD1ApiClient({ baseUrl, fetchImpl = fetch }) {
 
 export async function loadD1GroupState({ client, groupCode }) {
   if (!client) throw new Error('D1 API 配置缺失');
-  const response = await client.fetchImpl(`${client.baseUrl}/api/groups/${encodeURIComponent(groupCode)}/state`);
+  const response = await (0, client.fetchImpl)(`${client.baseUrl}/api/groups/${encodeURIComponent(groupCode)}/state`);
   if (!response.ok) {
     let errorText = response.statusText;
     try {
