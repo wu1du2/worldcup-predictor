@@ -13,6 +13,7 @@
     "acceptance:reports": "node tests/stage10.reports.acceptance.mjs",
     "acceptance:stats": "node tests/stage11.total-stats.acceptance.mjs",
     "acceptance:home": "node tests/stage12.home-create-group.acceptance.mjs",
+    "acceptance:nonblocking-load": "node tests/stage13.nonblocking-load.acceptance.mjs",
     "import:matches": "node scripts/importMatchesFromEspn.mjs",
     "import:matches:dry": "node scripts/importMatchesFromEspn.mjs --dry-run",
     "probe:odds": "node scripts/probeSportteryOdds.mjs",

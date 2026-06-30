@@ -105,18 +105,16 @@ function App() {
     setErrorMessage('');
 
     try {
-      const loadedMatches = await loadMatches({ client });
-      const [loaded, loadedScoreOdds, loadedAiRecommendations] = await Promise.all([
+      const [loadedMatches, loaded] = await Promise.all([
+        loadMatches({ client }),
         loadGroupState({ client, groupCode }),
-        loadScoreOdds({ client, matches: loadedMatches }),
-        loadAiRecommendations({ client }),
       ]);
       const availableDates = new Set(loadedMatches.map((match) => match.date));
       setGroup(loaded.group);
       setPlayers(loaded.players);
       setMatches(loadedMatches);
-      setScoreOddsByMatch(loadedScoreOdds);
-      setAiRecommendationsByMatch(loadedAiRecommendations);
+      setScoreOddsByMatch({});
+      setAiRecommendationsByMatch({});
       updateState((current) => ({
         ...current,
         selectedPlayerId: current.groupCode === groupCode ? current.selectedPlayerId : '',
@@ -126,6 +124,12 @@ function App() {
         selectedDate: availableDates.has(current.selectedDate) ? current.selectedDate : getDefaultMatchDateCn(loadedMatches),
       }));
       setLoadStatus('ready');
+      void loadScoreOdds({ client, matches: loadedMatches })
+        .then(setScoreOddsByMatch)
+        .catch((error) => console.warn('Failed to load score odds', error));
+      void loadAiRecommendations({ client })
+        .then(setAiRecommendationsByMatch)
+        .catch((error) => console.warn('Failed to load AI recommendations', error));
     } catch (error) {
       setLoadStatus('error');
       setErrorMessage(error.message || '加载失败');
