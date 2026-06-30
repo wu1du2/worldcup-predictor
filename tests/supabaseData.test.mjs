@@ -575,6 +575,55 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
   ]);
 });
 
+test('loadScoreOdds keeps score odds when trend loading fails', async () => {
+  const originalWarn = console.warn;
+  console.warn = () => {};
+  const client = {
+    from(table) {
+      return {
+        select() {
+          const query = {
+            order() {
+              return query;
+            },
+            range() {
+              if (table === 'score_odds_trends') {
+                return Promise.resolve({ data: null, error: { message: 'statement timeout' } });
+              }
+              return Promise.resolve({
+                data: [
+                  {
+                    home: '科特迪瓦',
+                    away: '挪威',
+                    kickoff_label: '07-01 01:00',
+                    score: '1-0',
+                    odds: 5.5,
+                  },
+                ],
+                error: null,
+              });
+            },
+          };
+          return query;
+        },
+      };
+    },
+  };
+
+  try {
+    const odds = await loadScoreOdds({
+      client,
+      matches: [{ id: 'm1', date: '2026-07-01', time: '01:00', home: '科特迪瓦', away: '挪威' }],
+    });
+
+    assert.deepEqual(odds, {
+      m1: [{ score: '1-0', odds: 5.5 }],
+    });
+  } finally {
+    console.warn = originalWarn;
+  }
+});
+
 test('loadScoreOdds paginates beyond Supabase default row limits', async () => {
   const firstPage = Array.from({ length: 1000 }, (_, index) => ({
     home: '占位',

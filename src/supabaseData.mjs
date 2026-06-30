@@ -109,10 +109,16 @@ export async function loadMatches({ client }) {
 }
 
 export async function loadScoreOdds({ client, matches }) {
-  const [rows, trendRows] = await Promise.all([
+  const [rowsResult, trendRowsResult] = await Promise.allSettled([
     loadAllScoreOddsRows(client),
     loadAllScoreOddsTrendRows(client),
   ]);
+  if (rowsResult.status === 'rejected') throw rowsResult.reason;
+  if (trendRowsResult.status === 'rejected') {
+    console.warn('Failed to load score odds trends', trendRowsResult.reason);
+  }
+  const rows = rowsResult.value;
+  const trendRows = trendRowsResult.status === 'fulfilled' ? trendRowsResult.value : [];
   return mapScoreOddsByMatch(matches, rows, trendRows);
 }
 
