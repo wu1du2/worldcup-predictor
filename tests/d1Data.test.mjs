@@ -2,8 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  createD1GroupPlayer,
   createD1ApiClient,
   loadD1GroupState,
+  saveD1GroupPredictions,
 } from '../src/d1Data.mjs';
 
 test('loadD1GroupState normalizes Worker group state into app players and predictions', async () => {
@@ -61,4 +63,45 @@ test('loadD1GroupState throws a readable error when Worker returns non-2xx', asy
     () => loadD1GroupState({ client, groupCode: 'missing' }),
     /D1 group state failed: 404 group_not_found/,
   );
+});
+
+test('createD1GroupPlayer posts a trimmed player name to the Worker', async () => {
+  const client = createD1ApiClient({
+    baseUrl: 'https://worldcup-api.example.workers.dev/',
+    fetchImpl: async (url, init) => {
+      assert.equal(url, 'https://worldcup-api.example.workers.dev/api/groups/lzscqjd/players');
+      assert.equal(init.method, 'POST');
+      assert.equal(init.headers['content-type'], 'application/json');
+      assert.deepEqual(JSON.parse(init.body), { name: '张三' });
+      return new Response(JSON.stringify({ player: { id: 'p1', name: '张三' } }), { status: 200 });
+    },
+  });
+
+  const player = await createD1GroupPlayer({ client, groupCode: 'lzscqjd', name: ' 张三 ' });
+
+  assert.deepEqual(player, { id: 'p1', name: '张三' });
+});
+
+test('saveD1GroupPredictions posts selected score entries to the Worker', async () => {
+  const client = createD1ApiClient({
+    baseUrl: 'https://worldcup-api.example.workers.dev',
+    fetchImpl: async (url, init) => {
+      assert.equal(url, 'https://worldcup-api.example.workers.dev/api/groups/lzscqjd/predictions');
+      assert.equal(init.method, 'POST');
+      assert.deepEqual(JSON.parse(init.body), {
+        playerId: 'p1',
+        entries: [{ matchId: 'm1', scores: ['1-0', '2-1'] }],
+      });
+      return new Response(JSON.stringify({ ok: true, rowsWritten: 1 }), { status: 200 });
+    },
+  });
+
+  const result = await saveD1GroupPredictions({
+    client,
+    groupCode: 'lzscqjd',
+    playerId: 'p1',
+    entries: [{ matchId: 'm1', scores: ['1-0', 2, '2-1'] }],
+  });
+
+  assert.deepEqual(result, { ok: true, rowsWritten: 1 });
 });

@@ -32,6 +32,63 @@ export async function loadD1GroupState({ client, groupCode }) {
   return normalizeD1GroupState(await response.json(), { groupCode });
 }
 
+export async function createD1GroupPlayer({ client, groupCode, name }) {
+  if (!client) throw new Error('D1 API 配置缺失');
+  const trimmedName = String(name || '').trim();
+  if (!trimmedName) return null;
+
+  const body = await postD1Json({
+    client,
+    path: `/api/groups/${encodeURIComponent(groupCode)}/players`,
+    payload: { name: trimmedName },
+  });
+
+  if (!body?.player?.id || !body?.player?.name) throw new Error('D1 player payload is invalid');
+  return {
+    id: body.player.id,
+    name: body.player.name,
+  };
+}
+
+export async function saveD1GroupPredictions({ client, groupCode, playerId, entries }) {
+  if (!client) throw new Error('D1 API 配置缺失');
+  const normalizedEntries = (entries || [])
+    .map((entry) => ({
+      matchId: entry.matchId,
+      scores: normalizeScores(entry.scores),
+    }))
+    .filter((entry) => entry.matchId);
+
+  if (!normalizedEntries.length) return { ok: true, rowsWritten: 0 };
+
+  return postD1Json({
+    client,
+    path: `/api/groups/${encodeURIComponent(groupCode)}/predictions`,
+    payload: { playerId, entries: normalizedEntries },
+  });
+}
+
+async function postD1Json({ client, path, payload }) {
+  const response = await (0, client.fetchImpl)(`${client.baseUrl}${path}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    let errorText = response.statusText;
+    try {
+      const body = await response.json();
+      errorText = body.error || body.message || errorText;
+    } catch {
+      // Keep status text when the Worker response is not JSON.
+    }
+    throw new Error(`D1 request failed: ${response.status} ${errorText}`.trim());
+  }
+
+  return response.json();
+}
+
 export function normalizeD1GroupState(payload, { groupCode } = {}) {
   if (!payload || typeof payload !== 'object') throw new Error('D1 group state payload is invalid');
   const group = payload.group && typeof payload.group === 'object' ? payload.group : null;
@@ -47,4 +104,8 @@ export function normalizeD1GroupState(payload, { groupCode } = {}) {
     players: mergePlayers(Array.isArray(payload.players) ? payload.players : []),
     predictions: mapPredictionsByPlayer(Array.isArray(payload.predictions) ? payload.predictions : []),
   };
+}
+
+function normalizeScores(scores) {
+  return Array.isArray(scores) ? scores.filter((score) => typeof score === 'string') : [];
 }

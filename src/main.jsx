@@ -29,7 +29,12 @@ import {
   saveGroupPredictions,
   submitAiUserStrategy,
 } from './supabaseData.mjs';
-import { createD1BrowserClient, loadD1GroupState } from './d1Data.mjs';
+import {
+  createD1BrowserClient,
+  createD1GroupPlayer,
+  loadD1GroupState,
+  saveD1GroupPredictions,
+} from './d1Data.mjs';
 import { formatReportJobTitle, formatReportStatusText } from './importReports.mjs';
 import {
   getAiReasonPreview,
@@ -273,7 +278,7 @@ function App() {
   }
 
   async function submitAll() {
-    if (!state.selectedPlayerId || !group || !client) return;
+    if (!state.selectedPlayerId || !group || (!d1Client && !client)) return;
 
     const entries = visibleMatches
       .map((match) => ({ matchId: match.id, scores: selectedScores(match.id) }))
@@ -282,13 +287,24 @@ function App() {
     updateState((current) => ({ ...current, flash: '保存中...' }));
 
     try {
-      await saveGroupPredictions({
-        client,
-        groupId: group.id,
-        playerId: state.selectedPlayerId,
-        entries,
-      });
-      const loaded = await loadGroupState({ client, groupCode });
+      let loaded;
+      if (d1Client) {
+        await saveD1GroupPredictions({
+          client: d1Client,
+          groupCode,
+          playerId: state.selectedPlayerId,
+          entries,
+        });
+        loaded = await loadD1GroupState({ client: d1Client, groupCode });
+      } else {
+        await saveGroupPredictions({
+          client,
+          groupId: group.id,
+          playerId: state.selectedPlayerId,
+          entries,
+        });
+        loaded = await loadGroupState({ client, groupCode });
+      }
       setPlayers(loaded.players);
       updateState((current) => ({
         ...current,
@@ -487,17 +503,25 @@ function App() {
   }
 
   async function confirmAddPlayer() {
-    if (!group || !client) return;
+    if (!group || (!d1Client && !client)) return;
 
     try {
-      const player = await createGroupPlayer({
-        client,
-        groupId: group.id,
-        name: state.newPlayerName || '',
-      });
+      const player = d1Client
+        ? await createD1GroupPlayer({
+          client: d1Client,
+          groupCode,
+          name: state.newPlayerName || '',
+        })
+        : await createGroupPlayer({
+          client,
+          groupId: group.id,
+          name: state.newPlayerName || '',
+        });
       if (!player) return;
 
-      const loaded = await loadGroupState({ client, groupCode });
+      const loaded = d1Client
+        ? await loadD1GroupState({ client: d1Client, groupCode })
+        : await loadGroupState({ client, groupCode });
       setPlayers(loaded.players);
       updateState((current) => ({
         ...current,
