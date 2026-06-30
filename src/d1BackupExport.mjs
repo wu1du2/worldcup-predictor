@@ -22,7 +22,6 @@ export function toJsonText(value) {
 export function buildD1SeedSqlFromBackupTables({ tables }) {
   const statements = [
     'pragma foreign_keys = off;',
-    'begin transaction;',
     ...deleteStatements(),
     ...insertGroups(tables.groups || []),
     ...insertPlayers(tables.players || []),
@@ -33,7 +32,6 @@ export function buildD1SeedSqlFromBackupTables({ tables }) {
     ...insertAiRecommendations(tables.ai_recommendations || []),
     ...insertAiStrategyStats(tables.ai_strategy_stats || []),
     ...insertImportReports(tables.import_reports || []),
-    'commit;',
     'pragma foreign_keys = on;',
   ];
   return `${statements.join('\n')}\n`;

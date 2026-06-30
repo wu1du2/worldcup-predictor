@@ -5,4 +5,4 @@ compatibility_date = "2026-06-30"
 [[d1_databases]]
 binding = "DB"
 database_name = "worldcup-predictor"
-database_id = "REPLACE_WITH_CLOUDFLARE_D1_DATABASE_ID"
+database_id = "22687bc5-aba5-45ec-b4b0-014944146a8a"
