@@ -96,6 +96,7 @@ function App() {
   const [createdHintOpen, setCreatedHintOpen] = useState(false);
   const [aiRecommendationDialog, setAiRecommendationDialog] = useState(null);
   const [aiRecommendationsByMatch, setAiRecommendationsByMatch] = useState({});
+  const [aiStrategyStats, setAiStrategyStats] = useState([]);
   const [staticSnapshot, setStaticSnapshot] = useState(null);
   const [aiStrategyOpen, setAiStrategyOpen] = useState(false);
   const [aiStrategyForm, setAiStrategyForm] = useState({ authorName: '', strategyName: '', strategyPrompt: '', status: 'idle', error: '' });
@@ -118,6 +119,7 @@ function App() {
         setMatches(snapshot.matches);
         setScoreOddsByMatch(snapshot.scoreOddsByMatch);
         setAiRecommendationsByMatch(snapshot.aiRecommendationsByMatch);
+        setAiStrategyStats(snapshot.aiStrategyStats || []);
         setLoadStatus('ready');
         updateState((current) => ({
           ...current,
@@ -211,10 +213,14 @@ function App() {
           ...currentRecommendations,
           ...(liveBoard.aiRecommendationsByMatch || {}),
         }));
+        if (liveBoard.aiStrategyStats?.length) {
+          setAiStrategyStats(liveBoard.aiStrategyStats);
+        }
         if (liveBoard.importReports?.length) {
           setStaticSnapshot((current) => current ? {
             ...current,
             importReports: liveBoard.importReports,
+            aiStrategyStats: liveBoard.aiStrategyStats?.length ? liveBoard.aiStrategyStats : current.aiStrategyStats,
           } : current);
         }
       })
@@ -415,8 +421,9 @@ function App() {
 
   async function showAiStrategyLeaderboard(page = 0) {
     setMoreMenuOpen(false);
-    if (staticSnapshot?.aiStrategyStats?.length) {
-      const result = getStaticAiStrategyStatsPage(staticSnapshot.aiStrategyStats, { page, pageSize: 6 });
+    const availableStrategyStats = aiStrategyStats.length ? aiStrategyStats : (staticSnapshot?.aiStrategyStats || []);
+    if (availableStrategyStats.length) {
+      const result = getStaticAiStrategyStatsPage(availableStrategyStats, { page, pageSize: 6 });
       setStrategyRankDialog({
         open: true,
         status: 'ready',
@@ -649,6 +656,7 @@ function App() {
               selectedPlayerId={state.selectedPlayerId}
               recommendedScores={recommendation?.scores || aiPredictions[match.id] || []}
               aiRecommendation={recommendation}
+              strategyStats={aiStrategyStats}
               scoreOptions={buildScoreOptionsForMatch(scoreOddsByMatch[match.id])}
               onToggle={toggleMatchScore}
               onOpenAiRecommendation={setAiRecommendationDialog}
@@ -840,6 +848,7 @@ function MatchCard({
   selectedPlayerId,
   recommendedScores,
   aiRecommendation,
+  strategyStats,
   scoreOptions,
   onToggle,
   onOpenAiRecommendation,
@@ -848,7 +857,8 @@ function MatchCard({
     match,
     scoreOptions,
     routerRecommendation: aiRecommendation,
-  }), [match, scoreOptions, aiRecommendation]);
+    strategyStats,
+  }), [match, scoreOptions, aiRecommendation, strategyStats]);
   const defaultStrategyTabId = getDefaultAiStrategyTabId(strategyTabs, aiRecommendation);
   const [activeStrategyTabId, setActiveStrategyTabId] = useState(defaultStrategyTabId);
 

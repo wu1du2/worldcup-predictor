@@ -118,6 +118,7 @@ test('loadD1LiveBoard reads a dated live window from the Worker', async () => {
         matches: [{ id: 'm1', date: '2026-06-30', time: '01:00', home: '巴西', away: '日本' }],
         scoreOddsByMatch: { m1: [{ score: '1-0', odds: 7.2 }] },
         aiRecommendationsByMatch: { m1: { scores: ['1-0'] } },
+        aiStrategyStats: [{ strategyId: 'stable-id', strategyName: '稳定型', roi: -12.5 }],
         importReports: [{ id: 'r1', jobName: 'live-d1' }],
       }), { status: 200 });
     },
@@ -127,5 +128,6 @@ test('loadD1LiveBoard reads a dated live window from the Worker', async () => {
 
   assert.deepEqual(liveBoard.matches, [{ id: 'm1', date: '2026-06-30', time: '01:00', home: '巴西', away: '日本' }]);
   assert.deepEqual(liveBoard.scoreOddsByMatch.m1, [{ score: '1-0', odds: 7.2 }]);
+  assert.deepEqual(liveBoard.aiStrategyStats, [{ strategyId: 'stable-id', strategyName: '稳定型', roi: -12.5 }]);
   assert.deepEqual(liveBoard.importReports, [{ id: 'r1', jobName: 'live-d1' }]);
 });

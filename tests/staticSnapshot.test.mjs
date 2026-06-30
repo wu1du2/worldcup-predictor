@@ -210,3 +210,16 @@ test('getStaticAiStrategyStatsPage paginates static leaderboard rows', () => {
     hasNext: false,
   });
 });
+
+test('getStaticAiStrategyStatsPage prioritizes the three flagship strategies before ROI sorting', () => {
+  const result = getStaticAiStrategyStatsPage([
+    { strategyId: 'other-hot', strategyName: '短期爆发', roi: 300 },
+    { strategyId: 'c52e5c84-d2f9-46e4-87d7-ea600bccb488', strategyName: '价值型', roi: 27.73 },
+    { strategyId: 'other-mid', strategyName: '普通策略', roi: 80 },
+    { strategyId: 'tem_source_consensus_poisson_context_v1_s2_c3_n3_cap6', strategyName: '共识型', roi: -5 },
+    { strategyId: 'tem_draw_anchor_lean_homeaway2_draw6_cap22', strategyName: '稳定型', roi: -12.34 },
+  ], { page: 0, pageSize: 4 });
+
+  assert.deepEqual(result.rows.map((row) => row.strategyName), ['稳定型', '价值型', '共识型', '短期爆发']);
+  assert.equal(result.hasNext, true);
+});

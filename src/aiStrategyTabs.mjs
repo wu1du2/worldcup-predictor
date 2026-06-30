@@ -1,49 +1,35 @@
 import { buildAiRecommendationRows } from './aiPredictionSync.mjs';
+import { flagshipStrategyDefinitions } from './flagshipStrategies.mjs';
+import { deterministicUuid } from './stableUuid.mjs';
 import { buildForcedStrategyAiPredictionEntries } from './strategyRouter.mjs';
 
-export const aiStrategyTabDefinitions = {
-  stable: {
-    id: 'stable',
-    label: '稳定型',
-    strategyId: 'tem_draw_anchor_lean_homeaway2_draw6_cap22',
-  },
-  value: {
-    id: 'value',
-    label: '价值型',
-    strategyId: 'tem_poisson_drawguard_context_v3_n2_draw7_5_cap35_p0_006',
-  },
-  consensus: {
-    id: 'consensus',
-    label: '共识型',
-    strategyId: 'tem_source_consensus_poisson_context_v1_s2_c3_n3_cap6',
-  },
-};
-
-const orderedTabs = [
-  aiStrategyTabDefinitions.stable,
-  aiStrategyTabDefinitions.value,
-  aiStrategyTabDefinitions.consensus,
-];
+export const aiStrategyTabDefinitions = Object.fromEntries(
+  flagshipStrategyDefinitions.map((definition) => [definition.id, definition]),
+);
 
 export function buildAiStrategyTabsForMatch({
   match,
   scoreOptions,
   routerRecommendation = null,
+  strategyStats = [],
 }) {
   if (!match?.id) return [];
+  const statsByStrategyId = new Map((strategyStats || []).map((row) => [row.strategyId, row]));
 
-  return orderedTabs.map((definition) => {
+  return flagshipStrategyDefinitions.map((definition) => {
     const isRouterPick = routerRecommendation?.strategyId === definition.strategyId;
+    const stats = statsByStrategyId.get(definition.strategyId)
+      || statsByStrategyId.get(deterministicUuid(`system:${definition.strategyId}`));
     return {
       ...definition,
       isRouterPick,
-      recommendation: isRouterPick && routerRecommendation
+      recommendation: withStrategyStats(isRouterPick && routerRecommendation
         ? routerRecommendation
         : buildForcedRecommendation({
           match,
           scoreOptions,
           strategyId: definition.strategyId,
-        }),
+        }), stats),
     };
   });
 }
@@ -90,4 +76,21 @@ function buildForcedRecommendation({ match, scoreOptions, strategyId }) {
     predictionRunId: row.prediction_run_id || '',
     predictedAt: row.predicted_at || '',
   };
+}
+
+function withStrategyStats(recommendation, stats) {
+  if (!recommendation || !stats) return recommendation;
+  const strategyRoi = Number(stats.roi);
+  if (!Number.isFinite(strategyRoi)) return recommendation;
+  return {
+    ...recommendation,
+    strategyRoi,
+    roiLabel: recommendation.roiLabel || formatStrategyRoi(strategyRoi),
+  };
+}
+
+function formatStrategyRoi(value) {
+  const rounded = Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+  const text = Number.isInteger(rounded) ? String(rounded) : String(rounded).replace(/0+$/, '').replace(/\.$/, '');
+  return `${rounded > 0 ? '+' : ''}${text}%`;
 }

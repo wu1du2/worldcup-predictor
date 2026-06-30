@@ -63,6 +63,20 @@ test('buildAiStrategyTabsForMatch preserves router reason only on the routed str
   assert.equal(stableTab.recommendation.routerReason, '');
 });
 
+test('buildAiStrategyTabsForMatch attaches flagship historical ROI to every strategy tab', () => {
+  const strategyStats = [
+    { strategyId: aiStrategyTabDefinitions.stable.strategyId, roi: -12.34, matchesCount: 18 },
+    { strategyId: aiStrategyTabDefinitions.value.strategyId, roi: 27.73, matchesCount: 18 },
+    { strategyId: aiStrategyTabDefinitions.consensus.strategyId, roi: 8, matchesCount: 12 },
+  ];
+
+  const tabs = buildAiStrategyTabsForMatch({ match, scoreOptions, strategyStats });
+
+  assert.deepEqual(tabs.map((tab) => tab.recommendation.roiLabel), ['-12.34%', '+27.73%', '+8%']);
+  assert.deepEqual(tabs.map((tab) => tab.recommendation.strategyRoi), [-12.34, 27.73, 8]);
+  assert.ok(tabs.every((tab) => tab.recommendation.strategyFeature));
+});
+
 test('getDefaultAiStrategyTabId falls back to the first tab when router strategy is absent', () => {
   const tabs = buildAiStrategyTabsForMatch({ match, scoreOptions });
 

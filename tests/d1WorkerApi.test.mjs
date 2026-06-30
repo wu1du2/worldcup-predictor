@@ -141,6 +141,16 @@ test('D1 worker returns a small live board window with odds and recommendations'
     },
   ]);
   assert.deepEqual(body.aiRecommendationsByMatch['espn-1'].scores, ['2-1']);
+  assert.deepEqual(body.aiStrategyStats, [{
+    strategyId: 'tem_draw_anchor_lean_homeaway2_draw6_cap22',
+    strategyName: '稳定型',
+    matchesCount: 18,
+    cost: 36,
+    revenue: 31.5,
+    profit: -4.5,
+    roi: -12.5,
+    updatedAt: '2026-06-30T08:00:00.000Z',
+  }]);
 });
 
 test('D1 worker keeps pre-match null scores as null in live board responses', async () => {
@@ -336,6 +346,20 @@ function fakeLiveBoardDb(overrides = {}) {
                 prediction_summary: '推荐 2-1。',
                 prediction_run_id: 'run-1',
                 predicted_at: '2026-06-30T00:00:00.000Z',
+              }],
+            };
+          }
+          if (sql.includes('from ai_strategy_stats')) {
+            return {
+              results: [{
+                strategy_id: 'tem_draw_anchor_lean_homeaway2_draw6_cap22',
+                strategy_name: '稳定型',
+                matches_count: 18,
+                cost: 36,
+                revenue: 31.5,
+                profit: -4.5,
+                roi: -12.5,
+                updated_at: '2026-06-30T08:00:00.000Z',
               }],
             };
           }

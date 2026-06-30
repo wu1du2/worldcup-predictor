@@ -138,6 +138,7 @@ export function normalizeD1LiveBoard(payload) {
     aiRecommendationsByMatch: payload.aiRecommendationsByMatch && typeof payload.aiRecommendationsByMatch === 'object'
       ? payload.aiRecommendationsByMatch
       : {},
+    aiStrategyStats: Array.isArray(payload.aiStrategyStats) ? payload.aiStrategyStats : [],
     importReports: Array.isArray(payload.importReports) ? payload.importReports : [],
   };
 }

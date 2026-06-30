@@ -9,6 +9,7 @@ import {
   mapScoreOddsByMatch,
   mergePlayers,
 } from './supabaseData.mjs';
+import { getFlagshipStrategyRank, isFlagshipStrategy } from './flagshipStrategies.mjs';
 import { toAppMatch } from './matchSchedule.mjs';
 
 export const staticSnapshotPath = '/data-snapshot.json';
@@ -176,7 +177,7 @@ export function buildStaticGroupSnapshotsFromBackupTables({ tables, now = new Da
 export function getStaticAiStrategyStatsPage(rows, { page = 0, pageSize = 6 } = {}) {
   const safePage = Math.max(0, Number(page) || 0);
   const safePageSize = Math.max(1, Number(pageSize) || 6);
-  const sortedRows = [...(rows || [])].sort((a, b) => Number(b.roi || 0) - Number(a.roi || 0));
+  const sortedRows = sortAiStrategyStatsForUi(rows || []);
   const from = safePage * safePageSize;
   return {
     rows: sortedRows.slice(from, from + safePageSize),
@@ -184,6 +185,20 @@ export function getStaticAiStrategyStatsPage(rows, { page = 0, pageSize = 6 } = 
     pageSize: safePageSize,
     hasNext: sortedRows.length > from + safePageSize,
   };
+}
+
+export function sortAiStrategyStatsForUi(rows) {
+  return [...(rows || [])].sort(compareAiStrategyStatsForUi);
+}
+
+function compareAiStrategyStatsForUi(a, b) {
+  const aFlagship = isFlagshipStrategy(a.strategyId);
+  const bFlagship = isFlagshipStrategy(b.strategyId);
+  if (aFlagship || bFlagship) {
+    if (aFlagship && bFlagship) return getFlagshipStrategyRank(a.strategyId) - getFlagshipStrategyRank(b.strategyId);
+    return aFlagship ? -1 : 1;
+  }
+  return Number(b.roi || 0) - Number(a.roi || 0);
 }
 
 function mapStaticAiStrategyStats(rows) {
@@ -198,7 +213,7 @@ function mapStaticAiStrategyStats(rows) {
       roi: Number(row.roi) || 0,
       updatedAt: row.updated_at || '',
     }))
-    .sort((a, b) => b.roi - a.roi);
+    .sort(compareAiStrategyStatsForUi);
 }
 
 function toAppImportReport(row) {

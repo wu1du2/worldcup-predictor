@@ -158,7 +158,7 @@ export async function loadLiveBoard(db, { from, to } = {}) {
     from: `${window.from}T00:00:00+08:00`,
     to: `${addChinaDateDays(window.to, 1)}T00:00:00+08:00`,
   };
-  const [oddsResult, trendResult, recommendationsResult, reportsResult] = await Promise.all([
+  const [oddsResult, trendResult, recommendationsResult, strategyStatsResult, reportsResult] = await Promise.all([
     db
       .prepare(`
         select home, away, kickoff_label, score, odds
@@ -180,6 +180,14 @@ export async function loadLiveBoard(db, { from, to } = {}) {
     loadAiRecommendationsForMatches(db, matches.map((match) => match.id)),
     db
       .prepare(`
+        select strategy_id, strategy_name, matches_count, cost, revenue, profit, roi, updated_at
+        from ai_strategy_stats
+        order by roi desc
+        limit 50
+      `)
+      .all(),
+    db
+      .prepare(`
         select id, job_name, status, started_at, finished_at, rows_written, items_seen,
           message, error_detail, run_url, created_at
         from import_reports
@@ -195,6 +203,7 @@ export async function loadLiveBoard(db, { from, to } = {}) {
     matches,
     scoreOddsByMatch: mapScoreOddsByMatch(matches, oddsResult.results || [], trendResult.results || []),
     aiRecommendationsByMatch: mapAiRecommendationsByMatch(recommendationsResult.results || []),
+    aiStrategyStats: (strategyStatsResult.results || []).map(toAppAiStrategyStat),
     importReports: (reportsResult.results || []).map(toAppImportReport),
   };
 }
@@ -372,6 +381,19 @@ function toAppImportReport(row) {
     errorDetail: row.error_detail || '',
     runUrl: row.run_url || '',
     createdAt: row.created_at,
+  };
+}
+
+function toAppAiStrategyStat(row) {
+  return {
+    strategyId: row.strategy_id,
+    strategyName: row.strategy_name || '',
+    matchesCount: Number(row.matches_count) || 0,
+    cost: Number(row.cost) || 0,
+    revenue: Number(row.revenue) || 0,
+    profit: Number(row.profit) || 0,
+    roi: Number(row.roi) || 0,
+    updatedAt: row.updated_at || '',
   };
 }
 
