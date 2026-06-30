@@ -224,6 +224,7 @@ async function loadAllScoreOddsRows(client) {
       .from('score_odds')
       .select('home,away,kickoff_label,score,odds')
       .order('source_match_key', { ascending: true })
+      .order('score', { ascending: true })
       .range(from, from + pageSize - 1);
 
     if (error) throw error;
@@ -243,6 +244,7 @@ async function loadAllScoreOddsTrendRows(client) {
       .from('score_odds_trends')
       .select('home,away,kickoff_label,score,first_odds,latest_odds,change_pct,snapshots_count')
       .order('source_match_key', { ascending: true })
+      .order('score', { ascending: true })
       .range(from, from + pageSize - 1);
 
     if (error) throw error;

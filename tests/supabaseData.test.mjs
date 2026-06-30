@@ -512,17 +512,17 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
       return {
         select(columns) {
           calls.push(['select', columns]);
-          return {
+          const query = {
             order(columnName, options) {
               calls.push(['order', columnName, options]);
-              return {
-                range(from, to) {
-                  calls.push(['range', from, to]);
-                  return Promise.resolve({ data: tableRows, error: null });
-                },
-              };
+              return query;
+            },
+            range(from, to) {
+              calls.push(['range', from, to]);
+              return Promise.resolve({ data: tableRows, error: null });
             },
           };
+          return query;
         },
       };
     },
@@ -543,10 +543,12 @@ test('loadScoreOdds reads score_odds and returns match-keyed options', async () 
     ['from', 'score_odds'],
     ['select', 'home,away,kickoff_label,score,odds'],
     ['order', 'source_match_key', { ascending: true }],
+    ['order', 'score', { ascending: true }],
     ['range', 0, 999],
     ['from', 'score_odds_trends'],
     ['select', 'home,away,kickoff_label,score,first_odds,latest_odds,change_pct,snapshots_count'],
     ['order', 'source_match_key', { ascending: true }],
+    ['order', 'score', { ascending: true }],
     ['range', 0, 999],
   ]);
 });
@@ -573,22 +575,22 @@ test('loadScoreOdds paginates beyond Supabase default row limits', async () => {
     from(table) {
       return {
         select() {
-          return {
+          const query = {
             order() {
-              return {
-                range(from, to) {
-                  ranges.push([from, to]);
-                  if (table !== 'score_odds') {
-                    return Promise.resolve({ data: [], error: null });
-                  }
-                  return Promise.resolve({
-                    data: from === 0 ? firstPage : secondPage,
-                    error: null,
-                  });
-                },
-              };
+              return query;
+            },
+            range(from, to) {
+              ranges.push([from, to]);
+              if (table !== 'score_odds') {
+                return Promise.resolve({ data: [], error: null });
+              }
+              return Promise.resolve({
+                data: from === 0 ? firstPage : secondPage,
+                error: null,
+              });
             },
           };
+          return query;
         },
       };
     },
