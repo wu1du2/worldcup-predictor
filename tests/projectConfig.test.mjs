@@ -16,3 +16,12 @@ test('project is configured as a Vite React app', async () => {
   assert.match(indexHtml, /<div id="root"><\/div>/);
   assert.match(indexHtml, /src="\/src\/main.jsx"/);
 });
+
+test('D1 schema indexes import report feed by recency', async () => {
+  const schema = await readFile('sql/d1_schema.sql', 'utf8');
+
+  assert.match(
+    schema,
+    /create index if not exists import_reports_created_at_idx\s+on import_reports\(created_at desc\);/,
+  );
+});

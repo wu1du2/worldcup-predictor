@@ -152,3 +152,6 @@ create table if not exists import_reports (
 
 create index if not exists import_reports_job_created_idx
   on import_reports(job_name, created_at desc);
+
+create index if not exists import_reports_created_at_idx
+  on import_reports(created_at desc);
