@@ -35,8 +35,11 @@ test('live D1 import workflow runs every five minutes and writes only generated 
   assert.match(workflow, /cron: '\*\/5 \* \* \* \*'/);
   assert.match(workflow, /concurrency:\n  group: import-live-d1\n  cancel-in-progress: true/);
   assert.match(workflow, /CLOUDFLARE_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_API_TOKEN \}\}/);
-  assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID: \$\{\{ secrets\.CLOUDFLARE_ACCOUNT_ID \}\}/);
+  assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID: ea85b9ad1849253605db55f73ad3be98/);
+  assert.match(workflow, /Validate Cloudflare D1 access/);
+  assert.match(workflow, /test -n "\$CLOUDFLARE_API_TOKEN"/);
+  assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --command "select 1 as ok;"/);
   assert.match(workflow, /npm run import:live:d1/);
   assert.match(workflow, /if: hashFiles\('output\/d1-live-import\.sql'\) != ''/);
-  assert.match(workflow, /wrangler@latest -- d1 execute worldcup-predictor --remote --file output\/d1-live-import\.sql/);
+  assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --file output\/d1-live-import\.sql/);
 });

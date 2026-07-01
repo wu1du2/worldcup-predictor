@@ -16,7 +16,7 @@ jobs:
     env:
       D1_API_URL: https://worldcup-predictor-api.wu1du2.workers.dev
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_ACCOUNT_ID: ea85b9ad1849253605db55f73ad3be98
 
     steps:
       - name: Checkout
@@ -31,12 +31,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate Cloudflare D1 access
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          npx wrangler@4.106.0 d1 execute worldcup-predictor --remote --command "select 1 as ok;"
+
       - name: Generate live import SQL
         run: npm run import:live:d1
 
       - name: Apply live import SQL
         if: hashFiles('output/d1-live-import.sql') != ''
-        run: npm exec wrangler@latest -- d1 execute worldcup-predictor --remote --file output/d1-live-import.sql
+        run: npx wrangler@4.106.0 d1 execute worldcup-predictor --remote --file output/d1-live-import.sql
 
       - name: No live changes
         if: hashFiles('output/d1-live-import.sql') == ''
