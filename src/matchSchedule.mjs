@@ -13,6 +13,7 @@ const chinaClockFormatter = new Intl.DateTimeFormat('en-GB', {
 });
 
 const teamNameCnByEnglish = {
+  Algeria: '阿尔及利亚',
   Argentina: '阿根廷',
   Australia: '澳大利亚',
   Austria: '奥地利',

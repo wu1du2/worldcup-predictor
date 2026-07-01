@@ -54,6 +54,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - The match importer upserts by `match_code` and overwrites schedule/status/score fields from the source. Keep legacy compatibility fields (`match_date`, `kickoff_at`, `home_team`, `away_team`) in sync while the old table shape exists.
 - Team Chinese names live in the `teams` table as the translation authority. Importers upsert teams from `data/team-name-mapping.csv`, write `home_team_id` and `away_team_id` to matches, and keep `home_cn` / `away_cn` only as snapshots.
 - Frontend match loading should use Supabase embedded joins (`home_team:teams!matches_home_team_id_fkey`, `away_team:teams!matches_away_team_id_fkey`) and prefer joined `teams.name_cn` over snapshot fields.
+- D1 live imports use `src/matchSchedule.mjs` directly, so its `teamNameCnByEnglish` fallback must stay in sync with tournament teams. A missing entry such as `Algeria -> 阿尔及利亚` leaves D1 match names in English and breaks odds joins even when `data/team-name-mapping.csv` is correct.
 
 ## Future Ideas
 

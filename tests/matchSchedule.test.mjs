@@ -121,6 +121,29 @@ test('normalizeEspnScoreboard converts ESPN events into UTC+8 match rows with sc
   ]);
 });
 
+test('normalizeEspnScoreboard translates Algeria for odds matching', () => {
+  const rows = normalizeEspnScoreboard({
+    events: [
+      {
+        id: '760498',
+        date: '2026-07-03T03:00Z',
+        status: { type: { state: 'pre', completed: false, shortDetail: 'Scheduled' } },
+        competitions: [
+          {
+            competitors: [
+              { homeAway: 'home', score: '0', team: { displayName: 'Switzerland' } },
+              { homeAway: 'away', score: '0', team: { displayName: 'Algeria' } },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+
+  assert.equal(rows[0].home_cn, '瑞士');
+  assert.equal(rows[0].away_cn, '阿尔及利亚');
+});
+
 test('normalizeEspnScoreboard keeps knockout stages and skips unresolved bracket placeholders', () => {
   const rows = normalizeEspnScoreboard({
     events: [
