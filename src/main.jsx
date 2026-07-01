@@ -128,6 +128,7 @@ function App() {
             ? current.selectedDate
             : getDefaultMatchDateCn(snapshot.matches),
         }));
+        hydrateLiveBoardFromD1();
       }
 
       const staticGroupSnapshot = await loadStaticGroupSnapshot(groupCode);
@@ -170,8 +171,8 @@ function App() {
       const availableDates = new Set(loadedMatches.map((match) => match.date));
       setGroup(loaded.group);
       setPlayers(loaded.players);
-      setMatches(loadedMatches);
       if (!snapshot?.matches.length) {
+        setMatches(loadedMatches);
         setScoreOddsByMatch({});
         setAiRecommendationsByMatch({});
       }
@@ -184,7 +185,7 @@ function App() {
         selectedDate: availableDates.has(current.selectedDate) ? current.selectedDate : getDefaultMatchDateCn(loadedMatches),
       }));
       setLoadStatus('ready');
-      hydrateLiveBoardFromD1();
+      if (!snapshot?.matches.length) hydrateLiveBoardFromD1();
       if (!snapshot?.matches.length) {
         void loadScoreOdds({ client, matches: loadedMatches, oddsWindow: buildFutureScoreOddsWindow() })
           .then(setScoreOddsByMatch)
