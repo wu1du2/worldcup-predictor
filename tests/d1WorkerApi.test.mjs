@@ -122,6 +122,9 @@ test('D1 worker returns a small live board window with odds and recommendations'
       away: '日本',
       homeScore: 2,
       awayScore: 1,
+      settlementHomeScore: 2,
+      settlementAwayScore: 1,
+      settlementScoreSource: 'final',
       status: 'post',
       statusDetail: 'Final',
       venue: '',
@@ -174,6 +177,8 @@ test('D1 worker keeps pre-match null scores as null in live board responses', as
 
   assert.equal(body.matches[0].homeScore, null);
   assert.equal(body.matches[0].awayScore, null);
+  assert.equal(body.matches[0].settlementHomeScore, null);
+  assert.equal(body.matches[0].settlementAwayScore, null);
 });
 
 function fakeDb({ group = null, players = [], predictions = [] } = {}) {
@@ -286,6 +291,9 @@ function fakeLiveBoardDb(overrides = {}) {
     away_cn: '日本',
     home_score: 2,
     away_score: 1,
+    settlement_home_score: 2,
+    settlement_away_score: 1,
+    settlement_score_source: 'final',
     status: 'post',
     status_detail: 'Final',
     stage: 'Round of 32',

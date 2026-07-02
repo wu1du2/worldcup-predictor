@@ -92,8 +92,8 @@ const stageLabelBySlug = {
   final: 'Final',
 };
 
-const scoreOverrideByMatchCode = {
-  'espn-760493': { home_score: 2, away_score: 2 },
+const regularTimeScoreOverrideByMatchCode = {
+  'espn-760493': { settlement_home_score: 2, settlement_away_score: 2 },
 };
 
 export function normalizeEspnScoreboard(scoreboard) {
@@ -162,6 +162,9 @@ export function toAppMatch(row) {
     away: row.away_team?.name_cn || row.away_cn || row.away,
     homeScore: row.home_score,
     awayScore: row.away_score,
+    settlementHomeScore: row.settlement_home_score ?? null,
+    settlementAwayScore: row.settlement_away_score ?? null,
+    settlementScoreSource: row.settlement_score_source || '',
     status: row.status || 'pre',
     statusDetail: row.status_detail || '',
     venue: row.venue || '',
@@ -203,7 +206,18 @@ function normalizeEspnEvent(event) {
   }
 
   const matchCode = `espn-${event.id}`;
-  const scoreOverride = scoreOverrideByMatchCode[matchCode];
+  const homeScore = normalizeScore(home.score, state);
+  const awayScore = normalizeScore(away.score, state);
+  const statusDetail = event.status?.type?.shortDetail || '';
+  const settlementScore = buildSettlementScore({
+    matchCode,
+    state,
+    statusDetail,
+    home,
+    away,
+    homeScore,
+    awayScore,
+  });
 
   return {
     id: event.id,
@@ -215,14 +229,63 @@ function normalizeEspnEvent(event) {
     away: awayName,
     home_cn: getTeamNameCn(homeName),
     away_cn: getTeamNameCn(awayName),
-    home_score: scoreOverride?.home_score ?? normalizeScore(home.score, state),
-    away_score: scoreOverride?.away_score ?? normalizeScore(away.score, state),
+    home_score: homeScore,
+    away_score: awayScore,
+    settlement_home_score: settlementScore.homeScore,
+    settlement_away_score: settlementScore.awayScore,
+    settlement_score_source: settlementScore.source,
     status: state,
-    status_detail: event.status?.type?.shortDetail || '',
+    status_detail: statusDetail,
     venue: formatVenue(competition?.venue),
     stage: getStageLabel(event),
     source: 'espn',
   };
+}
+
+function buildSettlementScore({ matchCode, state, statusDetail, home, away, homeScore, awayScore }) {
+  if (state !== 'post') {
+    return { homeScore: null, awayScore: null, source: '' };
+  }
+
+  if (requiresRegularTimeSettlementStatus(statusDetail)) {
+    const linescore = extractRegularTimeScoreFromCompetitors(home, away);
+    if (linescore) {
+      return { ...linescore, source: 'espn_linescore_regular_time' };
+    }
+
+    const override = regularTimeScoreOverrideByMatchCode[matchCode];
+    if (override) {
+      return {
+        homeScore: override.settlement_home_score,
+        awayScore: override.settlement_away_score,
+        source: 'manual_regular_time_override',
+      };
+    }
+
+    return { homeScore: null, awayScore: null, source: 'needs_regular_time_confirmation' };
+  }
+
+  return { homeScore, awayScore, source: Number.isInteger(homeScore) && Number.isInteger(awayScore) ? 'final' : '' };
+}
+
+function requiresRegularTimeSettlementStatus(statusDetail) {
+  return /\b(AET|PEN)\b|After Extra Time|Penalties/i.test(String(statusDetail || ''));
+}
+
+function extractRegularTimeScoreFromCompetitors(home, away) {
+  const homeScore = sumFirstTwoLineScores(home?.linescores);
+  const awayScore = sumFirstTwoLineScores(away?.linescores);
+  if (!Number.isInteger(homeScore) || !Number.isInteger(awayScore)) return null;
+  return { homeScore, awayScore };
+}
+
+function sumFirstTwoLineScores(linescores) {
+  if (!Array.isArray(linescores) || linescores.length < 2) return null;
+  const values = linescores.slice(0, 2).map((line) => {
+    const value = Number(line?.value ?? line?.displayValue);
+    return Number.isInteger(value) ? value : null;
+  });
+  return values.every(Number.isInteger) ? values[0] + values[1] : null;
 }
 
 function getChinaDate(date) {

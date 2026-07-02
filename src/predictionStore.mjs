@@ -1,4 +1,5 @@
-import { exactSportteryScores, sportteryScoreTemplate } from './scoreTemplate.mjs';
+import { sportteryScoreTemplate } from './scoreTemplate.mjs';
+import { formatSettlementScore, isSettledMatch, isWinningScoreLabel } from './settlementScore.mjs';
 
 export function createInitialState() {
   return {
@@ -84,19 +85,7 @@ export function getScoreTrendDirection(option) {
 }
 
 export function isCorrectScoreOption(match, option) {
-  const homeScore = match.homeScore ?? match.home_score;
-  const awayScore = match.awayScore ?? match.away_score;
-  if (match.status !== 'post' || !Number.isInteger(homeScore) || !Number.isInteger(awayScore)) {
-    return false;
-  }
-
-  const actualScore = `${homeScore}-${awayScore}`;
-  if (option.score === actualScore) return true;
-  if (exactSportteryScores.has(actualScore)) return false;
-
-  if (homeScore > awayScore) return option.score === '胜其他';
-  if (homeScore === awayScore) return option.score === '平其他';
-  return option.score === '负其他';
+  return isWinningScoreLabel(match, option.score);
 }
 
 export function getCopyStatusText(status) {
@@ -148,7 +137,7 @@ export function buildPredictionResultRows({ matches, players, state, scoreOddsBy
 
       settledMatchCount += 1;
       cost += scores.length;
-      const actualScore = `${match.homeScore}-${match.awayScore}`;
+      const actualScore = formatSettlementScore(match);
       if (!scores.includes(actualScore)) continue;
 
       const odds = findScoreOdds(scoreOddsByMatch[matchId], actualScore);
@@ -264,15 +253,13 @@ export function exportAllTimeStatsText({
 }
 
 function isCompletedMatch(match) {
-  return match.status === 'post'
-    && Number.isInteger(match.homeScore)
-    && Number.isInteger(match.awayScore);
+  return isSettledMatch(match);
 }
 
 function formatPredictionMatchHeader(match) {
   const baseLabel = `${match.time} ${match.home} vs ${match.away}`;
   if (!isCompletedMatch(match)) return baseLabel;
-  return `${baseLabel}[${match.homeScore}-${match.awayScore}]`;
+  return `${baseLabel}[${formatSettlementScore(match)}]`;
 }
 
 function findScoreOdds(scoreOptions = [], score) {

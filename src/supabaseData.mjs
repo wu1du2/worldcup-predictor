@@ -131,14 +131,28 @@ function normalizeScores(scores) {
 }
 
 export async function loadMatches({ client }) {
-  const { data, error } = await client
+  const selectWithSettlement = 'id,match_code,kickoff_at_utc,match_date_cn,time_cn,home,away,home_cn,away_cn,home_score,away_score,settlement_home_score,settlement_away_score,settlement_score_source,status,status_detail,venue,stage,home_team:teams!matches_home_team_id_fkey(name_en,name_cn),away_team:teams!matches_away_team_id_fkey(name_en,name_cn)';
+  const selectLegacy = 'id,match_code,kickoff_at_utc,match_date_cn,time_cn,home,away,home_cn,away_cn,home_score,away_score,status,status_detail,venue,stage,home_team:teams!matches_home_team_id_fkey(name_en,name_cn),away_team:teams!matches_away_team_id_fkey(name_en,name_cn)';
+  let { data, error } = await client
     .from('matches')
-    .select('id,match_code,kickoff_at_utc,match_date_cn,time_cn,home,away,home_cn,away_cn,home_score,away_score,status,status_detail,venue,stage,home_team:teams!matches_home_team_id_fkey(name_en,name_cn),away_team:teams!matches_away_team_id_fkey(name_en,name_cn)')
+    .select(selectWithSettlement)
     .eq('active', true)
     .order('kickoff_at_utc', { ascending: true });
 
+  if (isMissingSettlementColumnError(error)) {
+    ({ data, error } = await client
+      .from('matches')
+      .select(selectLegacy)
+      .eq('active', true)
+      .order('kickoff_at_utc', { ascending: true }));
+  }
+
   if (error) throw error;
   return (data || []).filter(isCompleteMatchRow).map(toAppMatch);
+}
+
+function isMissingSettlementColumnError(error) {
+  return /settlement_(home|away)_score|settlement_score_source/.test(String(error?.message || error?.details || ''));
 }
 
 export async function loadScoreOdds({ client, matches, oddsWindow = null }) {

@@ -51,6 +51,9 @@ test('buildD1LiveImportSql writes only live matches, odds, and one import report
       away_cn: '日本',
       home_score: 2,
       away_score: 1,
+      settlement_home_score: 2,
+      settlement_away_score: 1,
+      settlement_score_source: 'final',
       status: 'post',
       status_detail: 'Final',
       stage: 'Round of 32',
@@ -78,6 +81,7 @@ test('buildD1LiveImportSql writes only live matches, odds, and one import report
   });
 
   assert.match(sql, /insert into matches/);
+  assert.match(sql, /settlement_home_score, settlement_away_score, settlement_score_source/);
   assert.match(sql, /on conflict\(match_code\) do update/);
   assert.match(sql, /insert into score_odds/);
   assert.match(sql, /insert into import_reports/);
@@ -97,6 +101,9 @@ test('buildD1LiveImportSql keeps pre-match scores as SQL NULL instead of 0-0', (
       away_cn: '挪威',
       home_score: null,
       away_score: null,
+      settlement_home_score: null,
+      settlement_away_score: null,
+      settlement_score_source: '',
       status: 'pre',
       status_detail: 'Scheduled',
       stage: 'Round of 32',
@@ -104,6 +111,6 @@ test('buildD1LiveImportSql keeps pre-match scores as SQL NULL instead of 0-0', (
     report: { id: 'report-pre', startedAt: '2026-06-30T00:00:00.000Z', finishedAt: '2026-06-30T00:00:01.000Z' },
   });
 
-  assert.match(sql, /home_score, away_score/);
-  assert.match(sql, /'科特迪瓦', '挪威', NULL, NULL, 'pre'/);
+  assert.match(sql, /home_score, away_score, settlement_home_score, settlement_away_score, settlement_score_source/);
+  assert.match(sql, /'科特迪瓦', '挪威', NULL, NULL, NULL, NULL, '', 'pre'/);
 });

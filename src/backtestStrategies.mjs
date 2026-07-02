@@ -1,4 +1,8 @@
-import { exactSportteryScores } from './scoreTemplate.mjs';
+import {
+  formatSettlementScore,
+  isSettledMatch,
+  isWinningScoreLabel as isSettlementWinningScoreLabel,
+} from './settlementScore.mjs';
 
 export function backtestLowestOddsStrategy({
   strategyName,
@@ -100,7 +104,7 @@ function buildBacktestResult({ strategyName, pickCount, rows }) {
 function buildSettledBacktestRow({ match, picks, pickCount }) {
   if (picks.length < pickCount) return null;
 
-  const actualScore = `${match.homeScore}-${match.awayScore}`;
+  const actualScore = formatSettlementScore(match);
   const hit = picks.find((pick) => isWinningScoreLabel(match, pick.score));
   const cost = picks.length;
   const revenue = hit ? hit.odds : 0;
@@ -154,19 +158,11 @@ export function formatBacktestReport(result) {
 }
 
 function isCompletedMatch(match) {
-  return match.status === 'post'
-    && Number.isInteger(match.homeScore)
-    && Number.isInteger(match.awayScore);
+  return isSettledMatch(match);
 }
 
 function isWinningScoreLabel(match, score) {
-  const actualScore = `${match.homeScore}-${match.awayScore}`;
-  if (score === actualScore) return true;
-  if (exactSportteryScores.has(actualScore)) return false;
-
-  if (match.homeScore > match.awayScore) return score === '胜其他';
-  if (match.homeScore === match.awayScore) return score === '平其他';
-  return score === '负其他';
+  return isSettlementWinningScoreLabel(match, score);
 }
 
 function sum(values) {

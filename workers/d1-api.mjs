@@ -145,7 +145,8 @@ export async function loadLiveBoard(db, { from, to } = {}) {
   const matchesResult = await db
     .prepare(`
       select match_code, match_date_cn, time_cn, home, away, home_cn, away_cn,
-        home_score, away_score, status, status_detail, stage
+        home_score, away_score, settlement_home_score, settlement_away_score,
+        settlement_score_source, status, status_detail, stage
       from matches
       where active = 1 and match_date_cn >= ? and match_date_cn <= ?
       order by match_date_cn asc, time_cn asc
@@ -304,6 +305,9 @@ function toAppMatch(row) {
     away: row.away_cn || row.away,
     homeScore: Number.isInteger(row.home_score) ? row.home_score : normalizeNullableInteger(row.home_score),
     awayScore: Number.isInteger(row.away_score) ? row.away_score : normalizeNullableInteger(row.away_score),
+    settlementHomeScore: Number.isInteger(row.settlement_home_score) ? row.settlement_home_score : normalizeNullableInteger(row.settlement_home_score),
+    settlementAwayScore: Number.isInteger(row.settlement_away_score) ? row.settlement_away_score : normalizeNullableInteger(row.settlement_away_score),
+    settlementScoreSource: row.settlement_score_source || '',
     status: row.status || 'pre',
     statusDetail: row.status_detail || '',
     venue: '',

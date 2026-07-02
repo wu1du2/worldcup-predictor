@@ -162,6 +162,21 @@ test('isCorrectScoreOption recognizes exact completed scores', () => {
   assert.equal(isCorrectScoreOption({ status: 'pre', homeScore: 2, awayScore: 1 }, { score: '2-1' }), false);
 });
 
+test('isCorrectScoreOption uses settlement score before final AET score', () => {
+  const match = {
+    status: 'post',
+    statusDetail: 'AET',
+    homeScore: 3,
+    awayScore: 2,
+    settlementHomeScore: 2,
+    settlementAwayScore: 2,
+    settlementScoreSource: 'espn_linescore_regular_time',
+  };
+
+  assert.equal(isCorrectScoreOption(match, { score: '2-2' }), true);
+  assert.equal(isCorrectScoreOption(match, { score: '3-2' }), false);
+});
+
 test('isCorrectScoreOption recognizes Sporttery other-score buckets', () => {
   assert.equal(isCorrectScoreOption({ status: 'post', homeScore: 6, awayScore: 2 }, { score: '胜其他' }), true);
   assert.equal(isCorrectScoreOption({ status: 'post', homeScore: 6, awayScore: 2 }, { score: '负其他' }), false);
@@ -296,6 +311,36 @@ test('exportPredictionsText labels completed matches with the final score in pre
 
   assert.match(text, /【预测情况】\n03:00 加拿大 vs 波黑\[1-1\]\n09:00 美国 vs 巴拉圭/);
   assert.doesNotMatch(text, /美国 vs 巴拉圭\[/);
+});
+
+test('exportPredictionsText labels and settles AET matches with regular-time settlement score', () => {
+  const text = exportPredictionsText({
+    dateLabel: '7月2日',
+    matches: [
+      {
+        id: 'm-aet',
+        date: '2026-07-02',
+        time: '04:00',
+        home: '比利时',
+        away: '塞内加尔',
+        status: 'post',
+        statusDetail: 'AET',
+        homeScore: 3,
+        awayScore: 2,
+        settlementHomeScore: 2,
+        settlementAwayScore: 2,
+        settlementScoreSource: 'espn_linescore_regular_time',
+      },
+    ],
+    players: [{ id: 'p1', name: '张三' }],
+    state: { predictions: { p1: { 'm-aet': ['2-2'] } } },
+    scoreOddsByMatch: { 'm-aet': [{ score: '2-2', odds: 12 }, { score: '3-2', odds: 20 }] },
+  });
+
+  assert.match(text, /04:00 比利时 vs 塞内加尔\[2-2\]/);
+  assert.match(text, /张三｜1100%/);
+  assert.match(text, /✅ 比利时 vs 塞内加尔 2-2\(12\)/);
+  assert.doesNotMatch(text, /3-2\(20\)/);
 });
 
 test('exportPredictionsText appends invite date matches before the group URL', () => {

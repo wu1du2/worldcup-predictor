@@ -94,6 +94,9 @@ test('normalizeEspnScoreboard converts ESPN events into UTC+8 match rows with sc
       away_cn: '南非',
       home_score: 2,
       away_score: 0,
+      settlement_home_score: 2,
+      settlement_away_score: 0,
+      settlement_score_source: 'final',
       status: 'post',
       status_detail: 'FT',
       venue: 'Estadio Banorte, Mexico City, Mexico',
@@ -112,6 +115,9 @@ test('normalizeEspnScoreboard converts ESPN events into UTC+8 match rows with sc
       away_cn: '卡塔尔',
       home_score: null,
       away_score: null,
+      settlement_home_score: null,
+      settlement_away_score: null,
+      settlement_score_source: '',
       status: 'pre',
       status_detail: '6/12 - 9:00 AM CST',
       venue: 'BMO Field, Toronto, Canada',
@@ -144,11 +150,49 @@ test('normalizeEspnScoreboard translates Algeria for odds matching', () => {
   assert.equal(rows[0].away_cn, '阿尔及利亚');
 });
 
-test('normalizeEspnScoreboard temporarily fixes Belgium Senegal to regular-time score', () => {
+test('normalizeEspnScoreboard keeps AET final score and extracts regular-time settlement score', () => {
   const rows = normalizeEspnScoreboard({
     events: [
       {
         id: '760493',
+        date: '2026-07-01T20:00Z',
+        status: { type: { state: 'post', completed: true, shortDetail: 'AET' } },
+        competitions: [
+          {
+            competitors: [
+              {
+                homeAway: 'home',
+                score: '3',
+                linescores: [{ displayValue: '0' }, { displayValue: '2' }, { displayValue: '0' }, { displayValue: '1' }],
+                team: { displayName: 'Belgium' },
+              },
+              {
+                homeAway: 'away',
+                score: '2',
+                linescores: [{ displayValue: '1' }, { displayValue: '1' }, { displayValue: '0' }, { displayValue: '0' }],
+                team: { displayName: 'Senegal' },
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+
+  assert.equal(rows[0].match_code, 'espn-760493');
+  assert.equal(rows[0].home_score, 3);
+  assert.equal(rows[0].away_score, 2);
+  assert.equal(rows[0].settlement_home_score, 2);
+  assert.equal(rows[0].settlement_away_score, 2);
+  assert.equal(rows[0].settlement_score_source, 'espn_linescore_regular_time');
+  assert.equal(rows[0].status_detail, 'AET');
+});
+
+test('normalizeEspnScoreboard marks AET matches without linescores as needing settlement confirmation', () => {
+  const rows = normalizeEspnScoreboard({
+    events: [
+      {
+        id: '760999',
         date: '2026-07-01T20:00Z',
         status: { type: { state: 'post', completed: true, shortDetail: 'AET' } },
         competitions: [
@@ -163,9 +207,11 @@ test('normalizeEspnScoreboard temporarily fixes Belgium Senegal to regular-time 
     ],
   });
 
-  assert.equal(rows[0].match_code, 'espn-760493');
-  assert.equal(rows[0].home_score, 2);
+  assert.equal(rows[0].home_score, 3);
   assert.equal(rows[0].away_score, 2);
+  assert.equal(rows[0].settlement_home_score, null);
+  assert.equal(rows[0].settlement_away_score, null);
+  assert.equal(rows[0].settlement_score_source, 'needs_regular_time_confirmation');
   assert.equal(rows[0].status_detail, 'AET');
 });
 

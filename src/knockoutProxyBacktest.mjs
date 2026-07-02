@@ -1,3 +1,5 @@
+import { isSettledMatch } from './settlementScore.mjs';
+
 const scoreWeights = {
   roi: 0.35,
   hitRate: 0.05,
@@ -263,7 +265,7 @@ function getScoreOutcome(score) {
 }
 
 function isCompletedMatch(match) {
-  return Number.isInteger(match?.homeScore) && Number.isInteger(match?.awayScore);
+  return isSettledMatch({ ...match, status: match?.status || 'post' });
 }
 
 function getShapeHealth(averagePicks) {
