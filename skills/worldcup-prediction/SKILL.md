@@ -55,6 +55,7 @@ After each completed task, update this skill when new project-specific lessons, 
 - Team Chinese names live in the `teams` table as the translation authority. Importers upsert teams from `data/team-name-mapping.csv`, write `home_team_id` and `away_team_id` to matches, and keep `home_cn` / `away_cn` only as snapshots.
 - Frontend match loading should use Supabase embedded joins (`home_team:teams!matches_home_team_id_fkey`, `away_team:teams!matches_away_team_id_fkey`) and prefer joined `teams.name_cn` over snapshot fields.
 - D1 live imports use `src/matchSchedule.mjs` directly, so its `teamNameCnByEnglish` fallback must stay in sync with tournament teams. A missing entry such as `Algeria -> 阿尔及利亚` leaves D1 match names in English and breaks odds joins even when `data/team-name-mapping.csv` is correct.
+- Correct-score settlement should use regular-time scores for knockout matches. Until a general ESPN regular-time parser is implemented, `src/matchSchedule.mjs` carries a narrow override for `espn-760493` 比利时 vs 塞内加尔 so ESPN's `3-2 AET` imports as the Sporttery-settlement score `2-2`.
 
 ## Future Ideas
 
