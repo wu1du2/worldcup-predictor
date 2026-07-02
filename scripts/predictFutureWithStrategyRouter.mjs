@@ -262,10 +262,29 @@ async function upsertBuiltInStrategyStats({ client, historicalResults }) {
     .upsert(strategyRows, { onConflict: 'id' });
   if (strategyError) throw strategyError;
 
+  await deleteExistingSystemStrategyStats({ client });
+
   const { error: statsError } = await client
     .from('ai_strategy_stats')
     .upsert(statsRows, { onConflict: 'strategy_id' });
   if (statsError) throw statsError;
+}
+
+async function deleteExistingSystemStrategyStats({ client }) {
+  const { data, error } = await client
+    .from('ai_user_strategies')
+    .select('id')
+    .eq('author_name', 'system');
+  if (error) throw error;
+
+  const ids = (data || []).map((row) => row.id).filter(Boolean);
+  if (!ids.length) return;
+
+  const { error: deleteError } = await client
+    .from('ai_strategy_stats')
+    .delete()
+    .in('strategy_id', ids);
+  if (deleteError) throw deleteError;
 }
 
 async function withRetry(label, operation, attempts = 3) {
