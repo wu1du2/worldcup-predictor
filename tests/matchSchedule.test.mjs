@@ -144,6 +144,31 @@ test('normalizeEspnScoreboard translates Algeria for odds matching', () => {
   assert.equal(rows[0].away_cn, '阿尔及利亚');
 });
 
+test('normalizeEspnScoreboard temporarily fixes Belgium Senegal to regular-time score', () => {
+  const rows = normalizeEspnScoreboard({
+    events: [
+      {
+        id: '760493',
+        date: '2026-07-01T20:00Z',
+        status: { type: { state: 'post', completed: true, shortDetail: 'AET' } },
+        competitions: [
+          {
+            competitors: [
+              { homeAway: 'home', score: '3', team: { displayName: 'Belgium' } },
+              { homeAway: 'away', score: '2', team: { displayName: 'Senegal' } },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+
+  assert.equal(rows[0].match_code, 'espn-760493');
+  assert.equal(rows[0].home_score, 2);
+  assert.equal(rows[0].away_score, 2);
+  assert.equal(rows[0].status_detail, 'AET');
+});
+
 test('normalizeEspnScoreboard keeps knockout stages and skips unresolved bracket placeholders', () => {
   const rows = normalizeEspnScoreboard({
     events: [

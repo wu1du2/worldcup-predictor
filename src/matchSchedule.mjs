@@ -92,6 +92,10 @@ const stageLabelBySlug = {
   final: 'Final',
 };
 
+const scoreOverrideByMatchCode = {
+  'espn-760493': { home_score: 2, away_score: 2 },
+};
+
 export function normalizeEspnScoreboard(scoreboard) {
   return (scoreboard.events || [])
     .map((event) => normalizeEspnEvent(event))
@@ -198,9 +202,12 @@ function normalizeEspnEvent(event) {
     return null;
   }
 
+  const matchCode = `espn-${event.id}`;
+  const scoreOverride = scoreOverrideByMatchCode[matchCode];
+
   return {
     id: event.id,
-    match_code: `espn-${event.id}`,
+    match_code: matchCode,
     kickoff_at_utc: kickoff.toISOString(),
     match_date_cn: getChinaDate(kickoff),
     time_cn: chinaClockFormatter.format(kickoff),
@@ -208,8 +215,8 @@ function normalizeEspnEvent(event) {
     away: awayName,
     home_cn: getTeamNameCn(homeName),
     away_cn: getTeamNameCn(awayName),
-    home_score: normalizeScore(home.score, state),
-    away_score: normalizeScore(away.score, state),
+    home_score: scoreOverride?.home_score ?? normalizeScore(home.score, state),
+    away_score: scoreOverride?.away_score ?? normalizeScore(away.score, state),
     status: state,
     status_detail: event.status?.type?.shortDetail || '',
     venue: formatVenue(competition?.venue),
