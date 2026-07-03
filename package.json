@@ -34,6 +34,7 @@
     "ai:predict-all:dry": "node scripts/predictAllMatchesForAi.mjs --dry-run",
     "ai:predict-router": "node scripts/predictFutureWithStrategyRouter.mjs",
     "ai:predict-router:dry": "node scripts/predictFutureWithStrategyRouter.mjs --dry-run",
+    "ai:predict-router:d1": "node scripts/predictFutureWithStrategyRouterD1.mjs",
     "historical:contexts": "node scripts/buildHistoricalContexts.mjs",
     "historical:verify": "node scripts/verifyHistoricalContexts.mjs",
     "prematch:sources": "node scripts/backfillPrematchSources.mjs",
