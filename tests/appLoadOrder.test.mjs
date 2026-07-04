@@ -15,3 +15,9 @@ test('public live board hydration is not gated or overwritten by group state loa
   assert.ok(hydrateIndex < staticGroupIndex, 'live board should not wait for group state loading');
   assert.ok(conditionalSetMatchesIndex > loadedMatchesIndex, 'group state success must not overwrite live matches with stale static snapshot');
 });
+
+test('public live board hydration covers recent finished matches missing from static snapshots', async () => {
+  const source = await readFile(new URL('../src/main.jsx', import.meta.url), 'utf8');
+
+  assert.match(source, /buildRecentLiveDateWindow\(new Date\(\), \{ pastDays: 7, futureDays: 2 \}\)/);
+});

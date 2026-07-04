@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   buildD1LiveImportSql,
   buildLiveDateWindow,
+  buildRecentLiveDateWindow,
   hasLiveWindowChanged,
   normalizeLiveComparable,
 } from '../src/d1LiveImport.mjs';
@@ -13,6 +14,25 @@ test('buildLiveDateWindow covers today through the next two China dates', () => 
     from: '2026-06-30',
     to: '2026-07-02',
     dates: ['2026-06-30', '2026-07-01', '2026-07-02'],
+  });
+});
+
+test('buildRecentLiveDateWindow covers recent finished matches and upcoming live matches', () => {
+  assert.deepEqual(buildRecentLiveDateWindow(new Date('2026-07-04T12:00:00+08:00')), {
+    from: '2026-06-27',
+    to: '2026-07-06',
+    dates: [
+      '2026-06-27',
+      '2026-06-28',
+      '2026-06-29',
+      '2026-06-30',
+      '2026-07-01',
+      '2026-07-02',
+      '2026-07-03',
+      '2026-07-04',
+      '2026-07-05',
+      '2026-07-06',
+    ],
   });
 });
 
@@ -83,6 +103,7 @@ test('buildD1LiveImportSql writes only live matches, odds, and one import report
   assert.match(sql, /insert into matches/);
   assert.match(sql, /settlement_home_score, settlement_away_score, settlement_score_source/);
   assert.match(sql, /on conflict\(match_code\) do update/);
+  assert.match(sql, /when excluded\.settlement_score_source = 'needs_regular_time_confirmation'/);
   assert.match(sql, /insert into score_odds/);
   assert.match(sql, /insert into import_reports/);
   assert.match(sql, /巴西/);

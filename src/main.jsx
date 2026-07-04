@@ -37,7 +37,7 @@ import {
   saveD1GroupPredictions,
 } from './d1Data.mjs';
 import { formatReportJobTitle, formatReportStatusText } from './importReports.mjs';
-import { buildLiveDateWindow } from './liveWindow.mjs';
+import { buildRecentLiveDateWindow } from './liveWindow.mjs';
 import {
   getAiReasonPreview,
   getAiRecommendationForMatch,
@@ -104,6 +104,7 @@ function App() {
   const [strategyHitDetail, setStrategyHitDetail] = useState(null);
   const [knockoutStrategyOpen, setKnockoutStrategyOpen] = useState(false);
   const selectedDateButtonRef = useRef(null);
+  const hydratedD1WindowsRef = useRef(new Set());
   const client = useMemo(() => createSupabaseBrowserClient(), []);
   const d1Client = useMemo(() => createD1BrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
@@ -200,9 +201,12 @@ function App() {
     }
   }
 
-  function hydrateLiveBoardFromD1() {
+  function hydrateLiveBoardFromD1(windowOverride = null) {
     if (!d1Client) return;
-    const liveWindow = buildLiveDateWindow(new Date(), 2);
+    const liveWindow = windowOverride || buildRecentLiveDateWindow(new Date(), { pastDays: 7, futureDays: 2 });
+    const windowKey = `${liveWindow.from}:${liveWindow.to}`;
+    if (hydratedD1WindowsRef.current.has(windowKey)) return;
+    hydratedD1WindowsRef.current.add(windowKey);
     void loadD1LiveBoard({ client: d1Client, from: liveWindow.from, to: liveWindow.to })
       .then((liveBoard) => {
         setMatches((currentMatches) => mergeLiveBoardSnapshot({ matches: currentMatches }, liveBoard).matches);
@@ -289,6 +293,7 @@ function App() {
   }
 
   function selectDate(selectedDate) {
+    hydrateLiveBoardFromD1({ from: selectedDate, to: selectedDate });
     updateState((current) => ({
       ...current,
       selectedDate,

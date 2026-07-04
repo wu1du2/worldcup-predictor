@@ -1,8 +1,18 @@
 export function buildLiveDateWindow(now = new Date(), daysAhead = 2) {
   const from = getChinaDate(now);
+  return buildDateWindow(from, 0, daysAhead);
+}
+
+export function buildRecentLiveDateWindow(now = new Date(), { pastDays = 7, futureDays = 2 } = {}) {
+  const today = getChinaDate(now);
+  return buildDateWindow(today, -pastDays, futureDays);
+}
+
+function buildDateWindow(anchorDate, startOffset, endOffset) {
+  const from = addChinaDateDays(anchorDate, startOffset);
   const dates = [];
-  for (let offset = 0; offset <= daysAhead; offset += 1) {
-    dates.push(addChinaDateDays(from, offset));
+  for (let offset = startOffset; offset <= endOffset; offset += 1) {
+    dates.push(addChinaDateDays(anchorDate, offset));
   }
   return {
     from,

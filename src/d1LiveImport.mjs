@@ -1,4 +1,4 @@
-export { buildLiveDateWindow } from './liveWindow.mjs';
+export { buildLiveDateWindow, buildRecentLiveDateWindow } from './liveWindow.mjs';
 
 export function normalizeLiveComparable({ matches = [], scoreOddsRows = [], scoreOddsByMatch = {} } = {}) {
   const normalizedMatches = (matches || [])
@@ -117,9 +117,24 @@ on conflict(match_code) do update set
   away_cn = excluded.away_cn,
   home_score = excluded.home_score,
   away_score = excluded.away_score,
-  settlement_home_score = excluded.settlement_home_score,
-  settlement_away_score = excluded.settlement_away_score,
-  settlement_score_source = excluded.settlement_score_source,
+  settlement_home_score = case
+    when excluded.settlement_score_source = 'needs_regular_time_confirmation'
+      and matches.settlement_score_source in ('espn_linescore_regular_time', 'manual_regular_time_override')
+    then matches.settlement_home_score
+    else excluded.settlement_home_score
+  end,
+  settlement_away_score = case
+    when excluded.settlement_score_source = 'needs_regular_time_confirmation'
+      and matches.settlement_score_source in ('espn_linescore_regular_time', 'manual_regular_time_override')
+    then matches.settlement_away_score
+    else excluded.settlement_away_score
+  end,
+  settlement_score_source = case
+    when excluded.settlement_score_source = 'needs_regular_time_confirmation'
+      and matches.settlement_score_source in ('espn_linescore_regular_time', 'manual_regular_time_override')
+    then matches.settlement_score_source
+    else excluded.settlement_score_source
+  end,
   status = excluded.status,
   status_detail = excluded.status_detail,
   stage = excluded.stage,
