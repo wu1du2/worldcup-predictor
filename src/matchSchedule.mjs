@@ -103,6 +103,34 @@ export function normalizeEspnScoreboard(scoreboard) {
     .sort((a, b) => a.kickoff_at_utc.localeCompare(b.kickoff_at_utc));
 }
 
+export async function enrichEspnScoreboardWithRegularTimeSummaries(scoreboard, {
+  currentMatches = [],
+  fetchSummary,
+} = {}) {
+  if (!scoreboard || !Array.isArray(scoreboard.events) || typeof fetchSummary !== 'function') {
+    return scoreboard;
+  }
+
+  const currentById = new Map((currentMatches || []).map((match) => [match.id || match.matchCode || match.match_code, match]));
+  const events = [];
+
+  for (const event of scoreboard.events) {
+    if (!needsRegularTimeSummary(event, currentById.get(`espn-${event?.id}`))) {
+      events.push(event);
+      continue;
+    }
+
+    try {
+      const summary = await fetchSummary(event.id);
+      events.push(mergeEventLinescoresFromSummary(event, summary));
+    } catch {
+      events.push(event);
+    }
+  }
+
+  return { ...scoreboard, events };
+}
+
 export function buildDateTabs(matches) {
   const countsByDate = new Map();
 
@@ -269,7 +297,60 @@ function buildSettlementScore({ matchCode, state, statusDetail, home, away, home
 }
 
 function requiresRegularTimeSettlementStatus(statusDetail) {
-  return /\b(AET|PEN)\b|After Extra Time|Penalties/i.test(String(statusDetail || ''));
+  return /\b(AET|PEN|PENS)\b|After Extra Time|Penalties/i.test(String(statusDetail || ''));
+}
+
+function needsRegularTimeSummary(event, currentMatch) {
+  const state = event?.status?.type?.state || '';
+  const statusDetail = event?.status?.type?.shortDetail || event?.status?.type?.detail || '';
+  if (state !== 'post' || !requiresRegularTimeSettlementStatus(statusDetail)) return false;
+  if (hasConfirmedSettlement(currentMatch)) return false;
+
+  const competition = event.competitions?.[0];
+  const home = competition?.competitors?.find((competitor) => competitor.homeAway === 'home');
+  const away = competition?.competitors?.find((competitor) => competitor.homeAway === 'away');
+  return !extractRegularTimeScoreFromCompetitors(home, away);
+}
+
+function hasConfirmedSettlement(match) {
+  const homeScore = normalizeNullableInteger(match?.settlementHomeScore ?? match?.settlement_home_score);
+  const awayScore = normalizeNullableInteger(match?.settlementAwayScore ?? match?.settlement_away_score);
+  const source = match?.settlementScoreSource ?? match?.settlement_score_source ?? '';
+  return Number.isInteger(homeScore)
+    && Number.isInteger(awayScore)
+    && ['espn_linescore_regular_time', 'manual_regular_time_override'].includes(source);
+}
+
+function mergeEventLinescoresFromSummary(event, summary) {
+  const summaryCompetition = summary?.header?.competitions?.[0] || summary?.competitions?.[0];
+  const summaryCompetitors = summaryCompetition?.competitors || [];
+  if (!summaryCompetitors.length) return event;
+
+  return {
+    ...event,
+    competitions: (event.competitions || []).map((competition, index) => {
+      if (index !== 0) return competition;
+      return {
+        ...competition,
+        competitors: (competition.competitors || []).map((competitor) => {
+          const summaryCompetitor = findSummaryCompetitor(competitor, summaryCompetitors);
+          if (!summaryCompetitor?.linescores) return competitor;
+          return { ...competitor, linescores: summaryCompetitor.linescores };
+        }),
+      };
+    }),
+  };
+}
+
+function findSummaryCompetitor(competitor, summaryCompetitors) {
+  const homeAway = competitor?.homeAway;
+  const teamName = getTeamName(competitor);
+  return summaryCompetitors.find((summaryCompetitor) => summaryCompetitor.homeAway === homeAway)
+    || findSummaryCompetitorByName(summaryCompetitors, teamName);
+}
+
+function findSummaryCompetitorByName(summaryCompetitors, teamName) {
+  return summaryCompetitors.find((summaryCompetitor) => getTeamName(summaryCompetitor) === teamName);
 }
 
 function extractRegularTimeScoreFromCompetitors(home, away) {
@@ -313,6 +394,12 @@ function isUnresolvedBracketName(name) {
 function normalizeScore(score, state) {
   if (state === 'pre') return null;
   const parsed = Number(score);
+  return Number.isInteger(parsed) ? parsed : null;
+}
+
+function normalizeNullableInteger(value) {
+  if (value === null || value === undefined) return null;
+  const parsed = Number(value);
   return Number.isInteger(parsed) ? parsed : null;
 }
 

@@ -8,6 +8,7 @@ import {
   getMatchScoreText,
   getNextMatchDateCn,
   toMatchUpsertRows,
+  enrichEspnScoreboardWithRegularTimeSummaries,
   normalizeEspnScoreboard,
 } from '../src/matchSchedule.mjs';
 
@@ -213,6 +214,150 @@ test('normalizeEspnScoreboard marks AET matches without linescores as needing se
   assert.equal(rows[0].settlement_away_score, null);
   assert.equal(rows[0].settlement_score_source, 'needs_regular_time_confirmation');
   assert.equal(rows[0].status_detail, 'AET');
+});
+
+test('normalizeEspnScoreboard marks FT-Pens matches without linescores as needing settlement confirmation', () => {
+  const rows = normalizeEspnScoreboard({
+    events: [
+      {
+        id: '760998',
+        date: '2026-07-01T20:00Z',
+        status: { type: { state: 'post', completed: true, shortDetail: 'FT-Pens' } },
+        competitions: [
+          {
+            competitors: [
+              { homeAway: 'home', score: '4', team: { displayName: 'Netherlands' } },
+              { homeAway: 'away', score: '3', team: { displayName: 'Morocco' } },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+
+  assert.equal(rows[0].home_score, 4);
+  assert.equal(rows[0].away_score, 3);
+  assert.equal(rows[0].settlement_home_score, null);
+  assert.equal(rows[0].settlement_away_score, null);
+  assert.equal(rows[0].settlement_score_source, 'needs_regular_time_confirmation');
+  assert.equal(rows[0].status_detail, 'FT-Pens');
+});
+
+test('enrichEspnScoreboardWithRegularTimeSummaries fills AET regular-time linescores from summary', async () => {
+  const scoreboard = {
+    events: [
+      {
+        id: '760500',
+        date: '2026-07-03T22:00Z',
+        status: { type: { state: 'post', completed: true, shortDetail: 'AET' } },
+        competitions: [
+          {
+            competitors: [
+              { homeAway: 'home', score: '3', team: { displayName: 'Argentina' } },
+              { homeAway: 'away', score: '2', team: { displayName: 'Cape Verde' } },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+  const enriched = await enrichEspnScoreboardWithRegularTimeSummaries(scoreboard, {
+    currentMatches: [{
+      id: 'espn-760500',
+      settlementHomeScore: null,
+      settlementAwayScore: null,
+      settlementScoreSource: 'needs_regular_time_confirmation',
+    }],
+    fetchSummary: async (eventId) => {
+      assert.equal(eventId, '760500');
+      return {
+        header: {
+          competitions: [
+            {
+              competitors: [
+                {
+                  homeAway: 'home',
+                  score: '3',
+                  team: { displayName: 'Argentina' },
+                  linescores: [{ displayValue: '1' }, { displayValue: '0' }, { displayValue: '1' }, { displayValue: '1' }],
+                },
+                {
+                  homeAway: 'away',
+                  score: '2',
+                  team: { displayName: 'Cape Verde' },
+                  linescores: [{ displayValue: '0' }, { displayValue: '1' }, { displayValue: '1' }, { displayValue: '0' }],
+                },
+              ],
+            },
+          ],
+        },
+      };
+    },
+  });
+
+  const rows = normalizeEspnScoreboard(enriched);
+  assert.equal(rows[0].home_score, 3);
+  assert.equal(rows[0].away_score, 2);
+  assert.equal(rows[0].settlement_home_score, 1);
+  assert.equal(rows[0].settlement_away_score, 1);
+  assert.equal(rows[0].settlement_score_source, 'espn_linescore_regular_time');
+});
+
+test('enrichEspnScoreboardWithRegularTimeSummaries does not trust prior final settlement for penalty matches', async () => {
+  let summaryCalls = 0;
+  const enriched = await enrichEspnScoreboardWithRegularTimeSummaries({
+    events: [
+      {
+        id: '760997',
+        date: '2026-07-01T20:00Z',
+        status: { type: { state: 'post', completed: true, shortDetail: 'FT-Pens' } },
+        competitions: [
+          {
+            competitors: [
+              { homeAway: 'home', score: '4', team: { displayName: 'Netherlands' } },
+              { homeAway: 'away', score: '3', team: { displayName: 'Morocco' } },
+            ],
+          },
+        ],
+      },
+    ],
+  }, {
+    currentMatches: [{
+      id: 'espn-760997',
+      settlementHomeScore: 4,
+      settlementAwayScore: 3,
+      settlementScoreSource: 'final',
+    }],
+    fetchSummary: async () => {
+      summaryCalls += 1;
+      return {
+        header: {
+          competitions: [
+            {
+              competitors: [
+                {
+                  homeAway: 'home',
+                  team: { displayName: 'Netherlands' },
+                  linescores: [{ displayValue: '1' }, { displayValue: '0' }, { displayValue: '0' }, { displayValue: '0' }],
+                },
+                {
+                  homeAway: 'away',
+                  team: { displayName: 'Morocco' },
+                  linescores: [{ displayValue: '0' }, { displayValue: '1' }, { displayValue: '0' }, { displayValue: '0' }],
+                },
+              ],
+            },
+          ],
+        },
+      };
+    },
+  });
+
+  const rows = normalizeEspnScoreboard(enriched);
+  assert.equal(summaryCalls, 1);
+  assert.equal(rows[0].settlement_home_score, 1);
+  assert.equal(rows[0].settlement_away_score, 1);
+  assert.equal(rows[0].settlement_score_source, 'espn_linescore_regular_time');
 });
 
 test('normalizeEspnScoreboard keeps knockout stages and skips unresolved bracket placeholders', () => {

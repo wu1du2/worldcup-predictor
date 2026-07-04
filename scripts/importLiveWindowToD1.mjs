@@ -2,7 +2,10 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 
 import { fetchJsonWithRetry } from '../src/matchImport.mjs';
-import { normalizeEspnScoreboard } from '../src/matchSchedule.mjs';
+import {
+  enrichEspnScoreboardWithRegularTimeSummaries,
+  normalizeEspnScoreboard,
+} from '../src/matchSchedule.mjs';
 import {
   buildSportteryScoreUrl,
   dedupeParsedMatches,
@@ -35,11 +38,15 @@ await mkdir(new URL('../output/', import.meta.url), { recursive: true });
 await rm(outputPath, { force: true });
 
 const scoreboard = await fetchJsonWithRetry(scoreboardUrl, { retries: 3, timeoutMs: 20000, waitMs: 1000 });
-const matches = normalizeEspnScoreboard(scoreboard)
+const current = await fetchCurrentLiveBoard(liveWindow);
+const enrichedScoreboard = await enrichEspnScoreboardWithRegularTimeSummaries(scoreboard, {
+  currentMatches: current.matches || [],
+  fetchSummary: fetchEspnSummary,
+});
+const matches = normalizeEspnScoreboard(enrichedScoreboard)
   .filter((match) => match.match_date_cn >= liveWindow.from && match.match_date_cn <= liveWindow.to)
   .map((match) => ({ ...match, updated_at: startedAt }));
 const scoreOddsRows = await fetchLiveScoreOddsRows(liveWindow.dates, startedAt);
-const current = await fetchCurrentLiveBoard(liveWindow);
 const nextComparable = normalizeLiveComparable({ matches, scoreOddsRows });
 const currentComparable = normalizeLiveComparable(current);
 const changed = hasLiveWindowChanged(currentComparable, nextComparable);
@@ -102,6 +109,11 @@ async function fetchCurrentLiveBoard(window) {
     console.warn(`Could not read current D1 live-board; generating SQL as changed. ${error.message}`);
     return {};
   }
+}
+
+async function fetchEspnSummary(eventId) {
+  const url = `https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary?event=${encodeURIComponent(eventId)}`;
+  return fetchJsonWithRetry(url, { retries: 2, timeoutMs: 15000, waitMs: 750 });
 }
 
 async function fetchGb18030WithRetry(urlToFetch, options = {}) {
