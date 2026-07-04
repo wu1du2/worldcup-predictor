@@ -41,6 +41,18 @@ export default {
         return json(await saveGroupPredictions(env.DB, decodeURIComponent(groupPredictionMatch[1]), payload));
       }
 
+      const groupAdvancementMatch = url.pathname.match(/^\/api\/groups\/([^/]+)\/advancement-predictions$/);
+      if (groupAdvancementMatch) {
+        const groupCode = decodeURIComponent(groupAdvancementMatch[1]);
+        if (request.method === 'GET') {
+          return json(await loadAdvancementPredictions(env.DB, groupCode, { now: getNow(env) }));
+        }
+        if (request.method === 'POST') {
+          const payload = await readJsonBody(request);
+          return json(await saveAdvancementPredictions(env.DB, groupCode, payload, { now: getNow(env) }));
+        }
+      }
+
       return json({ error: 'not_found' }, { status: 404 });
     } catch (error) {
       if (error?.status) {
@@ -140,6 +152,76 @@ export async function saveGroupPredictions(db, groupCode, payload) {
   return { ok: true, rowsWritten };
 }
 
+export async function loadAdvancementPredictions(db, groupCode, { now = new Date() } = {}) {
+  const { group } = await getOrCreateGroup(db, groupCode);
+  const [tiesResult, predictionsResult] = await Promise.all([
+    loadRoundOf16Ties(db),
+    db
+      .prepare(`
+        select player_id, match_id, winner_side, winner_name
+        from advancement_predictions
+        where group_id = ?
+      `)
+      .bind(group.id)
+      .all(),
+  ]);
+
+  return {
+    ties: (tiesResult.results || []).map((row) => toAdvancementTie(row, now)),
+    predictions: (predictionsResult.results || []).map((row) => ({
+      playerId: row.player_id,
+      matchId: row.match_id,
+      winnerSide: row.winner_side,
+      winnerName: row.winner_name,
+    })),
+  };
+}
+
+export async function saveAdvancementPredictions(db, groupCode, payload, { now = new Date() } = {}) {
+  const { group } = await getOrCreateGroup(db, groupCode);
+  const playerId = String(payload?.playerId || '').trim();
+  if (!playerId) throw httpError(400, 'invalid_player', 'Player is required');
+
+  const player = await db
+    .prepare('select id, name from players where id = ? and group_id = ? limit 1')
+    .bind(playerId, group.id)
+    .first();
+  if (!player) throw httpError(404, 'player_not_found', 'Player not found');
+
+  const entries = Array.isArray(payload?.entries) ? payload.entries : [];
+  const tiesResult = await loadRoundOf16Ties(db);
+  const tiesByMatchId = new Map((tiesResult.results || []).map((tie) => [tie.match_code, tie]));
+  const updatedAt = new Date().toISOString();
+  let rowsWritten = 0;
+
+  for (const entry of entries) {
+    const matchId = String(entry?.matchId || '').trim();
+    const winnerSide = String(entry?.winnerSide || '').trim();
+    if (!matchId || !['home', 'away'].includes(winnerSide)) continue;
+    const tie = tiesByMatchId.get(matchId);
+    if (!tie) throw httpError(404, 'advancement_tie_not_found', 'Advancement tie not found');
+    if (isAdvancementLocked(tie.kickoff_at_utc, now)) {
+      throw httpError(409, 'advancement_locked', 'Advancement prediction is locked');
+    }
+
+    const winnerName = winnerSide === 'home' ? tie.home_cn : tie.away_cn;
+    await db
+      .prepare(`
+        insert into advancement_predictions (id, group_id, player_id, match_id, winner_side, winner_name, updated_at)
+        values (?, ?, ?, ?, ?, ?, ?)
+        on conflict(group_id, player_id, match_id)
+        do update set winner_side = excluded.winner_side,
+          winner_name = excluded.winner_name,
+          updated_at = excluded.updated_at
+      `)
+      .bind(randomId(), group.id, player.id, matchId, winnerSide, winnerName, updatedAt)
+      .run();
+    rowsWritten += 1;
+  }
+
+  return { ok: true, rowsWritten };
+}
+
 export async function loadLiveBoard(db, { from, to } = {}) {
   const window = normalizeLiveWindow({ from, to });
   const matchesResult = await db
@@ -207,6 +289,36 @@ export async function loadLiveBoard(db, { from, to } = {}) {
     aiStrategyStats: (strategyStatsResult.results || []).map(toAppAiStrategyStat),
     importReports: (reportsResult.results || []).map(toAppImportReport),
   };
+}
+
+function loadRoundOf16Ties(db) {
+  return db
+    .prepare(`
+      select match_code, match_date_cn, time_cn, kickoff_at_utc, home_cn, away_cn
+      from matches
+      where active = 1 and stage = 'Round of 16'
+      order by match_date_cn asc, time_cn asc
+    `)
+    .all();
+}
+
+function toAdvancementTie(row, now) {
+  return {
+    matchId: row.match_code,
+    date: row.match_date_cn,
+    time: row.time_cn,
+    kickoffAtUtc: row.kickoff_at_utc || '',
+    home: row.home_cn,
+    away: row.away_cn,
+    locked: isAdvancementLocked(row.kickoff_at_utc, now),
+  };
+}
+
+function isAdvancementLocked(kickoffAtUtc, now = new Date()) {
+  const kickoffMs = Date.parse(kickoffAtUtc || '');
+  const nowMs = now instanceof Date ? now.getTime() : Date.parse(String(now || ''));
+  if (!Number.isFinite(kickoffMs) || !Number.isFinite(nowMs)) return false;
+  return nowMs >= kickoffMs - 15 * 60 * 1000;
 }
 
 async function loadAiRecommendationsForMatches(db, matchIds) {
@@ -460,6 +572,11 @@ function httpError(status, code, message) {
 
 function randomId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function getNow(env = {}) {
+  const testNow = env.TEST_NOW ? new Date(env.TEST_NOW) : null;
+  return testNow && !Number.isNaN(testNow.valueOf()) ? testNow : new Date();
 }
 
 function json(body, { status = 200 } = {}) {

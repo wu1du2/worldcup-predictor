@@ -5,8 +5,10 @@ import {
   createD1GroupPlayer,
   createD1ApiClient,
   createD1BrowserClientFromEnv,
+  loadD1AdvancementPredictions,
   loadD1LiveBoard,
   loadD1GroupState,
+  saveD1AdvancementPredictions,
   saveD1GroupPredictions,
 } from '../src/d1Data.mjs';
 
@@ -129,6 +131,56 @@ test('saveD1GroupPredictions posts selected score entries to the Worker', async 
     groupCode: 'lzscqjd',
     playerId: 'p1',
     entries: [{ matchId: 'm1', scores: ['1-0', 2, '2-1'] }],
+  });
+
+  assert.deepEqual(result, { ok: true, rowsWritten: 1 });
+});
+
+test('loadD1AdvancementPredictions reads Round of 16 ties and group picks', async () => {
+  const client = createD1ApiClient({
+    baseUrl: 'https://worldcup-api.example.workers.dev',
+    fetchImpl: async (url) => {
+      assert.equal(url, 'https://worldcup-api.example.workers.dev/api/groups/lzscqjd/advancement-predictions');
+      return new Response(JSON.stringify({
+        ties: [
+          { matchId: 'm1', date: '2026-07-05', time: '01:00', kickoffAtUtc: '2026-07-04T17:00:00.000Z', home: '加拿大', away: '摩洛哥', locked: false },
+        ],
+        predictions: [
+          { playerId: 'p1', matchId: 'm1', winnerSide: 'away', winnerName: '摩洛哥' },
+        ],
+      }), { status: 200 });
+    },
+  });
+
+  const result = await loadD1AdvancementPredictions({ client, groupCode: 'lzscqjd' });
+
+  assert.deepEqual(result.ties, [
+    { matchId: 'm1', date: '2026-07-05', time: '01:00', kickoffAtUtc: '2026-07-04T17:00:00.000Z', home: '加拿大', away: '摩洛哥', locked: false },
+  ]);
+  assert.deepEqual(result.predictionsByPlayer, {
+    p1: { m1: { winnerSide: 'away', winnerName: '摩洛哥' } },
+  });
+});
+
+test('saveD1AdvancementPredictions posts partial winner picks to the Worker', async () => {
+  const client = createD1ApiClient({
+    baseUrl: 'https://worldcup-api.example.workers.dev',
+    fetchImpl: async (url, init) => {
+      assert.equal(url, 'https://worldcup-api.example.workers.dev/api/groups/lzscqjd/advancement-predictions');
+      assert.equal(init.method, 'POST');
+      assert.deepEqual(JSON.parse(init.body), {
+        playerId: 'p1',
+        entries: [{ matchId: 'm1', winnerSide: 'home' }],
+      });
+      return new Response(JSON.stringify({ ok: true, rowsWritten: 1 }), { status: 200 });
+    },
+  });
+
+  const result = await saveD1AdvancementPredictions({
+    client,
+    groupCode: 'lzscqjd',
+    playerId: 'p1',
+    entries: [{ matchId: 'm1', winnerSide: 'home' }, { matchId: '', winnerSide: 'away' }, { matchId: 'm2', winnerSide: 'draw' }],
   });
 
   assert.deepEqual(result, { ok: true, rowsWritten: 1 });

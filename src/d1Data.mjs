@@ -64,6 +64,23 @@ export async function loadD1LiveBoard({ client, from, to }) {
   return normalizeD1LiveBoard(await response.json());
 }
 
+export async function loadD1AdvancementPredictions({ client, groupCode }) {
+  if (!client) throw new Error('D1 API 配置缺失');
+  const response = await (0, client.fetchImpl)(`${client.baseUrl}/api/groups/${encodeURIComponent(groupCode)}/advancement-predictions`);
+  if (!response.ok) {
+    let errorText = response.statusText;
+    try {
+      const body = await response.json();
+      errorText = body.error || body.message || errorText;
+    } catch {
+      // Keep status text when the Worker response is not JSON.
+    }
+    throw new Error(`D1 advancement predictions failed: ${response.status} ${errorText}`.trim());
+  }
+
+  return normalizeD1AdvancementPredictions(await response.json());
+}
+
 export async function createD1GroupPlayer({ client, groupCode, name }) {
   if (!client) throw new Error('D1 API 配置缺失');
   const trimmedName = String(name || '').trim();
@@ -96,6 +113,24 @@ export async function saveD1GroupPredictions({ client, groupCode, playerId, entr
   return postD1Json({
     client,
     path: `/api/groups/${encodeURIComponent(groupCode)}/predictions`,
+    payload: { playerId, entries: normalizedEntries },
+  });
+}
+
+export async function saveD1AdvancementPredictions({ client, groupCode, playerId, entries }) {
+  if (!client) throw new Error('D1 API 配置缺失');
+  const normalizedEntries = (entries || [])
+    .map((entry) => ({
+      matchId: entry.matchId,
+      winnerSide: entry.winnerSide,
+    }))
+    .filter((entry) => entry.matchId && ['home', 'away'].includes(entry.winnerSide));
+
+  if (!normalizedEntries.length) return { ok: true, rowsWritten: 0 };
+
+  return postD1Json({
+    client,
+    path: `/api/groups/${encodeURIComponent(groupCode)}/advancement-predictions`,
     payload: { playerId, entries: normalizedEntries },
   });
 }
@@ -152,6 +187,34 @@ export function normalizeD1LiveBoard(payload) {
       : {},
     aiStrategyStats: Array.isArray(payload.aiStrategyStats) ? payload.aiStrategyStats : [],
     importReports: Array.isArray(payload.importReports) ? payload.importReports : [],
+  };
+}
+
+export function normalizeD1AdvancementPredictions(payload) {
+  if (!payload || typeof payload !== 'object') throw new Error('D1 advancement payload is invalid');
+  const predictionsByPlayer = {};
+  for (const row of Array.isArray(payload.predictions) ? payload.predictions : []) {
+    if (!row?.playerId || !row?.matchId || !['home', 'away'].includes(row.winnerSide)) continue;
+    predictionsByPlayer[row.playerId] ||= {};
+    predictionsByPlayer[row.playerId][row.matchId] = {
+      winnerSide: row.winnerSide,
+      winnerName: row.winnerName || '',
+    };
+  }
+
+  return {
+    ties: (Array.isArray(payload.ties) ? payload.ties : [])
+      .filter((tie) => tie?.matchId && tie?.home && tie?.away)
+      .map((tie) => ({
+        matchId: tie.matchId,
+        date: tie.date || '',
+        time: tie.time || '',
+        kickoffAtUtc: tie.kickoffAtUtc || '',
+        home: tie.home,
+        away: tie.away,
+        locked: Boolean(tie.locked),
+      })),
+    predictionsByPlayer,
   };
 }
 

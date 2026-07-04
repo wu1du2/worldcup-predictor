@@ -104,6 +104,118 @@ test('D1 worker upserts predictions for a group player', async () => {
   ]);
 });
 
+test('D1 worker returns Round of 16 advancement ties and group predictions', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    matches: [
+      roundOf16Match({ match_code: 'espn-760502', match_date_cn: '2026-07-05', time_cn: '01:00', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥' }),
+      roundOf16Match({ match_code: 'espn-760503', match_date_cn: '2026-07-05', time_cn: '05:00', kickoff_at_utc: '2026-07-04T21:00:00.000Z', home_cn: '巴拉圭', away_cn: '法国' }),
+    ],
+    advancementPredictions: [
+      { group_id: 'g1', player_id: 'p1', match_id: 'espn-760502', winner_side: 'away', winner_name: '摩洛哥', updated_at: '2026-07-04T00:00:00.000Z' },
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/advancement-predictions'), {
+    DB: db,
+    TEST_NOW: '2026-07-04T16:00:00.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body.ties, [
+    {
+      matchId: 'espn-760502',
+      date: '2026-07-05',
+      time: '01:00',
+      kickoffAtUtc: '2026-07-04T17:00:00.000Z',
+      home: '加拿大',
+      away: '摩洛哥',
+      locked: false,
+    },
+    {
+      matchId: 'espn-760503',
+      date: '2026-07-05',
+      time: '05:00',
+      kickoffAtUtc: '2026-07-04T21:00:00.000Z',
+      home: '巴拉圭',
+      away: '法国',
+      locked: false,
+    },
+  ]);
+  assert.deepEqual(body.predictions, [
+    { playerId: 'p1', matchId: 'espn-760502', winnerSide: 'away', winnerName: '摩洛哥' },
+  ]);
+});
+
+test('D1 worker saves partial advancement predictions before the lock time', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    matches: [
+      roundOf16Match({ match_code: 'espn-760502', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥' }),
+      roundOf16Match({ match_code: 'espn-760503', kickoff_at_utc: '2026-07-04T21:00:00.000Z', home_cn: '巴拉圭', away_cn: '法国' }),
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/advancement-predictions', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      playerId: 'p1',
+      entries: [
+        { matchId: 'espn-760502', winnerSide: 'home' },
+        { matchId: 'espn-760503', winnerSide: 'away' },
+      ],
+    }),
+  }), {
+    DB: db,
+    TEST_NOW: '2026-07-04T16:30:00.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body, { ok: true, rowsWritten: 2 });
+  assert.deepEqual(db.state.advancementPredictions.map((row) => ({
+    group_id: row.group_id,
+    player_id: row.player_id,
+    match_id: row.match_id,
+    winner_side: row.winner_side,
+    winner_name: row.winner_name,
+  })), [
+    { group_id: 'g1', player_id: 'p1', match_id: 'espn-760502', winner_side: 'home', winner_name: '加拿大' },
+    { group_id: 'g1', player_id: 'p1', match_id: 'espn-760503', winner_side: 'away', winner_name: '法国' },
+  ]);
+});
+
+test('D1 worker rejects advancement prediction changes inside the 15 minute lock window', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    matches: [
+      roundOf16Match({ match_code: 'espn-760502', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥' }),
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/advancement-predictions', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      playerId: 'p1',
+      entries: [{ matchId: 'espn-760502', winnerSide: 'away' }],
+    }),
+  }), {
+    DB: db,
+    TEST_NOW: '2026-07-04T16:45:00.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 409);
+  assert.equal(body.error, 'advancement_locked');
+  assert.deepEqual(db.state.advancementPredictions, []);
+});
+
 test('D1 worker returns a small live board window with odds and recommendations', async () => {
   const db = fakeLiveBoardDb();
 
@@ -204,11 +316,28 @@ function fakeDb({ group = null, players = [], predictions = [] } = {}) {
   };
 }
 
+function roundOf16Match(overrides = {}) {
+  return {
+    match_code: 'espn-r16',
+    match_date_cn: '2026-07-05',
+    time_cn: '01:00',
+    kickoff_at_utc: '2026-07-04T17:00:00.000Z',
+    home_cn: '加拿大',
+    away_cn: '摩洛哥',
+    status: 'pre',
+    status_detail: 'Scheduled',
+    stage: 'Round of 16',
+    ...overrides,
+  };
+}
+
 function fakeStatefulDb(initial = {}) {
   const state = {
     groups: [...(initial.groups || [])],
     players: [...(initial.players || [])],
     predictions: [...(initial.predictions || [])],
+    matches: [...(initial.matches || [])],
+    advancementPredictions: [...(initial.advancementPredictions || [])],
   };
 
   return {
@@ -239,6 +368,17 @@ function fakeStatefulDb(initial = {}) {
           if (sql.includes('from players')) {
             const [groupId] = this.bound;
             return { results: state.players.filter((player) => player.group_id === groupId) };
+          }
+          if (sql.includes('from advancement_predictions')) {
+            const [groupId] = this.bound;
+            return { results: state.advancementPredictions.filter((prediction) => prediction.group_id === groupId) };
+          }
+          if (sql.includes('from matches') && sql.includes("stage = 'Round of 16'")) {
+            return {
+              results: state.matches
+                .filter((match) => match.stage === 'Round of 16' && match.active !== 0)
+                .sort((a, b) => `${a.match_date_cn || ''} ${a.time_cn || ''}`.localeCompare(`${b.match_date_cn || ''} ${b.time_cn || ''}`)),
+            };
           }
           if (sql.includes('from predictions')) {
             const [groupId] = this.bound;
@@ -272,6 +412,28 @@ function fakeStatefulDb(initial = {}) {
               existing.updated_at = updatedAt;
             } else {
               state.predictions.push({ id, group_id: groupId, player_id: playerId, match_id: matchId, scores, updated_at: updatedAt });
+            }
+            return { success: true };
+          }
+          if (normalizedSql.startsWith('insert into advancement_predictions')) {
+            const [id, groupId, playerId, matchId, winnerSide, winnerName, updatedAt] = this.bound;
+            const existing = state.advancementPredictions.find((row) => (
+              row.group_id === groupId && row.player_id === playerId && row.match_id === matchId
+            ));
+            if (existing) {
+              existing.winner_side = winnerSide;
+              existing.winner_name = winnerName;
+              existing.updated_at = updatedAt;
+            } else {
+              state.advancementPredictions.push({
+                id,
+                group_id: groupId,
+                player_id: playerId,
+                match_id: matchId,
+                winner_side: winnerSide,
+                winner_name: winnerName,
+                updated_at: updatedAt,
+              });
             }
             return { success: true };
           }

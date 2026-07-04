@@ -32,8 +32,10 @@ import {
 import {
   createD1BrowserClient,
   createD1GroupPlayer,
+  loadD1AdvancementPredictions,
   loadD1LiveBoard,
   loadD1GroupState,
+  saveD1AdvancementPredictions,
   saveD1GroupPredictions,
 } from './d1Data.mjs';
 import { formatReportJobTitle, formatReportStatusText } from './importReports.mjs';
@@ -66,6 +68,13 @@ import {
 } from './aiStrategyHitDetails.mjs';
 import { getStaticAiStrategyStatsPage, loadStaticGroupSnapshot, loadStaticSnapshot } from './staticSnapshot.mjs';
 import { mergeLiveBoardSnapshot } from './liveBoard.mjs';
+import {
+  buildAdvancementEntries,
+  countAdvancementSelections,
+  exportAdvancementPredictionsText,
+  getAdvancementLockText,
+  isAdvancementTieLocked,
+} from './advancementPrediction.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
@@ -103,6 +112,14 @@ function App() {
   const [strategyRankDialog, setStrategyRankDialog] = useState({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' });
   const [strategyHitDetail, setStrategyHitDetail] = useState(null);
   const [knockoutStrategyOpen, setKnockoutStrategyOpen] = useState(false);
+  const [advancementDialog, setAdvancementDialog] = useState({
+    open: false,
+    status: 'idle',
+    ties: [],
+    predictionsByPlayer: {},
+    draft: {},
+    error: '',
+  });
   const selectedDateButtonRef = useRef(null);
   const hydratedD1WindowsRef = useRef(new Set());
   const client = useMemo(() => createSupabaseBrowserClient(), []);
@@ -261,6 +278,11 @@ function App() {
   const inviteDate = selectedDate ? getNextMatchDateCn(matches, selectedDate) : '';
   const inviteMatches = inviteDate ? matches.filter((match) => match.date === inviteDate) : [];
   const inviteDateLabel = inviteDate ? formatChinaDateLabel(inviteDate) : '';
+  const selectedAdvancementDraft = advancementDialog.open
+    ? advancementDialog.draft
+    : buildAdvancementDraftFromPredictions(advancementDialog.predictionsByPlayer, state.selectedPlayerId);
+  const advancementSelectedCount = countAdvancementSelections(selectedAdvancementDraft, advancementDialog.ties);
+  const advancementTotalCount = advancementDialog.ties.length || 8;
 
   useEffect(() => {
     if (!groupCode) return;
@@ -357,6 +379,110 @@ function App() {
     }
   }
 
+  async function openAdvancementDialog() {
+    if (!selectedPlayer) {
+      updateState((current) => ({ ...current, flash: '先选择用户名，再填写晋级预测。' }));
+      return;
+    }
+    if (!d1Client) {
+      setAdvancementDialog({
+        open: true,
+        status: 'error',
+        ties: [],
+        predictionsByPlayer: {},
+        draft: {},
+        error: 'D1 API 配置缺失',
+      });
+      return;
+    }
+
+    setAdvancementDialog((current) => ({
+      ...current,
+      open: true,
+      status: 'loading',
+      error: '',
+    }));
+
+    try {
+      const payload = await loadD1AdvancementPredictions({ client: d1Client, groupCode });
+      setAdvancementDialog({
+        open: true,
+        status: 'ready',
+        ties: payload.ties,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        draft: buildAdvancementDraftFromPredictions(payload.predictionsByPlayer, selectedPlayer.id),
+        error: '',
+      });
+    } catch (error) {
+      setAdvancementDialog((current) => ({
+        ...current,
+        open: true,
+        status: 'error',
+        error: error.message || '晋级预测加载失败',
+      }));
+    }
+  }
+
+  function selectAdvancementWinner(matchId, winnerSide) {
+    const tie = advancementDialog.ties.find((item) => item.matchId === matchId);
+    if (!tie || tie.locked || isAdvancementTieLocked(tie)) return;
+    setAdvancementDialog((current) => ({
+      ...current,
+      draft: {
+        ...current.draft,
+        [matchId]: current.draft?.[matchId] === winnerSide ? '' : winnerSide,
+      },
+      error: '',
+    }));
+  }
+
+  async function submitAdvancementPredictions() {
+    if (!selectedPlayer || !d1Client) return;
+    const entries = buildAdvancementEntries(advancementDialog.draft);
+    if (!entries.length) {
+      setAdvancementDialog((current) => ({ ...current, error: '至少选择一场晋级结果' }));
+      return;
+    }
+
+    setAdvancementDialog((current) => ({ ...current, status: 'saving', error: '' }));
+
+    try {
+      await saveD1AdvancementPredictions({
+        client: d1Client,
+        groupCode,
+        playerId: selectedPlayer.id,
+        entries,
+      });
+      const tiesById = new Map(advancementDialog.ties.map((tie) => [tie.matchId, tie]));
+      const savedRows = Object.fromEntries(entries.map((entry) => {
+        const tie = tiesById.get(entry.matchId);
+        return [entry.matchId, {
+          winnerSide: entry.winnerSide,
+          winnerName: entry.winnerSide === 'home' ? tie?.home || '' : tie?.away || '',
+        }];
+      }));
+      setAdvancementDialog((current) => ({
+        ...current,
+        status: 'ready',
+        predictionsByPlayer: {
+          ...current.predictionsByPlayer,
+          [selectedPlayer.id]: {
+            ...(current.predictionsByPlayer[selectedPlayer.id] || {}),
+            ...savedRows,
+          },
+        },
+        error: '',
+      }));
+      updateState((current) => ({ ...current, flash: '晋级预测已保存。' }));
+    } catch (error) {
+      setAdvancementDialog((current) => ({
+        ...current,
+        status: 'ready',
+        error: error.message || '晋级预测保存失败',
+      }));
+    }
+  }
+
   function showExport() {
     const text = exportPredictionsText({
       dateLabel,
@@ -373,6 +499,43 @@ function App() {
       ...current,
       exportText: text,
     }));
+  }
+
+  async function showAdvancementResults() {
+    if (!d1Client) {
+      updateState((current) => ({ ...current, flash: '晋级结果需要 D1 API。' }));
+      return;
+    }
+
+    updateState((current) => ({ ...current, flash: '正在生成晋级结果...' }));
+
+    try {
+      const payload = await loadD1AdvancementPredictions({ client: d1Client, groupCode });
+      setAdvancementDialog((current) => ({
+        ...current,
+        ties: payload.ties,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        draft: current.open ? buildAdvancementDraftFromPredictions(payload.predictionsByPlayer, state.selectedPlayerId) : current.draft,
+        status: current.open ? 'ready' : current.status,
+        error: '',
+      }));
+      const text = exportAdvancementPredictionsText({
+        ties: payload.ties,
+        players,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        currentGroupUrl: window.location.href,
+      });
+      updateState((current) => ({
+        ...current,
+        exportText: text,
+        flash: '晋级结果已生成。',
+      }));
+    } catch (error) {
+      updateState((current) => ({
+        ...current,
+        flash: error.message || '晋级结果生成失败',
+      }));
+    }
   }
 
   function showAllTimeStats() {
@@ -585,10 +748,10 @@ function App() {
         </div>
         <div className="topbar-actions">
           <button className="ghost-button" data-action="export" onClick={showExport}>
-            预测结果
+            比分结果
           </button>
-          <button className="ghost-button ai-strategy-button" data-action="ai-strategy-leaderboard" onClick={() => showAiStrategyLeaderboard(0)}>
-            AI排行榜
+          <button className="ghost-button" data-action="advancement-results" onClick={showAdvancementResults}>
+            晋级结果
           </button>
           <button className="icon-button topbar-menu-button" data-action="more-menu" aria-label="更多" onClick={() => setMoreMenuOpen(true)}>
             ...
@@ -638,6 +801,25 @@ function App() {
             +
           </button>
         </div>
+      </section>
+
+      <section className="advancement-entry-panel" aria-label="晋级预测入口">
+        <button
+          className="advancement-entry-button"
+          data-action="open-advancement-predictions"
+          disabled={!selectedPlayer}
+          onClick={openAdvancementDialog}
+        >
+          <span>
+            <strong>晋级预测</strong>
+            <small>16进8 · 开赛前15分钟锁定 · 点击填写晋级球队</small>
+          </span>
+          <em>
+            {selectedPlayer
+              ? (advancementDialog.ties.length ? `${advancementSelectedCount}/${advancementTotalCount}` : '去填写')
+              : '先选用户名'}
+          </em>
+        </button>
       </section>
 
       {loadStatus !== 'ready' ? (
@@ -694,6 +876,7 @@ function App() {
           onClose={() => setMoreMenuOpen(false)}
           onShowAllTimeStats={showAllTimeStats}
           onShowBackendReports={showBackendReports}
+          onShowAiStrategyLeaderboard={() => showAiStrategyLeaderboard(0)}
           onOpenAiStrategy={() => {
             setMoreMenuOpen(false);
             setAiStrategyOpen(true);
@@ -758,6 +941,17 @@ function App() {
         <KnockoutStrategyDialog onClose={() => setKnockoutStrategyOpen(false)} />
       ) : null}
 
+      {advancementDialog.open ? (
+        <AdvancementPredictionDialog
+          dialog={advancementDialog}
+          selectedCount={countAdvancementSelections(advancementDialog.draft, advancementDialog.ties)}
+          totalCount={advancementDialog.ties.length}
+          onSelect={selectAdvancementWinner}
+          onClose={() => setAdvancementDialog((current) => ({ ...current, open: false }))}
+          onSubmit={submitAdvancementPredictions}
+        />
+      ) : null}
+
       {aiRecommendationDialog ? (
         <AiRecommendationDialog
           recommendation={aiRecommendationDialog}
@@ -803,6 +997,13 @@ function InfoDialog({ title, message, onClose }) {
   );
 }
 
+function buildAdvancementDraftFromPredictions(predictionsByPlayer, playerId) {
+  const saved = playerId ? predictionsByPlayer?.[playerId] || {} : {};
+  return Object.fromEntries(Object.entries(saved)
+    .filter(([, prediction]) => ['home', 'away'].includes(prediction?.winnerSide))
+    .map(([matchId, prediction]) => [matchId, prediction.winnerSide]));
+}
+
 function DialogBackdrop({ ariaLabel, onClose, children, dismissOnBackdrop = true }) {
   function handleBackdropClick(event) {
     if (!dismissOnBackdrop) return;
@@ -816,7 +1017,7 @@ function DialogBackdrop({ ariaLabel, onClose, children, dismissOnBackdrop = true
   );
 }
 
-function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onOpenAiStrategy, onOpenKnockoutStrategy }) {
+function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onShowAiStrategyLeaderboard, onOpenAiStrategy, onOpenKnockoutStrategy }) {
   return (
     <DialogBackdrop ariaLabel="更多" onClose={onClose}>
       <div className="dialog compact-dialog more-menu-dialog" data-more-menu-dialog>
@@ -832,6 +1033,9 @@ function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onO
           </button>
           <button className="menu-action-button" data-action="backend-report" onClick={onShowBackendReports}>
             后台报告
+          </button>
+          <button className="menu-action-button" data-action="ai-strategy-leaderboard" onClick={onShowAiStrategyLeaderboard}>
+            AI排行榜
           </button>
           <button className="menu-action-button" data-action="open-ai-strategy" onClick={onOpenAiStrategy}>
             AI策略
@@ -1017,6 +1221,76 @@ function AddPlayerDialog({ name, onNameChange, onClose, onConfirm }) {
         <button className="primary-button full-button" data-action="confirm-add-player" onClick={onConfirm}>
           确定新增
         </button>
+      </div>
+    </DialogBackdrop>
+  );
+}
+
+function AdvancementPredictionDialog({ dialog, selectedCount, totalCount, onSelect, onClose, onSubmit }) {
+  const saving = dialog.status === 'saving';
+
+  return (
+    <DialogBackdrop ariaLabel="16进8晋级预测" onClose={onClose}>
+      <div className="dialog advancement-dialog" data-advancement-dialog>
+        <div className="advancement-dialog-header">
+          <button className="icon-button advancement-back-button" data-action="close-advancement" aria-label="返回" onClick={onClose}>
+            ‹
+          </button>
+          <div>
+            <h2>16进8晋级预测</h2>
+            <p>开赛前15分钟锁定，允许先保存部分场次。</p>
+          </div>
+        </div>
+
+        {dialog.status === 'loading' ? <div className="report-empty">正在读取16强对阵...</div> : null}
+        {dialog.status === 'error' ? <div className="report-empty">{dialog.error}</div> : null}
+
+        {dialog.status !== 'loading' && dialog.status !== 'error' ? (
+          <div className="advancement-list">
+            {dialog.ties.map((tie) => {
+              const locked = tie.locked || isAdvancementTieLocked(tie);
+              const selectedSide = dialog.draft?.[tie.matchId] || '';
+              return (
+                <article className={`advancement-tie-row ${locked ? 'locked' : ''}`} key={tie.matchId}>
+                  <div className="advancement-tie-meta">
+                    <span>{formatChinaDateLabel(tie.date)} {tie.time}</span>
+                    <strong>{getAdvancementLockText({ locked })}</strong>
+                  </div>
+                  <div className="advancement-choice-row">
+                    <button
+                      className={`advancement-team-button ${selectedSide === 'home' ? 'selected' : ''}`}
+                      disabled={locked}
+                      data-advancement-match-id={tie.matchId}
+                      data-winner-side="home"
+                      onClick={() => onSelect(tie.matchId, 'home')}
+                    >
+                      {tie.home}
+                    </button>
+                    <span>vs</span>
+                    <button
+                      className={`advancement-team-button ${selectedSide === 'away' ? 'selected' : ''}`}
+                      disabled={locked}
+                      data-advancement-match-id={tie.matchId}
+                      data-winner-side="away"
+                      onClick={() => onSelect(tie.matchId, 'away')}
+                    >
+                      {tie.away}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {dialog.error && dialog.status !== 'error' ? <p className="form-status error">{dialog.error}</p> : null}
+
+        <div className="advancement-submit-row">
+          <span>已选 {selectedCount}/{totalCount || 8}</span>
+          <button className="primary-button" data-action="save-advancement" disabled={saving || dialog.status === 'loading'} onClick={onSubmit}>
+            {saving ? '保存中...' : '保存晋级'}
+          </button>
+        </div>
       </div>
     </DialogBackdrop>
   );
