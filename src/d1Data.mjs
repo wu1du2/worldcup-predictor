@@ -212,6 +212,9 @@ export function normalizeD1AdvancementPredictions(payload) {
         kickoffAtUtc: tie.kickoffAtUtc || '',
         home: tie.home,
         away: tie.away,
+        homeScore: normalizeNullableInteger(tie.homeScore),
+        awayScore: normalizeNullableInteger(tie.awayScore),
+        status: tie.status || 'pre',
         locked: Boolean(tie.locked),
       })),
     predictionsByPlayer,
@@ -220,4 +223,11 @@ export function normalizeD1AdvancementPredictions(payload) {
 
 function normalizeScores(scores) {
   return Array.isArray(scores) ? scores.filter((score) => typeof score === 'string') : [];
+}
+
+function normalizeNullableInteger(value) {
+  if (Number.isInteger(value)) return value;
+  if (value === null || value === undefined || value === '') return null;
+  const number = Number(value);
+  return Number.isInteger(number) ? number : null;
 }

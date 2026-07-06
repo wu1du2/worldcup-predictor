@@ -74,6 +74,7 @@ import {
   exportAdvancementPredictionsText,
   getAdvancementLockText,
   isAdvancementTieLocked,
+  mergeAdvancementTiesWithMatches,
 } from './advancementPrediction.mjs';
 import './styles.css';
 
@@ -511,16 +512,17 @@ function App() {
 
     try {
       const payload = await loadD1AdvancementPredictions({ client: d1Client, groupCode });
+      const ties = await enrichAdvancementTiesWithLiveBoard(payload.ties);
       setAdvancementDialog((current) => ({
         ...current,
-        ties: payload.ties,
+        ties,
         predictionsByPlayer: payload.predictionsByPlayer,
         draft: current.open ? buildAdvancementDraftFromPredictions(payload.predictionsByPlayer, state.selectedPlayerId) : current.draft,
         status: current.open ? 'ready' : current.status,
         error: '',
       }));
       const text = exportAdvancementPredictionsText({
-        ties: payload.ties,
+        ties,
         players,
         predictionsByPlayer: payload.predictionsByPlayer,
         currentGroupUrl: window.location.href,
@@ -535,6 +537,17 @@ function App() {
         ...current,
         flash: error.message || '晋级结果生成失败',
       }));
+    }
+  }
+
+  async function enrichAdvancementTiesWithLiveBoard(ties) {
+    const dates = (ties || []).map((tie) => tie.date).filter(Boolean).sort();
+    if (!dates.length || !d1Client) return ties;
+    try {
+      const liveBoard = await loadD1LiveBoard({ client: d1Client, from: dates[0], to: dates[dates.length - 1] });
+      return mergeAdvancementTiesWithMatches({ ties, matches: liveBoard.matches });
+    } catch {
+      return ties;
     }
   }
 

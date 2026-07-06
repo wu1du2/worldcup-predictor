@@ -109,7 +109,7 @@ test('D1 worker returns Round of 16 advancement ties and group predictions', asy
     groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
     players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
     matches: [
-      roundOf16Match({ match_code: 'espn-760502', match_date_cn: '2026-07-05', time_cn: '01:00', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥' }),
+      roundOf16Match({ match_code: 'espn-760502', match_date_cn: '2026-07-05', time_cn: '01:00', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥', home_score: 0, away_score: 3, status: 'post', status_detail: 'FT' }),
       roundOf16Match({ match_code: 'espn-760503', match_date_cn: '2026-07-05', time_cn: '05:00', kickoff_at_utc: '2026-07-04T21:00:00.000Z', home_cn: '巴拉圭', away_cn: '法国' }),
     ],
     advancementPredictions: [
@@ -132,6 +132,9 @@ test('D1 worker returns Round of 16 advancement ties and group predictions', asy
       kickoffAtUtc: '2026-07-04T17:00:00.000Z',
       home: '加拿大',
       away: '摩洛哥',
+      homeScore: 0,
+      awayScore: 3,
+      status: 'post',
       locked: false,
     },
     {
@@ -141,6 +144,9 @@ test('D1 worker returns Round of 16 advancement ties and group predictions', asy
       kickoffAtUtc: '2026-07-04T21:00:00.000Z',
       home: '巴拉圭',
       away: '法国',
+      homeScore: null,
+      awayScore: null,
+      status: 'pre',
       locked: false,
     },
   ]);

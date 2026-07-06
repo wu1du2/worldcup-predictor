@@ -294,7 +294,8 @@ export async function loadLiveBoard(db, { from, to } = {}) {
 function loadRoundOf16Ties(db) {
   return db
     .prepare(`
-      select match_code, match_date_cn, time_cn, kickoff_at_utc, home_cn, away_cn
+      select match_code, match_date_cn, time_cn, kickoff_at_utc, home_cn, away_cn,
+        home_score, away_score, status
       from matches
       where active = 1 and stage = 'Round of 16'
       order by match_date_cn asc, time_cn asc
@@ -310,6 +311,9 @@ function toAdvancementTie(row, now) {
     kickoffAtUtc: row.kickoff_at_utc || '',
     home: row.home_cn,
     away: row.away_cn,
+    homeScore: normalizeNullableInteger(row.home_score),
+    awayScore: normalizeNullableInteger(row.away_score),
+    status: row.status || 'pre',
     locked: isAdvancementLocked(row.kickoff_at_utc, now),
   };
 }

@@ -7,6 +7,7 @@ import {
   exportAdvancementPredictionsText,
   getAdvancementLockText,
   isAdvancementTieLocked,
+  mergeAdvancementTiesWithMatches,
 } from '../src/advancementPrediction.mjs';
 
 test('buildAdvancementEntries converts draft winner sides into save payload entries', () => {
@@ -41,28 +42,42 @@ test('getAdvancementLockText describes locked and open ties', () => {
   assert.equal(getAdvancementLockText({ locked: false }), '可修改');
 });
 
-test('exportAdvancementPredictionsText renders player prediction sequences', () => {
+test('exportAdvancementPredictionsText renders settled leaderboard and pending picks', () => {
   const text = exportAdvancementPredictionsText({
     ties: [
-      { matchId: 'm1', date: '2026-07-05', time: '01:00', home: '加拿大', away: '摩洛哥' },
-      { matchId: 'm2', date: '2026-07-05', time: '05:00', home: '巴拉圭', away: '法国' },
+      { matchId: 'm1', date: '2026-07-05', time: '01:00', home: '加拿大', away: '摩洛哥', homeScore: 0, awayScore: 3, status: 'post' },
+      { matchId: 'm2', date: '2026-07-05', time: '05:00', home: '巴拉圭', away: '法国', homeScore: 0, awayScore: 1, status: 'post' },
+      { matchId: 'm3', date: '2026-07-06', time: '04:00', home: '巴西', away: '挪威', homeScore: null, awayScore: null, status: 'pre' },
     ],
     players: [
       { id: 'p1', name: '张三' },
       { id: 'p2', name: '李四' },
     ],
     predictionsByPlayer: {
-      p1: { m1: { winnerName: '加拿大' }, m2: { winnerName: '法国' } },
-      p2: { m1: { winnerName: '摩洛哥' } },
+      p1: { m1: { winnerName: '摩洛哥' }, m2: { winnerName: '法国' }, m3: { winnerName: '巴西' } },
+      p2: { m1: { winnerName: '加拿大' }, m2: { winnerName: '法国' } },
     },
     currentGroupUrl: 'https://example.com/?group=abc123',
   });
 
   assert.equal(text, [
-    '16进8晋级预测',
-    '顺序：加拿大vs摩洛哥、巴拉圭vs法国',
-    '张三：加拿大、法国',
-    '李四：摩洛哥、-',
+    '16进8晋级预测结果',
+    '正确答案：摩洛哥、法国、待定',
+    '【排行榜】',
+    '张三 2/2？',
+    '李四 1/2？',
+    '【预测明细】',
+    '张三：摩洛哥✅、法国✅、巴西？',
+    '李四：加拿大❌、法国✅、-',
     '[欢迎预测] https://example.com/?group=abc123',
   ].join('\n'));
+});
+
+test('mergeAdvancementTiesWithMatches fills result fields from live board matches', () => {
+  assert.deepEqual(mergeAdvancementTiesWithMatches({
+    ties: [{ matchId: 'm1', home: '加拿大', away: '摩洛哥', status: 'pre' }],
+    matches: [{ id: 'm1', homeScore: 0, awayScore: 3, status: 'post' }],
+  }), [
+    { matchId: 'm1', home: '加拿大', away: '摩洛哥', homeScore: 0, awayScore: 3, status: 'post' },
+  ]);
 });

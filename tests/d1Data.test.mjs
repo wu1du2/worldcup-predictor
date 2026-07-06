@@ -143,7 +143,18 @@ test('loadD1AdvancementPredictions reads Round of 16 ties and group picks', asyn
       assert.equal(url, 'https://worldcup-api.example.workers.dev/api/groups/lzscqjd/advancement-predictions');
       return new Response(JSON.stringify({
         ties: [
-          { matchId: 'm1', date: '2026-07-05', time: '01:00', kickoffAtUtc: '2026-07-04T17:00:00.000Z', home: '加拿大', away: '摩洛哥', locked: false },
+          {
+            matchId: 'm1',
+            date: '2026-07-05',
+            time: '01:00',
+            kickoffAtUtc: '2026-07-04T17:00:00.000Z',
+            home: '加拿大',
+            away: '摩洛哥',
+            homeScore: 0,
+            awayScore: 3,
+            status: 'post',
+            locked: false,
+          },
         ],
         predictions: [
           { playerId: 'p1', matchId: 'm1', winnerSide: 'away', winnerName: '摩洛哥' },
@@ -155,7 +166,18 @@ test('loadD1AdvancementPredictions reads Round of 16 ties and group picks', asyn
   const result = await loadD1AdvancementPredictions({ client, groupCode: 'lzscqjd' });
 
   assert.deepEqual(result.ties, [
-    { matchId: 'm1', date: '2026-07-05', time: '01:00', kickoffAtUtc: '2026-07-04T17:00:00.000Z', home: '加拿大', away: '摩洛哥', locked: false },
+    {
+      matchId: 'm1',
+      date: '2026-07-05',
+      time: '01:00',
+      kickoffAtUtc: '2026-07-04T17:00:00.000Z',
+      home: '加拿大',
+      away: '摩洛哥',
+      homeScore: 0,
+      awayScore: 3,
+      status: 'post',
+      locked: false,
+    },
   ]);
   assert.deepEqual(result.predictionsByPlayer, {
     p1: { m1: { winnerSide: 'away', winnerName: '摩洛哥' } },
