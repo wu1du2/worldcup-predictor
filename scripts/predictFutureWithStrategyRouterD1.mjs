@@ -229,7 +229,8 @@ async function loadD1Tables() {
 
 async function d1Select(command) {
   const { stdout } = await execFileAsync('npx', [
-    'wrangler',
+    '--yes',
+    'wrangler@4.106.0',
     'd1',
     'execute',
     'worldcup-predictor',

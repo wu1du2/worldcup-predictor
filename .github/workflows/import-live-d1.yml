@@ -46,3 +46,9 @@ jobs:
       - name: No live changes
         if: hashFiles('output/d1-live-import.sql') == ''
         run: echo "Live D1 window unchanged; no write."
+
+      - name: Generate AI prediction SQL
+        run: npm run ai:predict-router:d1
+
+      - name: Apply AI prediction SQL
+        run: npx wrangler@4.106.0 d1 execute worldcup-predictor --remote --file output/d1-ai-sync.sql

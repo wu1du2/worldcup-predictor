@@ -28,7 +28,7 @@ test('odds import workflow is paused as a Supabase no-op', async () => {
   assert.match(workflow, /intentionally does not write Supabase/);
 });
 
-test('live D1 import workflow runs every five minutes and writes only generated SQL', async () => {
+test('live D1 import workflow runs every five minutes and refreshes AI predictions', async () => {
   const workflow = await readFile(new URL('../.github/workflows/import-live-d1.yml', import.meta.url), 'utf8');
 
   assert.match(workflow, /workflow_dispatch:/);
@@ -42,4 +42,6 @@ test('live D1 import workflow runs every five minutes and writes only generated 
   assert.match(workflow, /npm run import:live:d1/);
   assert.match(workflow, /if: hashFiles\('output\/d1-live-import\.sql'\) != ''/);
   assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --file output\/d1-live-import\.sql/);
+  assert.match(workflow, /npm run ai:predict-router:d1/);
+  assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --file output\/d1-ai-sync\.sql/);
 });
