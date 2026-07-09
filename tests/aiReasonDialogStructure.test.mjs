@@ -96,8 +96,9 @@ test('handicap challenge entry is an inviting info card below player picker', ()
   );
 
   assert.match(entrySource, /四强之路，舍你其谁/);
-  assert.match(entrySource, /4场 · 每场三选一 · 实时计算最高可赢/);
-  assert.match(entrySource, /已选 \$\{handicapSelectedCount\}\/\$\{handicapTotalCount\} 最高可赢/);
+  assert.match(entrySource, /4场 · 每场三选一 · 实时计算已赢和最高可赢/);
+  assert.match(entrySource, /已选 \$\{handicapSelectedCount\}\/\$\{handicapTotalCount\} 已赢/);
+  assert.match(entrySource, /最高可赢/);
   assert.match(entrySource, /data-action="open-handicap-challenge"/);
   assert.match(mainSource, /className="handicap-payout-highlight"/);
   assert.match(mainSource, /固定成本15/);

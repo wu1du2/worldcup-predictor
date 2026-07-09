@@ -34,6 +34,49 @@ export function calculateMaxPayoutOdds(draft = {}, matches = []) {
   return odds.reduce((sum, odd) => sum + odd + sum * odd, 0);
 }
 
+export function calculateHandicapChallengePayout(draft = {}, matches = []) {
+  const matchesById = new Map((matches || []).map((match) => [match?.matchId, match]));
+  const legs = Object.entries(draft || {})
+    .filter(([, choiceKey]) => handicapChoiceKeys.includes(choiceKey))
+    .map(([matchId, choiceKey]) => {
+      const match = matchesById.get(matchId);
+      const odd = Number(match?.odds?.[choiceKey]);
+      if (!match || !Number.isFinite(odd) || odd <= 0) return null;
+      return {
+        matchId,
+        choiceKey,
+        match,
+        odd,
+      };
+    })
+    .filter(Boolean);
+
+  const tickets = buildComboTickets(legs).map((ticketLegs) => {
+    const payoutOdds = ticketLegs.reduce((product, leg) => product * leg.odd, 1);
+    const resultChoices = ticketLegs.map((leg) => getHandicapResultChoice(leg.match));
+    const hasLostLeg = ticketLegs.some((leg, index) => resultChoices[index] && resultChoices[index] !== leg.choiceKey);
+    const allSettled = resultChoices.every(Boolean);
+    const status = hasLostLeg ? 'lost' : (allSettled ? 'won' : 'live');
+    return {
+      legs: ticketLegs.map((leg) => ({ matchId: leg.matchId, choiceKey: leg.choiceKey })),
+      payoutOdds,
+      status,
+    };
+  });
+
+  const currentWonOdds = sumTicketOdds(tickets.filter((ticket) => ticket.status === 'won'));
+  const maxPayoutOdds = sumTicketOdds(tickets.filter((ticket) => ticket.status !== 'lost'));
+
+  return {
+    tickets,
+    currentWonOdds,
+    maxPayoutOdds,
+    wonCount: tickets.filter((ticket) => ticket.status === 'won').length,
+    lostCount: tickets.filter((ticket) => ticket.status === 'lost').length,
+    liveCount: tickets.filter((ticket) => ticket.status === 'live').length,
+  };
+}
+
 export function formatHandicapChoiceLabel(_match, choiceKey) {
   return choiceLabels[choiceKey] || '';
 }
@@ -90,7 +133,7 @@ export function exportHandicapChallengeText({
 
   const visiblePlayers = (players || []).filter((player) => player?.id && player?.name && player.name !== 'AI推荐');
   const playerLines = visiblePlayers
-    .map((player) => {
+    .map((player, index) => {
       const draft = Object.fromEntries(validMatches.map((match) => [
         match.matchId,
         predictionsByPlayer?.[player.id]?.[match.matchId]?.choiceKey || '',
@@ -105,9 +148,21 @@ export function exportHandicapChallengeText({
         if (!resultChoice) return label;
         return `${label}${choiceKey === resultChoice ? '✅' : '❌'}`;
       });
-      return `${player.name}：${picks.join('、')}｜最高可赢${formatMaxPayoutOdds(calculateMaxPayoutOdds(draft, validMatches))}`;
+      const payout = calculateHandicapChallengePayout(draft, validMatches);
+      return {
+        index,
+        currentWonOdds: payout.currentWonOdds,
+        maxPayoutOdds: payout.maxPayoutOdds,
+        line: `${player.name}：${picks.join('、')}｜已赢${formatMaxPayoutOdds(payout.currentWonOdds)} 最高可赢${formatMaxPayoutOdds(payout.maxPayoutOdds)}`,
+      };
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((left, right) => (
+      right.currentWonOdds - left.currentWonOdds
+      || right.maxPayoutOdds - left.maxPayoutOdds
+      || left.index - right.index
+    ))
+    .map((row) => row.line);
 
   lines.push('【预测】');
   lines.push(...(playerLines.length ? playerLines : ['暂无预测']));
@@ -170,6 +225,23 @@ function normalizeChoiceNumbers(values = {}) {
 
 function hasAllChoices(values = {}) {
   return handicapChoiceKeys.every((choiceKey) => Number.isFinite(values?.[choiceKey]) && values[choiceKey] > 0);
+}
+
+function buildComboTickets(legs = []) {
+  const tickets = [];
+  const count = legs.length;
+  for (let mask = 1; mask < (1 << count); mask += 1) {
+    const ticket = [];
+    for (let index = 0; index < count; index += 1) {
+      if (mask & (1 << index)) ticket.push(legs[index]);
+    }
+    tickets.push(ticket);
+  }
+  return tickets;
+}
+
+function sumTicketOdds(tickets = []) {
+  return tickets.reduce((sum, ticket) => sum + ticket.payoutOdds, 0);
 }
 
 function formatOdds(value) {

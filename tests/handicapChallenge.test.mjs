@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   buildHandicapChallengeEntries,
   calculateAllHitProbability,
+  calculateHandicapChallengePayout,
   calculateMaxPayoutOdds,
   exportHandicapChallengeText,
   formatMaxPayoutOdds,
@@ -52,6 +53,29 @@ test('calculateMaxPayoutOdds sums every selected combo ticket payout', () => {
   assert.equal(formatMaxPayoutOdds(0), 'X0');
 });
 
+test('calculateHandicapChallengePayout flags won, lost, and live combo tickets', () => {
+  const matches = [
+    { matchId: 'hc1', handicap: -1, homeScore: 2, awayScore: 0, status: 'post', odds: { win: 2, draw: 3, loss: 4 } },
+    { matchId: 'hc2', handicap: -1, homeScore: 0, awayScore: 0, status: 'pre', odds: { win: 2.5, draw: 3, loss: 5 } },
+    { matchId: 'hc3', handicap: -1, homeScore: 1, awayScore: 0, status: 'post', odds: { win: 4, draw: 2, loss: 6 } },
+    { matchId: 'hc4', handicap: -1, homeScore: 0, awayScore: 2, status: 'post', odds: { win: 8, draw: 7, loss: 3 } },
+  ];
+
+  const payout = calculateHandicapChallengePayout({
+    hc1: 'win',
+    hc2: 'loss',
+    hc3: 'loss',
+    hc4: 'loss',
+  }, matches);
+
+  assert.equal(payout.tickets.length, 15);
+  assert.equal(payout.wonCount, 3);
+  assert.equal(payout.lostCount, 8);
+  assert.equal(payout.liveCount, 4);
+  assert.equal(payout.currentWonOdds, 11);
+  assert.equal(payout.maxPayoutOdds, 71);
+});
+
 test('formatHandicapChoiceLabel explains handicap outcomes with the market side', () => {
   assert.equal(formatHandicapChoiceLabel({ home: '法国', away: '摩洛哥', handicap: -1 }, 'win'), '让胜');
   assert.equal(formatHandicapChoiceLabel({ home: '法国', away: '摩洛哥', handicap: -1 }, 'draw'), '让平');
@@ -88,11 +112,11 @@ test('normalizeHandicapChallengePayload builds normalized probabilities from odd
   });
 });
 
-test('exportHandicapChallengeText renders player sequences without odds and probability details', () => {
+test('exportHandicapChallengeText renders player sequences sorted by current and max payout without odds details', () => {
   const text = exportHandicapChallengeText({
     matches: [
-      { matchId: 'hc1', date: '2026-07-10', time: '04:00', home: '法国', away: '摩洛哥', handicap: -1, probabilities: { win: 0.357, draw: 0.29, loss: 0.353 }, odds: { win: 2.48, draw: 3.05, loss: 2.51 } },
-      { matchId: 'hc2', date: '2026-07-11', time: '03:00', home: '西班牙', away: '比利时', handicap: -1, probabilities: { win: 0.343, draw: 0.272, loss: 0.385 }, odds: { win: 2.58, draw: 3.26, loss: 2.3 } },
+      { matchId: 'hc1', date: '2026-07-10', time: '04:00', home: '法国', away: '摩洛哥', handicap: -1, homeScore: 2, awayScore: 0, status: 'post', probabilities: { win: 0.357, draw: 0.29, loss: 0.353 }, odds: { win: 2.48, draw: 3.05, loss: 2.51 } },
+      { matchId: 'hc2', date: '2026-07-11', time: '03:00', home: '西班牙', away: '比利时', handicap: -1, status: 'pre', probabilities: { win: 0.343, draw: 0.272, loss: 0.385 }, odds: { win: 2.58, draw: 3.26, loss: 2.3 } },
     ],
     players: [
       { id: 'p1', name: '张三' },
@@ -101,7 +125,7 @@ test('exportHandicapChallengeText renders player sequences without odds and prob
     ],
     predictionsByPlayer: {
       p1: { hc1: { choiceKey: 'win' }, hc2: { choiceKey: 'loss' } },
-      p2: { hc1: { choiceKey: 'draw' } },
+      p2: { hc1: { choiceKey: 'draw' }, hc2: { choiceKey: 'draw' } },
     },
     currentGroupUrl: 'https://example.com/?group=lzscqjd',
   });
@@ -112,9 +136,9 @@ test('exportHandicapChallengeText renders player sequences without odds and prob
     '法国-1 vs 摩洛哥',
     '西班牙-1 vs 比利时',
     '【预测】',
-    '张三：让胜、让负｜最高可赢X10.48',
-    '李四：让平、-｜最高可赢X3.05',
+    '张三：让胜✅、让负｜已赢X2.48 最高可赢X10.48',
+    '李四：让平❌、让平｜已赢X0 最高可赢X3.26',
     '[欢迎预测] https://example.com/?group=lzscqjd',
   ].join('\n'));
-  assert.doesNotMatch(text, /2\.48|35\.7%|38\.5%/);
+  assert.doesNotMatch(text, /35\.7%|38\.5%/);
 });
