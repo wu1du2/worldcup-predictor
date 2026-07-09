@@ -6,10 +6,12 @@ import {
   createD1ApiClient,
   createD1BrowserClientFromEnv,
   loadD1AdvancementPredictions,
+  loadD1HandicapChallenge,
   loadD1LiveBoard,
   loadD1GroupState,
   saveD1AdvancementPredictions,
   saveD1GroupPredictions,
+  saveD1HandicapChallengePredictions,
 } from '../src/d1Data.mjs';
 
 test('createD1BrowserClientFromEnv keeps D1 disabled unless explicitly enabled', () => {
@@ -206,6 +208,71 @@ test('saveD1AdvancementPredictions posts partial winner picks to the Worker', as
   });
 
   assert.deepEqual(result, { ok: true, rowsWritten: 1 });
+});
+
+test('loadD1HandicapChallenge reads challenge matches and group picks', async () => {
+  const client = createD1ApiClient({
+    baseUrl: 'https://worldcup-api.example.workers.dev',
+    fetchImpl: async (url) => {
+      assert.equal(url, 'https://worldcup-api.example.workers.dev/api/groups/lzscqjd/handicap-challenge');
+      return new Response(JSON.stringify({
+        matches: [{
+          matchId: 'hc-france-morocco',
+          date: '2026-07-10',
+          time: '04:00',
+          home: '法国',
+          away: '摩洛哥',
+          handicap: -1,
+          odds: { win: 2.48, draw: 3.05, loss: 2.51 },
+          probabilities: { win: 0.357, draw: 0.29, loss: 0.353 },
+          locked: false,
+        }],
+        predictions: [
+          { playerId: 'p1', matchId: 'hc-france-morocco', choiceKey: 'loss' },
+        ],
+      }), { status: 200 });
+    },
+  });
+
+  const result = await loadD1HandicapChallenge({ client, groupCode: 'lzscqjd' });
+
+  assert.equal(result.matches[0].matchId, 'hc-france-morocco');
+  assert.equal(result.matches[0].probabilities.win, 0.357);
+  assert.deepEqual(result.predictionsByPlayer, {
+    p1: { 'hc-france-morocco': { choiceKey: 'loss' } },
+  });
+});
+
+test('saveD1HandicapChallengePredictions posts valid challenge choices to the Worker', async () => {
+  const client = createD1ApiClient({
+    baseUrl: 'https://worldcup-api.example.workers.dev',
+    fetchImpl: async (url, init) => {
+      assert.equal(url, 'https://worldcup-api.example.workers.dev/api/groups/lzscqjd/handicap-challenge');
+      assert.equal(init.method, 'POST');
+      assert.deepEqual(JSON.parse(init.body), {
+        playerId: 'p1',
+        entries: [
+          { matchId: 'hc1', choiceKey: 'win' },
+          { matchId: 'hc2', choiceKey: 'draw' },
+        ],
+      });
+      return new Response(JSON.stringify({ ok: true, rowsWritten: 2 }), { status: 200 });
+    },
+  });
+
+  const result = await saveD1HandicapChallengePredictions({
+    client,
+    groupCode: 'lzscqjd',
+    playerId: 'p1',
+    entries: [
+      { matchId: 'hc1', choiceKey: 'win' },
+      { matchId: 'hc2', choiceKey: 'draw' },
+      { matchId: 'hc3', choiceKey: 'home' },
+      { matchId: '', choiceKey: 'loss' },
+    ],
+  });
+
+  assert.deepEqual(result, { ok: true, rowsWritten: 2 });
 });
 
 test('loadD1LiveBoard reads a dated live window from the Worker', async () => {

@@ -45,6 +45,43 @@ create table if not exists advancement_predictions (
 create index if not exists advancement_predictions_group_player_idx
   on advancement_predictions(group_id, player_id);
 
+create table if not exists handicap_challenge_matches (
+  match_id text primary key,
+  match_code text,
+  issue text not null,
+  date_cn text not null,
+  time_cn text not null,
+  kickoff_at_utc text,
+  home_cn text not null,
+  away_cn text not null,
+  handicap integer not null,
+  odds_win real not null,
+  odds_draw real not null,
+  odds_loss real not null,
+  probability_win real not null,
+  probability_draw real not null,
+  probability_loss real not null,
+  active integer not null default 1,
+  updated_at text,
+  created_at text
+);
+
+create index if not exists handicap_challenge_matches_active_date_idx
+  on handicap_challenge_matches(active, date_cn, time_cn);
+
+create table if not exists handicap_challenge_predictions (
+  id text primary key,
+  group_id text not null references groups(id) on delete cascade,
+  player_id text not null references players(id) on delete cascade,
+  match_id text not null references handicap_challenge_matches(match_id) on delete cascade,
+  choice_key text not null check (choice_key in ('win', 'draw', 'loss')),
+  updated_at text,
+  unique (group_id, player_id, match_id)
+);
+
+create index if not exists handicap_challenge_predictions_group_player_idx
+  on handicap_challenge_predictions(group_id, player_id);
+
 create table if not exists matches (
   match_code text primary key,
   match_date_cn text,

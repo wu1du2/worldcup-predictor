@@ -1,4 +1,5 @@
 import { mapPredictionsByPlayer, mergePlayers } from './supabaseData.mjs';
+import { handicapChoiceKeys, normalizeHandicapChallengePayload } from './handicapChallenge.mjs';
 
 export function createD1BrowserClient() {
   return createD1BrowserClientFromEnv(import.meta.env);
@@ -81,6 +82,23 @@ export async function loadD1AdvancementPredictions({ client, groupCode }) {
   return normalizeD1AdvancementPredictions(await response.json());
 }
 
+export async function loadD1HandicapChallenge({ client, groupCode }) {
+  if (!client) throw new Error('D1 API 配置缺失');
+  const response = await (0, client.fetchImpl)(`${client.baseUrl}/api/groups/${encodeURIComponent(groupCode)}/handicap-challenge`);
+  if (!response.ok) {
+    let errorText = response.statusText;
+    try {
+      const body = await response.json();
+      errorText = body.error || body.message || errorText;
+    } catch {
+      // Keep status text when the Worker response is not JSON.
+    }
+    throw new Error(`D1 handicap challenge failed: ${response.status} ${errorText}`.trim());
+  }
+
+  return normalizeHandicapChallengePayload(await response.json());
+}
+
 export async function createD1GroupPlayer({ client, groupCode, name }) {
   if (!client) throw new Error('D1 API 配置缺失');
   const trimmedName = String(name || '').trim();
@@ -131,6 +149,24 @@ export async function saveD1AdvancementPredictions({ client, groupCode, playerId
   return postD1Json({
     client,
     path: `/api/groups/${encodeURIComponent(groupCode)}/advancement-predictions`,
+    payload: { playerId, entries: normalizedEntries },
+  });
+}
+
+export async function saveD1HandicapChallengePredictions({ client, groupCode, playerId, entries }) {
+  if (!client) throw new Error('D1 API 配置缺失');
+  const normalizedEntries = (entries || [])
+    .map((entry) => ({
+      matchId: entry.matchId,
+      choiceKey: entry.choiceKey,
+    }))
+    .filter((entry) => entry.matchId && handicapChoiceKeys.includes(entry.choiceKey));
+
+  if (!normalizedEntries.length) return { ok: true, rowsWritten: 0 };
+
+  return postD1Json({
+    client,
+    path: `/api/groups/${encodeURIComponent(groupCode)}/handicap-challenge`,
     payload: { playerId, entries: normalizedEntries },
   });
 }

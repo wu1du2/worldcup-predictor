@@ -222,6 +222,116 @@ test('D1 worker rejects advancement prediction changes inside the 15 minute lock
   assert.deepEqual(db.state.advancementPredictions, []);
 });
 
+test('D1 worker returns handicap challenge matches and group predictions', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    handicapMatches: [
+      handicapMatch({ match_id: 'hc-france-morocco', match_code: 'espn-france-morocco', home_cn: '法国', away_cn: '摩洛哥' }),
+    ],
+    matches: [
+      quarterfinalMatch({ match_code: 'espn-france-morocco', home_cn: '法国', away_cn: '摩洛哥', home_score: 2, away_score: 0, status: 'post' }),
+    ],
+    handicapPredictions: [
+      { group_id: 'g1', player_id: 'p1', match_id: 'hc-france-morocco', choice_key: 'win', updated_at: '2026-07-09T00:00:00.000Z' },
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/handicap-challenge'), {
+    DB: db,
+    TEST_NOW: '2026-07-09T08:00:00.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body.matches, [{
+    matchId: 'hc-france-morocco',
+    matchCode: 'espn-france-morocco',
+    issue: '周四097',
+    date: '2026-07-10',
+    time: '04:00',
+    kickoffAtUtc: '2026-07-09T20:00:00.000Z',
+    home: '法国',
+    away: '摩洛哥',
+    handicap: -1,
+    odds: { win: 2.48, draw: 3.05, loss: 2.51 },
+    probabilities: { win: 0.357, draw: 0.29, loss: 0.353 },
+    homeScore: 2,
+    awayScore: 0,
+    status: 'post',
+    locked: false,
+  }]);
+  assert.deepEqual(body.predictions, [
+    { playerId: 'p1', matchId: 'hc-france-morocco', choiceKey: 'win' },
+  ]);
+});
+
+test('D1 worker saves handicap challenge picks before the lock time', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    handicapMatches: [
+      handicapMatch({ match_id: 'hc-france-morocco', kickoff_at_utc: '2026-07-09T20:00:00.000Z' }),
+      handicapMatch({ match_id: 'hc-spain-belgium', kickoff_at_utc: '2026-07-10T19:00:00.000Z', home_cn: '西班牙', away_cn: '比利时' }),
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/handicap-challenge', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      playerId: 'p1',
+      entries: [
+        { matchId: 'hc-france-morocco', choiceKey: 'win' },
+        { matchId: 'hc-spain-belgium', choiceKey: 'loss' },
+      ],
+    }),
+  }), {
+    DB: db,
+    TEST_NOW: '2026-07-09T19:40:00.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body, { ok: true, rowsWritten: 2 });
+  assert.deepEqual(db.state.handicapPredictions.map((row) => ({
+    group_id: row.group_id,
+    player_id: row.player_id,
+    match_id: row.match_id,
+    choice_key: row.choice_key,
+  })), [
+    { group_id: 'g1', player_id: 'p1', match_id: 'hc-france-morocco', choice_key: 'win' },
+    { group_id: 'g1', player_id: 'p1', match_id: 'hc-spain-belgium', choice_key: 'loss' },
+  ]);
+});
+
+test('D1 worker rejects handicap challenge changes inside the 15 minute lock window', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    handicapMatches: [
+      handicapMatch({ match_id: 'hc-france-morocco', kickoff_at_utc: '2026-07-09T20:00:00.000Z' }),
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/handicap-challenge', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      playerId: 'p1',
+      entries: [{ matchId: 'hc-france-morocco', choiceKey: 'loss' }],
+    }),
+  }), {
+    DB: db,
+    TEST_NOW: '2026-07-09T19:45:00.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 409);
+  assert.equal(body.error, 'handicap_challenge_locked');
+  assert.deepEqual(db.state.handicapPredictions, []);
+});
+
 test('D1 worker returns a small live board window with odds and recommendations', async () => {
   const db = fakeLiveBoardDb();
 
@@ -337,6 +447,29 @@ function quarterfinalMatch(overrides = {}) {
   };
 }
 
+function handicapMatch(overrides = {}) {
+  return {
+    match_id: 'hc-france-morocco',
+    match_code: 'espn-france-morocco',
+    issue: '周四097',
+    date_cn: '2026-07-10',
+    time_cn: '04:00',
+    kickoff_at_utc: '2026-07-09T20:00:00.000Z',
+    home_cn: '法国',
+    away_cn: '摩洛哥',
+    handicap: -1,
+    odds_win: 2.48,
+    odds_draw: 3.05,
+    odds_loss: 2.51,
+    probability_win: 0.357,
+    probability_draw: 0.29,
+    probability_loss: 0.353,
+    active: 1,
+    updated_at: '2026-07-09T08:00:00.000Z',
+    ...overrides,
+  };
+}
+
 function fakeStatefulDb(initial = {}) {
   const state = {
     groups: [...(initial.groups || [])],
@@ -344,6 +477,8 @@ function fakeStatefulDb(initial = {}) {
     predictions: [...(initial.predictions || [])],
     matches: [...(initial.matches || [])],
     advancementPredictions: [...(initial.advancementPredictions || [])],
+    handicapMatches: [...(initial.handicapMatches || [])],
+    handicapPredictions: [...(initial.handicapPredictions || [])],
   };
 
   return {
@@ -378,6 +513,28 @@ function fakeStatefulDb(initial = {}) {
           if (sql.includes('from advancement_predictions')) {
             const [groupId] = this.bound;
             return { results: state.advancementPredictions.filter((prediction) => prediction.group_id === groupId) };
+          }
+          if (sql.includes('from handicap_challenge_predictions')) {
+            const [groupId] = this.bound;
+            return { results: state.handicapPredictions.filter((prediction) => prediction.group_id === groupId) };
+          }
+          if (sql.includes('from handicap_challenge_matches')) {
+            return {
+              results: state.handicapMatches
+                .filter((match) => match.active !== 0)
+                .map((match) => {
+                  const liveMatch = state.matches.find((item) => item.match_code === match.match_code) || {};
+                  return {
+                    ...match,
+                    home_score: liveMatch.home_score ?? null,
+                    away_score: liveMatch.away_score ?? null,
+                    settlement_home_score: liveMatch.settlement_home_score ?? null,
+                    settlement_away_score: liveMatch.settlement_away_score ?? null,
+                    status: liveMatch.status || 'pre',
+                  };
+                })
+                .sort((a, b) => `${a.date_cn || ''} ${a.time_cn || ''}`.localeCompare(`${b.date_cn || ''} ${b.time_cn || ''}`)),
+            };
           }
           if (sql.includes('from matches') && sql.includes('Quarterfinal')) {
             return {
@@ -438,6 +595,26 @@ function fakeStatefulDb(initial = {}) {
                 match_id: matchId,
                 winner_side: winnerSide,
                 winner_name: winnerName,
+                updated_at: updatedAt,
+              });
+            }
+            return { success: true };
+          }
+          if (normalizedSql.startsWith('insert into handicap_challenge_predictions')) {
+            const [id, groupId, playerId, matchId, choiceKey, updatedAt] = this.bound;
+            const existing = state.handicapPredictions.find((row) => (
+              row.group_id === groupId && row.player_id === playerId && row.match_id === matchId
+            ));
+            if (existing) {
+              existing.choice_key = choiceKey;
+              existing.updated_at = updatedAt;
+            } else {
+              state.handicapPredictions.push({
+                id,
+                group_id: groupId,
+                player_id: playerId,
+                match_id: matchId,
+                choice_key: choiceKey,
                 updated_at: updatedAt,
               });
             }

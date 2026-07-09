@@ -53,6 +53,18 @@ export default {
         }
       }
 
+      const groupHandicapMatch = url.pathname.match(/^\/api\/groups\/([^/]+)\/handicap-challenge$/);
+      if (groupHandicapMatch) {
+        const groupCode = decodeURIComponent(groupHandicapMatch[1]);
+        if (request.method === 'GET') {
+          return json(await loadHandicapChallenge(env.DB, groupCode, { now: getNow(env) }));
+        }
+        if (request.method === 'POST') {
+          const payload = await readJsonBody(request);
+          return json(await saveHandicapChallengePredictions(env.DB, groupCode, payload, { now: getNow(env) }));
+        }
+      }
+
       return json({ error: 'not_found' }, { status: 404 });
     } catch (error) {
       if (error?.status) {
@@ -222,6 +234,73 @@ export async function saveAdvancementPredictions(db, groupCode, payload, { now =
   return { ok: true, rowsWritten };
 }
 
+export async function loadHandicapChallenge(db, groupCode, { now = new Date() } = {}) {
+  const { group } = await getOrCreateGroup(db, groupCode);
+  const [matchesResult, predictionsResult] = await Promise.all([
+    loadHandicapChallengeMatches(db),
+    db
+      .prepare(`
+        select player_id, match_id, choice_key
+        from handicap_challenge_predictions
+        where group_id = ?
+      `)
+      .bind(group.id)
+      .all(),
+  ]);
+
+  return {
+    matches: (matchesResult.results || []).map((row) => toHandicapChallengeMatch(row, now)),
+    predictions: (predictionsResult.results || []).map((row) => ({
+      playerId: row.player_id,
+      matchId: row.match_id,
+      choiceKey: row.choice_key,
+    })),
+  };
+}
+
+export async function saveHandicapChallengePredictions(db, groupCode, payload, { now = new Date() } = {}) {
+  const { group } = await getOrCreateGroup(db, groupCode);
+  const playerId = String(payload?.playerId || '').trim();
+  if (!playerId) throw httpError(400, 'invalid_player', 'Player is required');
+
+  const player = await db
+    .prepare('select id, name from players where id = ? and group_id = ? limit 1')
+    .bind(playerId, group.id)
+    .first();
+  if (!player) throw httpError(404, 'player_not_found', 'Player not found');
+
+  const entries = Array.isArray(payload?.entries) ? payload.entries : [];
+  const matchesResult = await loadHandicapChallengeMatches(db);
+  const matchesById = new Map((matchesResult.results || []).map((match) => [match.match_id, match]));
+  const updatedAt = new Date().toISOString();
+  let rowsWritten = 0;
+
+  for (const entry of entries) {
+    const matchId = String(entry?.matchId || '').trim();
+    const choiceKey = String(entry?.choiceKey || '').trim();
+    if (!matchId || !isHandicapChoiceKey(choiceKey)) continue;
+    const match = matchesById.get(matchId);
+    if (!match) throw httpError(404, 'handicap_challenge_match_not_found', 'Handicap challenge match not found');
+    if (isAdvancementLocked(match.kickoff_at_utc, now)) {
+      throw httpError(409, 'handicap_challenge_locked', 'Handicap challenge is locked');
+    }
+
+    await db
+      .prepare(`
+        insert into handicap_challenge_predictions (id, group_id, player_id, match_id, choice_key, updated_at)
+        values (?, ?, ?, ?, ?, ?)
+        on conflict(group_id, player_id, match_id)
+        do update set choice_key = excluded.choice_key,
+          updated_at = excluded.updated_at
+      `)
+      .bind(randomId(), group.id, player.id, matchId, choiceKey, updatedAt)
+      .run();
+    rowsWritten += 1;
+  }
+
+  return { ok: true, rowsWritten };
+}
+
 export async function loadLiveBoard(db, { from, to } = {}) {
   const window = normalizeLiveWindow({ from, to });
   const matchesResult = await db
@@ -303,6 +382,21 @@ function loadQuarterfinalTies(db) {
     .all();
 }
 
+function loadHandicapChallengeMatches(db) {
+  return db
+    .prepare(`
+      select h.match_id, h.match_code, h.issue, h.date_cn, h.time_cn, h.kickoff_at_utc,
+        h.home_cn, h.away_cn, h.handicap, h.odds_win, h.odds_draw, h.odds_loss,
+        h.probability_win, h.probability_draw, h.probability_loss,
+        m.home_score, m.away_score, m.settlement_home_score, m.settlement_away_score, m.status
+      from handicap_challenge_matches h
+      left join matches m on m.match_code = h.match_code
+      where h.active = 1
+      order by h.date_cn asc, h.time_cn asc
+    `)
+    .all();
+}
+
 function toAdvancementTie(row, now) {
   return {
     matchId: row.match_code,
@@ -313,6 +407,34 @@ function toAdvancementTie(row, now) {
     away: row.away_cn,
     homeScore: normalizeNullableInteger(row.home_score),
     awayScore: normalizeNullableInteger(row.away_score),
+    status: row.status || 'pre',
+    locked: isAdvancementLocked(row.kickoff_at_utc, now),
+  };
+}
+
+function toHandicapChallengeMatch(row, now) {
+  return {
+    matchId: row.match_id,
+    matchCode: row.match_code || '',
+    issue: row.issue || '',
+    date: row.date_cn,
+    time: row.time_cn,
+    kickoffAtUtc: row.kickoff_at_utc || '',
+    home: row.home_cn,
+    away: row.away_cn,
+    handicap: Number(row.handicap),
+    odds: {
+      win: Number(row.odds_win),
+      draw: Number(row.odds_draw),
+      loss: Number(row.odds_loss),
+    },
+    probabilities: {
+      win: Number(row.probability_win),
+      draw: Number(row.probability_draw),
+      loss: Number(row.probability_loss),
+    },
+    homeScore: normalizeNullableInteger(row.settlement_home_score ?? row.home_score),
+    awayScore: normalizeNullableInteger(row.settlement_away_score ?? row.away_score),
     status: row.status || 'pre',
     locked: isAdvancementLocked(row.kickoff_at_utc, now),
   };
@@ -557,6 +679,10 @@ function addChinaDateDays(dateText, days) {
 
 function normalizeScores(scores) {
   return Array.isArray(scores) ? scores.filter((score) => typeof score === 'string') : [];
+}
+
+function isHandicapChoiceKey(value) {
+  return ['win', 'draw', 'loss'].includes(value);
 }
 
 async function readJsonBody(request) {

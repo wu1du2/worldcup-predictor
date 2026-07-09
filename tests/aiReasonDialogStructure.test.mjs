@@ -66,13 +66,19 @@ test('topbar exposes result exports while AI leaderboard lives in the more menu'
   const moreMenuSource = componentSource('MoreMenuDialog', 'MatchCard');
 
   assert.match(topbarSource, /比分结果/);
-  assert.match(topbarSource, /晋级结果/);
-  assert.match(topbarSource, /data-action="advancement-results"/);
+  assert.match(topbarSource, /让球结果/);
+  assert.match(topbarSource, /data-action="handicap-results"/);
+  assert.doesNotMatch(topbarSource, /晋级结果/);
+  assert.doesNotMatch(topbarSource, /data-action="advancement-results"/);
   assert.doesNotMatch(topbarSource, /AI排行榜/);
   assert.doesNotMatch(topbarSource, /data-action="ai-strategy-leaderboard"/);
   assert.doesNotMatch(topbarSource, /data-action="open-ai-strategy"/);
   assert.match(moreMenuSource, /AI排行榜/);
   assert.match(moreMenuSource, /data-action="ai-strategy-leaderboard"/);
+  assert.match(moreMenuSource, /晋级预测/);
+  assert.match(moreMenuSource, /晋级结果/);
+  assert.match(moreMenuSource, /data-action="open-advancement-predictions"/);
+  assert.match(moreMenuSource, /data-action="advancement-results"/);
   assert.match(moreMenuSource, /AI策略/);
   assert.match(moreMenuSource, /data-action="open-ai-strategy"/);
   assert.match(mainSource, /function AiStrategyDialog/);
@@ -82,17 +88,18 @@ test('topbar exposes result exports while AI leaderboard lives in the more menu'
   assert.match(stylesSource, /\.strategy-rank-dialog/);
 });
 
-test('advancement prediction entry is an inviting info card below player picker', () => {
+test('handicap challenge entry is an inviting info card below player picker', () => {
   const entrySource = mainSource.slice(
     mainSource.indexOf('<section className="advancement-entry-panel"'),
     mainSource.indexOf("{loadStatus !== 'ready'"),
   );
 
-  assert.match(entrySource, /8进4/);
-  assert.match(entrySource, /开赛前15分钟锁定/);
-  assert.match(entrySource, /点击填写晋级球队/);
+  assert.match(entrySource, /四强之路，舍你其谁/);
+  assert.match(entrySource, /4场 · 每场三选一 · 实时计算全中概率/);
+  assert.match(entrySource, /data-action="open-handicap-challenge"/);
   assert.match(stylesSource, /\.advancement-entry-panel[\s\S]*margin-top: 14px/);
   assert.match(stylesSource, /\.advancement-entry-button[\s\S]*min-height: 58px/);
+  assert.match(stylesSource, /\.handicap-entry-button/);
 });
 
 test('AI leaderboard highlights the top three strategies', () => {

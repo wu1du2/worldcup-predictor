@@ -33,10 +33,12 @@ import {
   createD1BrowserClient,
   createD1GroupPlayer,
   loadD1AdvancementPredictions,
+  loadD1HandicapChallenge,
   loadD1LiveBoard,
   loadD1GroupState,
   saveD1AdvancementPredictions,
   saveD1GroupPredictions,
+  saveD1HandicapChallengePredictions,
 } from './d1Data.mjs';
 import { formatReportJobTitle, formatReportStatusText } from './importReports.mjs';
 import { buildRecentLiveDateWindow } from './liveWindow.mjs';
@@ -76,6 +78,16 @@ import {
   isAdvancementTieLocked,
   mergeAdvancementTiesWithMatches,
 } from './advancementPrediction.mjs';
+import {
+  buildHandicapChallengeEntries,
+  calculateAllHitProbability,
+  exportHandicapChallengeText,
+  formatHandicapChoiceLabel,
+  formatHandicapMatchLabel,
+  formatProbability,
+  getHandicapResultChoice,
+  handicapChoiceKeys,
+} from './handicapChallenge.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
@@ -117,6 +129,14 @@ function App() {
     open: false,
     status: 'idle',
     ties: [],
+    predictionsByPlayer: {},
+    draft: {},
+    error: '',
+  });
+  const [handicapDialog, setHandicapDialog] = useState({
+    open: false,
+    status: 'idle',
+    matches: [],
     predictionsByPlayer: {},
     draft: {},
     error: '',
@@ -284,6 +304,12 @@ function App() {
     : buildAdvancementDraftFromPredictions(advancementDialog.predictionsByPlayer, state.selectedPlayerId);
   const advancementSelectedCount = countAdvancementSelections(selectedAdvancementDraft, advancementDialog.ties);
   const advancementTotalCount = advancementDialog.ties.length || 8;
+  const selectedHandicapDraft = handicapDialog.open
+    ? handicapDialog.draft
+    : buildHandicapDraftFromPredictions(handicapDialog.predictionsByPlayer, state.selectedPlayerId);
+  const handicapSelectedCount = countHandicapSelections(selectedHandicapDraft, handicapDialog.matches);
+  const handicapTotalCount = handicapDialog.matches.length || 4;
+  const handicapAllHitProbability = calculateAllHitProbability(selectedHandicapDraft, handicapDialog.matches);
 
   useEffect(() => {
     if (!groupCode) return;
@@ -484,6 +510,106 @@ function App() {
     }
   }
 
+  async function openHandicapChallengeDialog() {
+    if (!selectedPlayer) {
+      updateState((current) => ({ ...current, flash: '先选择用户名，再参加四强挑战。' }));
+      return;
+    }
+    if (!d1Client) {
+      setHandicapDialog({
+        open: true,
+        status: 'error',
+        matches: [],
+        predictionsByPlayer: {},
+        draft: {},
+        error: 'D1 API 配置缺失',
+      });
+      return;
+    }
+
+    setHandicapDialog((current) => ({
+      ...current,
+      open: true,
+      status: 'loading',
+      error: '',
+    }));
+
+    try {
+      const payload = await loadD1HandicapChallenge({ client: d1Client, groupCode });
+      setHandicapDialog({
+        open: true,
+        status: 'ready',
+        matches: payload.matches,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        draft: buildHandicapDraftFromPredictions(payload.predictionsByPlayer, selectedPlayer.id),
+        error: '',
+      });
+    } catch (error) {
+      setHandicapDialog((current) => ({
+        ...current,
+        open: true,
+        status: 'error',
+        error: error.message || '四强挑战加载失败',
+      }));
+    }
+  }
+
+  function selectHandicapChoice(matchId, choiceKey) {
+    const match = handicapDialog.matches.find((item) => item.matchId === matchId);
+    if (!match || match.locked || isAdvancementTieLocked(match)) return;
+    setHandicapDialog((current) => ({
+      ...current,
+      draft: {
+        ...current.draft,
+        [matchId]: current.draft?.[matchId] === choiceKey ? '' : choiceKey,
+      },
+      error: '',
+    }));
+  }
+
+  async function submitHandicapChallengePredictions() {
+    if (!selectedPlayer || !d1Client) return;
+    const entries = buildHandicapChallengeEntries(handicapDialog.draft);
+    if (!entries.length) {
+      setHandicapDialog((current) => ({ ...current, error: '至少选择一场结果' }));
+      return;
+    }
+
+    setHandicapDialog((current) => ({ ...current, status: 'saving', error: '' }));
+
+    try {
+      await saveD1HandicapChallengePredictions({
+        client: d1Client,
+        groupCode,
+        playerId: selectedPlayer.id,
+        entries,
+      });
+      const savedRows = Object.fromEntries(entries.map((entry) => [
+        entry.matchId,
+        { choiceKey: entry.choiceKey },
+      ]));
+      setHandicapDialog((current) => ({
+        ...current,
+        status: 'ready',
+        predictionsByPlayer: {
+          ...current.predictionsByPlayer,
+          [selectedPlayer.id]: {
+            ...(current.predictionsByPlayer[selectedPlayer.id] || {}),
+            ...savedRows,
+          },
+        },
+        error: '',
+      }));
+      updateState((current) => ({ ...current, flash: '四强挑战已保存。' }));
+    } catch (error) {
+      setHandicapDialog((current) => ({
+        ...current,
+        status: 'ready',
+        error: error.message || '四强挑战保存失败',
+      }));
+    }
+  }
+
   function showExport() {
     const text = exportPredictionsText({
       dateLabel,
@@ -500,6 +626,43 @@ function App() {
       ...current,
       exportText: text,
     }));
+  }
+
+  async function showHandicapChallengeResults() {
+    if (!d1Client) {
+      updateState((current) => ({ ...current, flash: '让球结果需要 D1 API。' }));
+      return;
+    }
+
+    updateState((current) => ({ ...current, flash: '正在生成让球结果...' }));
+
+    try {
+      const payload = await loadD1HandicapChallenge({ client: d1Client, groupCode });
+      setHandicapDialog((current) => ({
+        ...current,
+        matches: payload.matches,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        draft: current.open ? buildHandicapDraftFromPredictions(payload.predictionsByPlayer, state.selectedPlayerId) : current.draft,
+        status: current.open ? 'ready' : current.status,
+        error: '',
+      }));
+      const text = exportHandicapChallengeText({
+        matches: payload.matches,
+        players,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        currentGroupUrl: window.location.href,
+      });
+      updateState((current) => ({
+        ...current,
+        exportText: text,
+        flash: '让球结果已生成。',
+      }));
+    } catch (error) {
+      updateState((current) => ({
+        ...current,
+        flash: error.message || '让球结果生成失败',
+      }));
+    }
   }
 
   async function showAdvancementResults() {
@@ -763,8 +926,8 @@ function App() {
           <button className="ghost-button" data-action="export" onClick={showExport}>
             比分结果
           </button>
-          <button className="ghost-button" data-action="advancement-results" onClick={showAdvancementResults}>
-            晋级结果
+          <button className="ghost-button" data-action="handicap-results" onClick={showHandicapChallengeResults}>
+            让球结果
           </button>
           <button className="icon-button topbar-menu-button" data-action="more-menu" aria-label="更多" onClick={() => setMoreMenuOpen(true)}>
             ...
@@ -816,20 +979,20 @@ function App() {
         </div>
       </section>
 
-      <section className="advancement-entry-panel" aria-label="晋级预测入口">
+      <section className="advancement-entry-panel" aria-label="四强挑战入口">
         <button
-          className="advancement-entry-button"
-          data-action="open-advancement-predictions"
+          className="advancement-entry-button handicap-entry-button"
+          data-action="open-handicap-challenge"
           disabled={!selectedPlayer}
-          onClick={openAdvancementDialog}
+          onClick={openHandicapChallengeDialog}
         >
           <span>
-            <strong>晋级预测</strong>
-            <small>8进4 · 开赛前15分钟锁定 · 点击填写晋级球队</small>
+            <strong>四强之路，舍你其谁</strong>
+            <small>4场 · 每场三选一 · 实时计算全中概率</small>
           </span>
           <em>
             {selectedPlayer
-              ? (advancementDialog.ties.length ? `${advancementSelectedCount}/${advancementTotalCount}` : '去填写')
+              ? (handicapDialog.matches.length ? `${handicapSelectedCount}/${handicapTotalCount} · ${formatProbability(handicapAllHitProbability)}` : '去挑战')
               : '先选用户名'}
           </em>
         </button>
@@ -890,6 +1053,14 @@ function App() {
           onShowAllTimeStats={showAllTimeStats}
           onShowBackendReports={showBackendReports}
           onShowAiStrategyLeaderboard={() => showAiStrategyLeaderboard(0)}
+          onOpenAdvancementPredictions={() => {
+            setMoreMenuOpen(false);
+            openAdvancementDialog();
+          }}
+          onShowAdvancementResults={() => {
+            setMoreMenuOpen(false);
+            showAdvancementResults();
+          }}
           onOpenAiStrategy={() => {
             setMoreMenuOpen(false);
             setAiStrategyOpen(true);
@@ -965,6 +1136,18 @@ function App() {
         />
       ) : null}
 
+      {handicapDialog.open ? (
+        <HandicapChallengeDialog
+          dialog={handicapDialog}
+          selectedCount={countHandicapSelections(handicapDialog.draft, handicapDialog.matches)}
+          totalCount={handicapDialog.matches.length}
+          allHitProbability={calculateAllHitProbability(handicapDialog.draft, handicapDialog.matches)}
+          onSelect={selectHandicapChoice}
+          onClose={() => setHandicapDialog((current) => ({ ...current, open: false }))}
+          onSubmit={submitHandicapChallengePredictions}
+        />
+      ) : null}
+
       {aiRecommendationDialog ? (
         <AiRecommendationDialog
           recommendation={aiRecommendationDialog}
@@ -1017,6 +1200,20 @@ function buildAdvancementDraftFromPredictions(predictionsByPlayer, playerId) {
     .map(([matchId, prediction]) => [matchId, prediction.winnerSide]));
 }
 
+function buildHandicapDraftFromPredictions(predictionsByPlayer, playerId) {
+  const saved = playerId ? predictionsByPlayer?.[playerId] || {} : {};
+  return Object.fromEntries(Object.entries(saved)
+    .filter(([, prediction]) => handicapChoiceKeys.includes(prediction?.choiceKey))
+    .map(([matchId, prediction]) => [matchId, prediction.choiceKey]));
+}
+
+function countHandicapSelections(draft = {}, matches = []) {
+  const matchIds = new Set((matches || []).map((match) => match?.matchId).filter(Boolean));
+  return Object.entries(draft || {})
+    .filter(([matchId, choiceKey]) => matchIds.has(matchId) && handicapChoiceKeys.includes(choiceKey))
+    .length;
+}
+
 function DialogBackdrop({ ariaLabel, onClose, children, dismissOnBackdrop = true }) {
   function handleBackdropClick(event) {
     if (!dismissOnBackdrop) return;
@@ -1030,7 +1227,16 @@ function DialogBackdrop({ ariaLabel, onClose, children, dismissOnBackdrop = true
   );
 }
 
-function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onShowAiStrategyLeaderboard, onOpenAiStrategy, onOpenKnockoutStrategy }) {
+function MoreMenuDialog({
+  onClose,
+  onShowAllTimeStats,
+  onShowBackendReports,
+  onShowAiStrategyLeaderboard,
+  onOpenAdvancementPredictions,
+  onShowAdvancementResults,
+  onOpenAiStrategy,
+  onOpenKnockoutStrategy,
+}) {
   return (
     <DialogBackdrop ariaLabel="更多" onClose={onClose}>
       <div className="dialog compact-dialog more-menu-dialog" data-more-menu-dialog>
@@ -1049,6 +1255,12 @@ function MoreMenuDialog({ onClose, onShowAllTimeStats, onShowBackendReports, onS
           </button>
           <button className="menu-action-button" data-action="ai-strategy-leaderboard" onClick={onShowAiStrategyLeaderboard}>
             AI排行榜
+          </button>
+          <button className="menu-action-button" data-action="open-advancement-predictions" onClick={onOpenAdvancementPredictions}>
+            晋级预测
+          </button>
+          <button className="menu-action-button" data-action="advancement-results" onClick={onShowAdvancementResults}>
+            晋级结果
           </button>
           <button className="menu-action-button" data-action="open-ai-strategy" onClick={onOpenAiStrategy}>
             AI策略
@@ -1307,6 +1519,82 @@ function AdvancementPredictionDialog({ dialog, selectedCount, totalCount, onSele
       </div>
     </DialogBackdrop>
   );
+}
+
+function HandicapChallengeDialog({ dialog, selectedCount, totalCount, allHitProbability, onSelect, onClose, onSubmit }) {
+  const saving = dialog.status === 'saving';
+
+  return (
+    <DialogBackdrop ariaLabel="四强之路，舍你其谁" onClose={onClose}>
+      <div className="dialog advancement-dialog handicap-dialog" data-handicap-dialog>
+        <div className="advancement-dialog-header">
+          <button className="icon-button advancement-back-button" data-action="close-handicap-challenge" aria-label="返回" onClick={onClose}>
+            ‹
+          </button>
+          <div>
+            <h2>四强之路，舍你其谁</h2>
+            <p>每场选一个让球结果，底部实时计算全中概率。</p>
+          </div>
+        </div>
+
+        {dialog.status === 'loading' ? <div className="report-empty">正在读取让球赔率...</div> : null}
+        {dialog.status === 'error' ? <div className="report-empty">{dialog.error}</div> : null}
+
+        {dialog.status !== 'loading' && dialog.status !== 'error' ? (
+          <div className="advancement-list handicap-list">
+            {dialog.matches.map((match) => {
+              const locked = match.locked || isAdvancementTieLocked(match);
+              const selectedChoice = dialog.draft?.[match.matchId] || '';
+              const resultChoice = getHandicapResultChoice(match);
+              return (
+                <article className={`advancement-tie-row handicap-match-row ${locked ? 'locked' : ''}`} key={match.matchId}>
+                  <div className="advancement-tie-meta">
+                    <span>{formatChinaDateLabel(match.date)} {match.time}</span>
+                    <strong>{locked ? '已锁定' : '可修改'}</strong>
+                  </div>
+                  <h3>{formatHandicapMatchLabel(match)}</h3>
+                  <div className="handicap-choice-grid">
+                    {handicapChoiceKeys.map((choiceKey) => {
+                      const selected = selectedChoice === choiceKey;
+                      const correct = resultChoice && resultChoice === choiceKey;
+                      return (
+                        <button
+                          key={choiceKey}
+                          className={`handicap-choice-button ${selected ? 'selected' : ''} ${correct ? 'correct-result' : ''}`}
+                          disabled={locked}
+                          data-handicap-match-id={match.matchId}
+                          data-choice-key={choiceKey}
+                          onClick={() => onSelect(match.matchId, choiceKey)}
+                        >
+                          <strong>{formatHandicapChoiceLabel(match, choiceKey)}</strong>
+                          <span>{formatOdds(match.odds?.[choiceKey])}</span>
+                          <small>{formatProbability(match.probabilities?.[choiceKey])}</small>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {dialog.error && dialog.status !== 'error' ? <p className="form-status error">{dialog.error}</p> : null}
+
+        <div className="advancement-submit-row handicap-submit-row">
+          <span>已选 {selectedCount}/{totalCount || 4} · 全中概率 {formatProbability(allHitProbability)}</span>
+          <button className="primary-button" data-action="save-handicap-challenge" disabled={saving || dialog.status === 'loading'} onClick={onSubmit}>
+            {saving ? '保存中...' : '保存挑战'}
+          </button>
+        </div>
+      </div>
+    </DialogBackdrop>
+  );
+}
+
+function formatOdds(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number.toFixed(2) : '-';
 }
 
 function AiStrategyDialog({ form, onChange, onClose, onSubmit }) {
