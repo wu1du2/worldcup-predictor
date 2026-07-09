@@ -83,6 +83,11 @@ export function exportHandicapChallengeText({
   const validMatches = (matches || []).filter((match) => match?.matchId && match?.home && match?.away);
   const lines = ['四强之路，舍你其谁'];
 
+  if (validMatches.length) {
+    lines.push('【赛程】');
+    lines.push(...validMatches.map((match) => formatHandicapMatchLabel(match)));
+  }
+
   const visiblePlayers = (players || []).filter((player) => player?.id && player?.name && player.name !== 'AI推荐');
   const playerLines = visiblePlayers
     .map((player) => {

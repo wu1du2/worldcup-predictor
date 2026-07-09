@@ -108,6 +108,9 @@ test('exportHandicapChallengeText renders player sequences without odds and prob
 
   assert.equal(text, [
     '四强之路，舍你其谁',
+    '【赛程】',
+    '法国-1 vs 摩洛哥',
+    '西班牙-1 vs 比利时',
     '【预测】',
     '张三：让胜、让负｜最高可赢X10.48',
     '李四：让平、-｜最高可赢X3.05',
