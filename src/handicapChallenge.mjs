@@ -23,6 +23,17 @@ export function calculateAllHitProbability(draft = {}, matches = []) {
   return probabilities.reduce((product, value) => product * value, 1);
 }
 
+export function calculateMaxPayoutOdds(draft = {}, matches = []) {
+  const matchesById = new Map((matches || []).map((match) => [match?.matchId, match]));
+  const odds = Object.entries(draft || {})
+    .filter(([, choiceKey]) => handicapChoiceKeys.includes(choiceKey))
+    .map(([matchId, choiceKey]) => Number(matchesById.get(matchId)?.odds?.[choiceKey]))
+    .filter((value) => Number.isFinite(value) && value > 0);
+
+  if (!odds.length) return 0;
+  return odds.reduce((product, value) => product * value, 1);
+}
+
 export function formatHandicapChoiceLabel(_match, choiceKey) {
   return choiceLabels[choiceKey] || '';
 }
@@ -97,7 +108,7 @@ export function exportHandicapChallengeText({
         if (!resultChoice) return label;
         return `${label}${choiceKey === resultChoice ? '✅' : '❌'}`;
       });
-      return `${player.name}：${picks.join('、')}｜全中概率 ${formatProbability(calculateAllHitProbability(draft, validMatches))}`;
+      return `${player.name}：${picks.join('、')}｜最高可赢${formatMaxPayoutOdds(calculateMaxPayoutOdds(draft, validMatches))}`;
     })
     .filter(Boolean);
 
@@ -147,6 +158,13 @@ export function formatProbability(value) {
   const number = Number(value);
   if (!Number.isFinite(number) || number <= 0) return '0.0%';
   return `${(number * 100).toFixed(1)}%`;
+}
+
+export function formatMaxPayoutOdds(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return 'X0';
+  if (Number.isInteger(number)) return `X${number}`;
+  return `X${number.toFixed(2)}`;
 }
 
 function normalizeChoiceNumbers(values = {}) {

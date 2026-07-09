@@ -80,10 +80,11 @@ import {
 } from './advancementPrediction.mjs';
 import {
   buildHandicapChallengeEntries,
-  calculateAllHitProbability,
+  calculateMaxPayoutOdds,
   exportHandicapChallengeText,
   formatHandicapChoiceLabel,
   formatHandicapMatchLabel,
+  formatMaxPayoutOdds,
   formatProbability,
   getHandicapResultChoice,
   handicapChoiceKeys,
@@ -309,7 +310,7 @@ function App() {
     : buildHandicapDraftFromPredictions(handicapDialog.predictionsByPlayer, state.selectedPlayerId);
   const handicapSelectedCount = countHandicapSelections(selectedHandicapDraft, handicapDialog.matches);
   const handicapTotalCount = handicapDialog.matches.length || 4;
-  const handicapAllHitProbability = calculateAllHitProbability(selectedHandicapDraft, handicapDialog.matches);
+  const handicapMaxPayoutOdds = calculateMaxPayoutOdds(selectedHandicapDraft, handicapDialog.matches);
 
   useEffect(() => {
     if (!groupCode) return;
@@ -988,11 +989,11 @@ function App() {
         >
           <span>
             <strong>四强之路，舍你其谁</strong>
-            <small>4场 · 每场三选一 · 实时计算全中概率</small>
+            <small>4场 · 每场三选一 · 实时计算最高可赢</small>
           </span>
           <em>
             {selectedPlayer
-              ? (handicapDialog.matches.length ? `${handicapSelectedCount}/${handicapTotalCount} · ${formatProbability(handicapAllHitProbability)}` : '去挑战')
+              ? (handicapDialog.matches.length ? `已选 ${handicapSelectedCount}/${handicapTotalCount} 最高可赢${formatMaxPayoutOdds(handicapMaxPayoutOdds)}` : '去挑战')
               : '先选用户名'}
           </em>
         </button>
@@ -1141,7 +1142,7 @@ function App() {
           dialog={handicapDialog}
           selectedCount={countHandicapSelections(handicapDialog.draft, handicapDialog.matches)}
           totalCount={handicapDialog.matches.length}
-          allHitProbability={calculateAllHitProbability(handicapDialog.draft, handicapDialog.matches)}
+          maxPayoutOdds={calculateMaxPayoutOdds(handicapDialog.draft, handicapDialog.matches)}
           onSelect={selectHandicapChoice}
           onClose={() => setHandicapDialog((current) => ({ ...current, open: false }))}
           onSubmit={submitHandicapChallengePredictions}
@@ -1521,7 +1522,7 @@ function AdvancementPredictionDialog({ dialog, selectedCount, totalCount, onSele
   );
 }
 
-function HandicapChallengeDialog({ dialog, selectedCount, totalCount, allHitProbability, onSelect, onClose, onSubmit }) {
+function HandicapChallengeDialog({ dialog, selectedCount, totalCount, maxPayoutOdds, onSelect, onClose, onSubmit }) {
   const saving = dialog.status === 'saving';
 
   return (
@@ -1533,7 +1534,7 @@ function HandicapChallengeDialog({ dialog, selectedCount, totalCount, allHitProb
           </button>
           <div>
             <h2>四强之路，舍你其谁</h2>
-            <p>每场选一个让球结果，底部实时计算全中概率。</p>
+            <p>每场选一个让球结果，底部实时计算当前串关最高可赢。</p>
           </div>
         </div>
 
@@ -1582,7 +1583,7 @@ function HandicapChallengeDialog({ dialog, selectedCount, totalCount, allHitProb
         {dialog.error && dialog.status !== 'error' ? <p className="form-status error">{dialog.error}</p> : null}
 
         <div className="advancement-submit-row handicap-submit-row">
-          <span>已选 {selectedCount}/{totalCount || 4} · 全中概率 {formatProbability(allHitProbability)}</span>
+          <span>已选 {selectedCount}/{totalCount || 4} 最高可赢{formatMaxPayoutOdds(maxPayoutOdds)}</span>
           <button className="primary-button" data-action="save-handicap-challenge" disabled={saving || dialog.status === 'loading'} onClick={onSubmit}>
             {saving ? '保存中...' : '保存挑战'}
           </button>

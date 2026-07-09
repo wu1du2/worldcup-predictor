@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import {
   buildHandicapChallengeEntries,
   calculateAllHitProbability,
+  calculateMaxPayoutOdds,
   exportHandicapChallengeText,
+  formatMaxPayoutOdds,
   formatHandicapChoiceLabel,
   getHandicapResultChoice,
   normalizeHandicapChallengePayload,
@@ -33,6 +35,19 @@ test('calculateAllHitProbability multiplies selected normalized probabilities', 
 
   assert.equal(calculateAllHitProbability({ hc1: 'win', hc2: 'loss', hc3: 'draw' }, matches), 0.357 * 0.385 * 0.253);
   assert.equal(calculateAllHitProbability({ hc1: 'win' }, matches), 0.357);
+});
+
+test('calculateMaxPayoutOdds multiplies selected odds for the current parlay', () => {
+  const matches = [
+    { matchId: 'hc1', odds: { win: 2.48, draw: 3.05, loss: 2.51 } },
+    { matchId: 'hc2', odds: { win: 2.58, draw: 3.26, loss: 2.3 } },
+    { matchId: 'hc3', odds: { win: 1.88, draw: 3.5, loss: 3.22 } },
+  ];
+
+  assert.equal(calculateMaxPayoutOdds({ hc1: 'win', hc2: 'loss', hc3: 'draw' }, matches), 2.48 * 2.3 * 3.5);
+  assert.equal(formatMaxPayoutOdds(16), 'X16');
+  assert.equal(formatMaxPayoutOdds(2.48 * 2.3 * 3.5), 'X19.96');
+  assert.equal(formatMaxPayoutOdds(0), 'X0');
 });
 
 test('formatHandicapChoiceLabel explains handicap outcomes with the market side', () => {
@@ -71,7 +86,7 @@ test('normalizeHandicapChallengePayload builds normalized probabilities from odd
   });
 });
 
-test('exportHandicapChallengeText renders player sequences and all-hit probability', () => {
+test('exportHandicapChallengeText renders player sequences and max payout odds', () => {
   const text = exportHandicapChallengeText({
     matches: [
       { matchId: 'hc1', date: '2026-07-10', time: '04:00', home: '法国', away: '摩洛哥', handicap: -1, probabilities: { win: 0.357, draw: 0.29, loss: 0.353 }, odds: { win: 2.48, draw: 3.05, loss: 2.51 } },
@@ -94,8 +109,8 @@ test('exportHandicapChallengeText renders player sequences and all-hit probabili
     '法国-1 vs 摩洛哥：让胜 2.48｜35.7%，让平 3.05｜29.0%，让负 2.51｜35.3%',
     '西班牙-1 vs 比利时：让胜 2.58｜34.3%，让平 3.26｜27.2%，让负 2.30｜38.5%',
     '【预测】',
-    '张三：让胜、让负｜全中概率 13.7%',
-    '李四：让平、-｜全中概率 29.0%',
+    '张三：让胜、让负｜最高可赢X5.70',
+    '李四：让平、-｜最高可赢X3.05',
     '[欢迎预测] https://example.com/?group=lzscqjd',
   ].join('\n'));
 });
