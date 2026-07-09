@@ -83,14 +83,6 @@ export function exportHandicapChallengeText({
   const validMatches = (matches || []).filter((match) => match?.matchId && match?.home && match?.away);
   const lines = ['四强之路，舍你其谁'];
 
-  for (const match of validMatches) {
-    lines.push(`${formatHandicapMatchLabel(match)}：${handicapChoiceKeys.map((choiceKey) => {
-      const odds = Number(match?.odds?.[choiceKey]);
-      const probability = Number(match?.probabilities?.[choiceKey]);
-      return `${formatHandicapChoiceLabel(match, choiceKey)} ${formatOdds(odds)}｜${formatProbability(probability)}`;
-    }).join('，')}`);
-  }
-
   const visiblePlayers = (players || []).filter((player) => player?.id && player?.name && player.name !== 'AI推荐');
   const playerLines = visiblePlayers
     .map((player) => {

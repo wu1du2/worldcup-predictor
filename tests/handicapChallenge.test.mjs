@@ -88,7 +88,7 @@ test('normalizeHandicapChallengePayload builds normalized probabilities from odd
   });
 });
 
-test('exportHandicapChallengeText renders player sequences and max payout odds', () => {
+test('exportHandicapChallengeText renders player sequences without odds and probability details', () => {
   const text = exportHandicapChallengeText({
     matches: [
       { matchId: 'hc1', date: '2026-07-10', time: '04:00', home: '法国', away: '摩洛哥', handicap: -1, probabilities: { win: 0.357, draw: 0.29, loss: 0.353 }, odds: { win: 2.48, draw: 3.05, loss: 2.51 } },
@@ -108,11 +108,10 @@ test('exportHandicapChallengeText renders player sequences and max payout odds',
 
   assert.equal(text, [
     '四强之路，舍你其谁',
-    '法国-1 vs 摩洛哥：让胜 2.48｜35.7%，让平 3.05｜29.0%，让负 2.51｜35.3%',
-    '西班牙-1 vs 比利时：让胜 2.58｜34.3%，让平 3.26｜27.2%，让负 2.30｜38.5%',
     '【预测】',
     '张三：让胜、让负｜最高可赢X10.48',
     '李四：让平、-｜最高可赢X3.05',
     '[欢迎预测] https://example.com/?group=lzscqjd',
   ].join('\n'));
+  assert.doesNotMatch(text, /2\.48|35\.7%|38\.5%/);
 });
