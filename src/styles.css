@@ -841,10 +841,6 @@ h1 {
   color: #87918c;
 }
 
-.handicap-submit-row span {
-  color: #0c4f40;
-}
-
 .advancement-submit-row {
   padding-top: 8px;
   border-top: 1px solid #e0e6e1;
@@ -854,6 +850,31 @@ h1 {
   color: #4f5c56;
   font-size: 13px;
   font-weight: 900;
+}
+
+.handicap-payout-summary {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.handicap-payout-summary span {
+  color: #4f5c56;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.handicap-payout-highlight {
+  color: #075544;
+  font-size: 18px;
+  font-weight: 1000;
+  line-height: 1.05;
+}
+
+.handicap-payout-summary small {
+  color: #69766f;
+  font-size: 11px;
+  font-weight: 850;
 }
 
 .compact-dialog {

@@ -31,7 +31,7 @@ export function calculateMaxPayoutOdds(draft = {}, matches = []) {
     .filter((value) => Number.isFinite(value) && value > 0);
 
   if (!odds.length) return 0;
-  return odds.reduce((product, value) => product * value, 1);
+  return odds.reduce((sum, odd) => sum + odd + sum * odd, 0);
 }
 
 export function formatHandicapChoiceLabel(_match, choiceKey) {

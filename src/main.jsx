@@ -631,11 +631,11 @@ function App() {
 
   async function showHandicapChallengeResults() {
     if (!d1Client) {
-      updateState((current) => ({ ...current, flash: '让球结果需要 D1 API。' }));
+      updateState((current) => ({ ...current, flash: '四强之路需要 D1 API。' }));
       return;
     }
 
-    updateState((current) => ({ ...current, flash: '正在生成让球结果...' }));
+    updateState((current) => ({ ...current, flash: '正在生成四强之路...' }));
 
     try {
       const payload = await loadD1HandicapChallenge({ client: d1Client, groupCode });
@@ -656,12 +656,12 @@ function App() {
       updateState((current) => ({
         ...current,
         exportText: text,
-        flash: '让球结果已生成。',
+        flash: '四强之路已生成。',
       }));
     } catch (error) {
       updateState((current) => ({
         ...current,
-        flash: error.message || '让球结果生成失败',
+        flash: error.message || '四强之路生成失败',
       }));
     }
   }
@@ -928,7 +928,7 @@ function App() {
             比分结果
           </button>
           <button className="ghost-button" data-action="handicap-results" onClick={showHandicapChallengeResults}>
-            让球结果
+            四强之路
           </button>
           <button className="icon-button topbar-menu-button" data-action="more-menu" aria-label="更多" onClick={() => setMoreMenuOpen(true)}>
             ...
@@ -1534,7 +1534,7 @@ function HandicapChallengeDialog({ dialog, selectedCount, totalCount, maxPayoutO
           </button>
           <div>
             <h2>四强之路，舍你其谁</h2>
-            <p>每场选一个让球结果，底部实时计算当前串关最高可赢。</p>
+            <p>每场选一个让球胜平负，保存后按固定成本15覆盖全部组合。</p>
           </div>
         </div>
 
@@ -1583,9 +1583,13 @@ function HandicapChallengeDialog({ dialog, selectedCount, totalCount, maxPayoutO
         {dialog.error && dialog.status !== 'error' ? <p className="form-status error">{dialog.error}</p> : null}
 
         <div className="advancement-submit-row handicap-submit-row">
-          <span>已选 {selectedCount}/{totalCount || 4} 最高可赢{formatMaxPayoutOdds(maxPayoutOdds)}</span>
+          <div className="handicap-payout-summary">
+            <span>已选 {selectedCount}/{totalCount || 4}</span>
+            <strong className="handicap-payout-highlight">最高可赢{formatMaxPayoutOdds(maxPayoutOdds)}</strong>
+            <small>固定成本15 · 15个组合</small>
+          </div>
           <button className="primary-button" data-action="save-handicap-challenge" disabled={saving || dialog.status === 'loading'} onClick={onSubmit}>
-            {saving ? '保存中...' : '保存挑战'}
+            {saving ? '确认中...' : '确认挑战'}
           </button>
         </div>
       </div>

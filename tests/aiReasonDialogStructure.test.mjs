@@ -66,7 +66,8 @@ test('topbar exposes result exports while AI leaderboard lives in the more menu'
   const moreMenuSource = componentSource('MoreMenuDialog', 'MatchCard');
 
   assert.match(topbarSource, /比分结果/);
-  assert.match(topbarSource, /让球结果/);
+  assert.match(topbarSource, /四强之路/);
+  assert.doesNotMatch(topbarSource, /让球结果/);
   assert.match(topbarSource, /data-action="handicap-results"/);
   assert.doesNotMatch(topbarSource, /晋级结果/);
   assert.doesNotMatch(topbarSource, /data-action="advancement-results"/);
@@ -98,9 +99,12 @@ test('handicap challenge entry is an inviting info card below player picker', ()
   assert.match(entrySource, /4场 · 每场三选一 · 实时计算最高可赢/);
   assert.match(entrySource, /已选 \$\{handicapSelectedCount\}\/\$\{handicapTotalCount\} 最高可赢/);
   assert.match(entrySource, /data-action="open-handicap-challenge"/);
+  assert.match(mainSource, /className="handicap-payout-highlight"/);
+  assert.match(mainSource, /固定成本15/);
   assert.match(stylesSource, /\.advancement-entry-panel[\s\S]*margin-top: 14px/);
   assert.match(stylesSource, /\.advancement-entry-button[\s\S]*min-height: 58px/);
   assert.match(stylesSource, /\.handicap-entry-button/);
+  assert.match(stylesSource, /\.handicap-payout-highlight/);
 });
 
 test('AI leaderboard highlights the top three strategies', () => {
