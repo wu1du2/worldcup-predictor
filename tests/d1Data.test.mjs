@@ -136,7 +136,7 @@ test('saveD1GroupPredictions posts selected score entries to the Worker', async 
   assert.deepEqual(result, { ok: true, rowsWritten: 1 });
 });
 
-test('loadD1AdvancementPredictions reads Round of 16 ties and group picks', async () => {
+test('loadD1AdvancementPredictions reads advancement ties and group picks', async () => {
   const client = createD1ApiClient({
     baseUrl: 'https://worldcup-api.example.workers.dev',
     fetchImpl: async (url) => {

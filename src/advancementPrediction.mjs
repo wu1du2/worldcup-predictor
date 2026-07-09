@@ -43,7 +43,7 @@ export function exportAdvancementPredictionsText({
   predictionsByPlayer = {},
   currentGroupUrl = '',
 } = {}) {
-  const lines = ['16进8晋级预测结果'];
+  const lines = ['8进4晋级预测结果'];
   const visiblePlayers = (players || []).filter((player) => player?.id && player?.name && player.name !== 'AI推荐');
   const validTies = (ties || []).filter((tie) => tie?.matchId && tie?.home && tie?.away);
   const settledTies = validTies.filter((tie) => getAdvancementWinnerName(tie));

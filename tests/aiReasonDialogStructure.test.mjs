@@ -58,25 +58,41 @@ test('dialog backdrops close on blank area while AI strategy input dialog is pro
   assert.match(mainSource, /<DialogBackdrop ariaLabel="AI推荐详情" onClose={onClose}>/);
 });
 
-test('AI leaderboard is a topbar action and strategy submission lives in the more menu', () => {
+test('topbar exposes result exports while AI leaderboard lives in the more menu', () => {
   const topbarSource = mainSource.slice(
     mainSource.indexOf('<header className="topbar">'),
     mainSource.indexOf('<section className="date-panel"'),
   );
   const moreMenuSource = componentSource('MoreMenuDialog', 'MatchCard');
 
-  assert.match(topbarSource, /预测结果/);
-  assert.match(topbarSource, /AI排行榜/);
-  assert.match(topbarSource, /data-action="ai-strategy-leaderboard"/);
+  assert.match(topbarSource, /比分结果/);
+  assert.match(topbarSource, /晋级结果/);
+  assert.match(topbarSource, /data-action="advancement-results"/);
+  assert.doesNotMatch(topbarSource, /AI排行榜/);
+  assert.doesNotMatch(topbarSource, /data-action="ai-strategy-leaderboard"/);
   assert.doesNotMatch(topbarSource, /data-action="open-ai-strategy"/);
+  assert.match(moreMenuSource, /AI排行榜/);
+  assert.match(moreMenuSource, /data-action="ai-strategy-leaderboard"/);
   assert.match(moreMenuSource, /AI策略/);
   assert.match(moreMenuSource, /data-action="open-ai-strategy"/);
-  assert.doesNotMatch(moreMenuSource, /AI预测排行榜/);
   assert.match(mainSource, /function AiStrategyDialog/);
   assert.match(mainSource, /data-action="submit-ai-strategy"/);
   assert.match(mainSource, /function AiStrategyLeaderboardDialog/);
   assert.match(stylesSource, /\.strategy-dialog/);
   assert.match(stylesSource, /\.strategy-rank-dialog/);
+});
+
+test('advancement prediction entry is an inviting info card below player picker', () => {
+  const entrySource = mainSource.slice(
+    mainSource.indexOf('<section className="advancement-entry-panel"'),
+    mainSource.indexOf("{loadStatus !== 'ready'"),
+  );
+
+  assert.match(entrySource, /8进4/);
+  assert.match(entrySource, /开赛前15分钟锁定/);
+  assert.match(entrySource, /点击填写晋级球队/);
+  assert.match(stylesSource, /\.advancement-entry-panel[\s\S]*margin-top: 14px/);
+  assert.match(stylesSource, /\.advancement-entry-button[\s\S]*min-height: 58px/);
 });
 
 test('AI leaderboard highlights the top three strategies', () => {

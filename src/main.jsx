@@ -825,7 +825,7 @@ function App() {
         >
           <span>
             <strong>晋级预测</strong>
-            <small>16进8 · 开赛前15分钟锁定 · 点击填写晋级球队</small>
+            <small>8进4 · 开赛前15分钟锁定 · 点击填写晋级球队</small>
           </span>
           <em>
             {selectedPlayer
@@ -1243,19 +1243,19 @@ function AdvancementPredictionDialog({ dialog, selectedCount, totalCount, onSele
   const saving = dialog.status === 'saving';
 
   return (
-    <DialogBackdrop ariaLabel="16进8晋级预测" onClose={onClose}>
+    <DialogBackdrop ariaLabel="8进4晋级预测" onClose={onClose}>
       <div className="dialog advancement-dialog" data-advancement-dialog>
         <div className="advancement-dialog-header">
           <button className="icon-button advancement-back-button" data-action="close-advancement" aria-label="返回" onClick={onClose}>
             ‹
           </button>
           <div>
-            <h2>16进8晋级预测</h2>
+            <h2>8进4晋级预测</h2>
             <p>开赛前15分钟锁定，允许先保存部分场次。</p>
           </div>
         </div>
 
-        {dialog.status === 'loading' ? <div className="report-empty">正在读取16强对阵...</div> : null}
+        {dialog.status === 'loading' ? <div className="report-empty">正在读取8强对阵...</div> : null}
         {dialog.status === 'error' ? <div className="report-empty">{dialog.error}</div> : null}
 
         {dialog.status !== 'loading' && dialog.status !== 'error' ? (

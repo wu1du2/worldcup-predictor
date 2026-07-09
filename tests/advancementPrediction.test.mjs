@@ -61,7 +61,7 @@ test('exportAdvancementPredictionsText renders settled leaderboard and pending p
   });
 
   assert.equal(text, [
-    '16进8晋级预测结果',
+    '8进4晋级预测结果',
     '正确答案：摩洛哥、法国、待定',
     '【排行榜】',
     '张三 2/2？',

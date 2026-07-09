@@ -45,3 +45,16 @@ test('live D1 import workflow runs every five minutes and refreshes AI predictio
   assert.match(workflow, /npm run ai:predict-router:d1/);
   assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --file output\/d1-ai-sync\.sql/);
 });
+
+test('D1 API Worker deploys when Worker code changes on master', async () => {
+  const workflow = await readFile(new URL('../.github/workflows/deploy-worker.yml', import.meta.url), 'utf8');
+
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.match(workflow, /branches:\n      - master/);
+  assert.match(workflow, /- workers\/\*\*/);
+  assert.match(workflow, /- wrangler\.toml/);
+  assert.match(workflow, /CLOUDFLARE_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_API_TOKEN \}\}/);
+  assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID: ea85b9ad1849253605db55f73ad3be98/);
+  assert.match(workflow, /test -n "\$CLOUDFLARE_API_TOKEN"/);
+  assert.match(workflow, /npx wrangler@4\.106\.0 deploy/);
+});

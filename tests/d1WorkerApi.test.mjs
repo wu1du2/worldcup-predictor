@@ -104,13 +104,13 @@ test('D1 worker upserts predictions for a group player', async () => {
   ]);
 });
 
-test('D1 worker returns Round of 16 advancement ties and group predictions', async () => {
+test('D1 worker returns Quarterfinals advancement ties and group predictions', async () => {
   const db = fakeStatefulDb({
     groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
     players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
     matches: [
-      roundOf16Match({ match_code: 'espn-760502', match_date_cn: '2026-07-05', time_cn: '01:00', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥', home_score: 0, away_score: 3, status: 'post', status_detail: 'FT' }),
-      roundOf16Match({ match_code: 'espn-760503', match_date_cn: '2026-07-05', time_cn: '05:00', kickoff_at_utc: '2026-07-04T21:00:00.000Z', home_cn: '巴拉圭', away_cn: '法国' }),
+      quarterfinalMatch({ match_code: 'espn-760502', match_date_cn: '2026-07-05', time_cn: '01:00', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥', home_score: 0, away_score: 3, status: 'post', status_detail: 'FT' }),
+      quarterfinalMatch({ match_code: 'espn-760503', match_date_cn: '2026-07-05', time_cn: '05:00', kickoff_at_utc: '2026-07-04T21:00:00.000Z', home_cn: '巴拉圭', away_cn: '法国' }),
     ],
     advancementPredictions: [
       { group_id: 'g1', player_id: 'p1', match_id: 'espn-760502', winner_side: 'away', winner_name: '摩洛哥', updated_at: '2026-07-04T00:00:00.000Z' },
@@ -160,8 +160,8 @@ test('D1 worker saves partial advancement predictions before the lock time', asy
     groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
     players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
     matches: [
-      roundOf16Match({ match_code: 'espn-760502', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥' }),
-      roundOf16Match({ match_code: 'espn-760503', kickoff_at_utc: '2026-07-04T21:00:00.000Z', home_cn: '巴拉圭', away_cn: '法国' }),
+      quarterfinalMatch({ match_code: 'espn-760502', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥' }),
+      quarterfinalMatch({ match_code: 'espn-760503', kickoff_at_utc: '2026-07-04T21:00:00.000Z', home_cn: '巴拉圭', away_cn: '法国' }),
     ],
   });
 
@@ -200,7 +200,7 @@ test('D1 worker rejects advancement prediction changes inside the 15 minute lock
     groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
     players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
     matches: [
-      roundOf16Match({ match_code: 'espn-760502', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥' }),
+      quarterfinalMatch({ match_code: 'espn-760502', kickoff_at_utc: '2026-07-04T17:00:00.000Z', home_cn: '加拿大', away_cn: '摩洛哥' }),
     ],
   });
 
@@ -322,7 +322,7 @@ function fakeDb({ group = null, players = [], predictions = [] } = {}) {
   };
 }
 
-function roundOf16Match(overrides = {}) {
+function quarterfinalMatch(overrides = {}) {
   return {
     match_code: 'espn-r16',
     match_date_cn: '2026-07-05',
@@ -332,7 +332,7 @@ function roundOf16Match(overrides = {}) {
     away_cn: '摩洛哥',
     status: 'pre',
     status_detail: 'Scheduled',
-    stage: 'Round of 16',
+    stage: 'Quarterfinals',
     ...overrides,
   };
 }
@@ -379,10 +379,10 @@ function fakeStatefulDb(initial = {}) {
             const [groupId] = this.bound;
             return { results: state.advancementPredictions.filter((prediction) => prediction.group_id === groupId) };
           }
-          if (sql.includes('from matches') && sql.includes("stage = 'Round of 16'")) {
+          if (sql.includes('from matches') && sql.includes('Quarterfinal')) {
             return {
               results: state.matches
-                .filter((match) => match.stage === 'Round of 16' && match.active !== 0)
+                .filter((match) => match.stage === 'Quarterfinals' && match.active !== 0)
                 .sort((a, b) => `${a.match_date_cn || ''} ${a.time_cn || ''}`.localeCompare(`${b.match_date_cn || ''} ${b.time_cn || ''}`)),
             };
           }

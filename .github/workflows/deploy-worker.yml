@@ -1,0 +1,32 @@
+name: Deploy D1 API Worker
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - workers/**
+      - wrangler.toml
+
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: true
+
+jobs:
+  deploy-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ea85b9ad1849253605db55f73ad3be98
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Cloudflare token
+        run: test -n "$CLOUDFLARE_API_TOKEN"
+
+      - name: Deploy Worker
+        run: npx wrangler@4.106.0 deploy

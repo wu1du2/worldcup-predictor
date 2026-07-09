@@ -155,7 +155,7 @@ export async function saveGroupPredictions(db, groupCode, payload) {
 export async function loadAdvancementPredictions(db, groupCode, { now = new Date() } = {}) {
   const { group } = await getOrCreateGroup(db, groupCode);
   const [tiesResult, predictionsResult] = await Promise.all([
-    loadRoundOf16Ties(db),
+    loadQuarterfinalTies(db),
     db
       .prepare(`
         select player_id, match_id, winner_side, winner_name
@@ -189,7 +189,7 @@ export async function saveAdvancementPredictions(db, groupCode, payload, { now =
   if (!player) throw httpError(404, 'player_not_found', 'Player not found');
 
   const entries = Array.isArray(payload?.entries) ? payload.entries : [];
-  const tiesResult = await loadRoundOf16Ties(db);
+  const tiesResult = await loadQuarterfinalTies(db);
   const tiesByMatchId = new Map((tiesResult.results || []).map((tie) => [tie.match_code, tie]));
   const updatedAt = new Date().toISOString();
   let rowsWritten = 0;
@@ -291,13 +291,13 @@ export async function loadLiveBoard(db, { from, to } = {}) {
   };
 }
 
-function loadRoundOf16Ties(db) {
+function loadQuarterfinalTies(db) {
   return db
     .prepare(`
       select match_code, match_date_cn, time_cn, kickoff_at_utc, home_cn, away_cn,
         home_score, away_score, status
       from matches
-      where active = 1 and stage = 'Round of 16'
+      where active = 1 and stage in ('Quarterfinals', 'Quarterfinal')
       order by match_date_cn asc, time_cn asc
     `)
     .all();
