@@ -988,7 +988,7 @@ function App() {
           onClick={openHandicapChallengeDialog}
         >
           <span>
-            <strong>四强之路，舍你其谁</strong>
+            <strong>四强之路</strong>
             <small>4场 · 每场三选一 · 实时计算已赢和最高可赢</small>
           </span>
           <em>
@@ -1526,15 +1526,15 @@ function HandicapChallengeDialog({ dialog, selectedCount, totalCount, payout, on
   const saving = dialog.status === 'saving';
 
   return (
-    <DialogBackdrop ariaLabel="四强之路，舍你其谁" onClose={onClose}>
+    <DialogBackdrop ariaLabel="四强之路" onClose={onClose}>
       <div className="dialog advancement-dialog handicap-dialog" data-handicap-dialog>
         <div className="advancement-dialog-header">
           <button className="icon-button advancement-back-button" data-action="close-handicap-challenge" aria-label="返回" onClick={onClose}>
             ‹
           </button>
           <div>
-            <h2>四强之路，舍你其谁</h2>
-            <p>每场选一个让球胜平负，保存后按固定成本15覆盖全部组合。</p>
+            <h2>四强之路</h2>
+            <p>每场三选一，固定成本15覆盖全部组合。</p>
           </div>
         </div>
 

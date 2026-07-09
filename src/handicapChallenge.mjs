@@ -124,7 +124,7 @@ export function exportHandicapChallengeText({
   currentGroupUrl = '',
 } = {}) {
   const validMatches = (matches || []).filter((match) => match?.matchId && match?.home && match?.away);
-  const lines = ['四强之路，舍你其谁'];
+  const lines = ['四强之路'];
 
   if (validMatches.length) {
     lines.push('【赛程】');
@@ -214,9 +214,9 @@ export function formatProbability(value) {
 
 export function formatMaxPayoutOdds(value) {
   const number = Number(value);
-  if (!Number.isFinite(number) || number <= 0) return 'X0';
-  if (Number.isInteger(number)) return `X${number}`;
-  return `X${number.toFixed(2)}`;
+  if (!Number.isFinite(number) || number <= 0) return '0';
+  if (Number.isInteger(number)) return String(number);
+  return number.toFixed(2);
 }
 
 function normalizeChoiceNumbers(values = {}) {

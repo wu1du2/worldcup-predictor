@@ -95,7 +95,8 @@ test('handicap challenge entry is an inviting info card below player picker', ()
     mainSource.indexOf("{loadStatus !== 'ready'"),
   );
 
-  assert.match(entrySource, /四强之路，舍你其谁/);
+  assert.match(entrySource, /<strong>四强之路<\/strong>/);
+  assert.doesNotMatch(entrySource, /四强之路，舍你其谁/);
   assert.match(entrySource, /4场 · 每场三选一 · 实时计算已赢和最高可赢/);
   assert.match(entrySource, /已选 \$\{handicapSelectedCount\}\/\$\{handicapTotalCount\} 已赢/);
   assert.match(entrySource, /最高可赢/);
@@ -103,7 +104,8 @@ test('handicap challenge entry is an inviting info card below player picker', ()
   assert.match(mainSource, /className="handicap-payout-highlight"/);
   assert.match(mainSource, /固定成本15/);
   assert.match(stylesSource, /\.advancement-entry-panel[\s\S]*margin-top: 14px/);
-  assert.match(stylesSource, /\.advancement-entry-button[\s\S]*min-height: 58px/);
+  assert.match(stylesSource, /\.advancement-entry-button[\s\S]*min-height: 50px/);
+  assert.match(stylesSource, /\.handicap-choice-button[\s\S]*min-height: 54px/);
   assert.match(stylesSource, /\.handicap-entry-button/);
   assert.match(stylesSource, /\.handicap-payout-highlight/);
 });

@@ -48,9 +48,9 @@ test('calculateMaxPayoutOdds sums every selected combo ticket payout', () => {
 
   assert.equal(calculateMaxPayoutOdds({ hc1: 'win', hc2: 'draw', hc3: 'draw' }, matches), 71);
   assert.equal(calculateMaxPayoutOdds({ hc1: 'win', hc2: 'draw', hc3: 'draw', hc4: 'win' }, matches), 575);
-  assert.equal(formatMaxPayoutOdds(16), 'X16');
-  assert.equal(formatMaxPayoutOdds(568.123), 'X568.12');
-  assert.equal(formatMaxPayoutOdds(0), 'X0');
+  assert.equal(formatMaxPayoutOdds(16), '16');
+  assert.equal(formatMaxPayoutOdds(568.123), '568.12');
+  assert.equal(formatMaxPayoutOdds(0), '0');
 });
 
 test('calculateHandicapChallengePayout flags won, lost, and live combo tickets', () => {
@@ -131,13 +131,13 @@ test('exportHandicapChallengeText renders player sequences sorted by current and
   });
 
   assert.equal(text, [
-    '四强之路，舍你其谁',
+    '四强之路',
     '【赛程】',
     '法国-1 vs 摩洛哥',
     '西班牙-1 vs 比利时',
     '【预测】',
-    '张三：让胜✅、让负｜已赢X2.48 最高可赢X10.48',
-    '李四：让平❌、让平｜已赢X0 最高可赢X3.26',
+    '张三：让胜✅、让负｜已赢2.48 最高可赢10.48',
+    '李四：让平❌、让平｜已赢0 最高可赢3.26',
     '[欢迎预测] https://example.com/?group=lzscqjd',
   ].join('\n'));
   assert.doesNotMatch(text, /35\.7%|38\.5%/);
