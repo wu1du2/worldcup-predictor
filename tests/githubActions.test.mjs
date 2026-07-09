@@ -51,6 +51,7 @@ test('D1 API Worker deploys when Worker code changes on master', async () => {
 
   assert.match(workflow, /workflow_dispatch:/);
   assert.match(workflow, /branches:\n      - master/);
+  assert.match(workflow, /- \.github\/workflows\/deploy-worker\.yml/);
   assert.match(workflow, /- workers\/\*\*/);
   assert.match(workflow, /- wrangler\.toml/);
   assert.match(workflow, /CLOUDFLARE_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_API_TOKEN \}\}/);
