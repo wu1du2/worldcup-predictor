@@ -260,7 +260,7 @@ function App() {
 
   function hydrateLiveBoardFromD1(windowOverride = null) {
     if (!d1Client) return;
-    const liveWindow = windowOverride || buildRecentLiveDateWindow(new Date(), { pastDays: 7, futureDays: 2 });
+    const liveWindow = windowOverride || buildRecentLiveDateWindow(new Date(), { pastDays: 7, futureDays: 3 });
     const windowKey = `${liveWindow.from}:${liveWindow.to}`;
     if (hydratedD1WindowsRef.current.has(windowKey)) return;
     hydratedD1WindowsRef.current.add(windowKey);
@@ -1137,7 +1137,7 @@ function App() {
         </div>
       </section>
 
-      <section className="advancement-entry-panel" aria-label="四强挑战入口">
+      <section className="advancement-entry-panel champion-entry-panel" aria-label="冠军之路入口">
         <button
           className="advancement-entry-button champion-entry-button"
           data-action="open-champion-road"
@@ -1153,6 +1153,13 @@ function App() {
               ? (hasSavedChampionRanking ? `已排 ${championRankedCount}/${championDialog.teams.length}` : '去排序')
               : '先选用户名'}
           </em>
+        </button>
+        <button
+          className="ghost-button champion-result-button"
+          data-action="champion-road-results"
+          onClick={showChampionRoadResults}
+        >
+          冠军结果
         </button>
       </section>
 
@@ -1223,7 +1230,6 @@ function App() {
             setMoreMenuOpen(false);
             showHandicapChallengeResults();
           }}
-          onShowChampionRoadResults={showChampionRoadResults}
           onOpenAiStrategy={() => {
             setMoreMenuOpen(false);
             setAiStrategyOpen(true);
@@ -1419,7 +1425,6 @@ function MoreMenuDialog({
   onOpenAdvancementPredictions,
   onShowAdvancementResults,
   onShowHandicapChallengeResults,
-  onShowChampionRoadResults,
   onOpenAiStrategy,
   onOpenKnockoutStrategy,
 }) {
@@ -1447,9 +1452,6 @@ function MoreMenuDialog({
           </button>
           <button className="menu-action-button" data-action="advancement-results" onClick={onShowAdvancementResults}>
             晋级结果
-          </button>
-          <button className="menu-action-button" data-action="champion-road-results" onClick={onShowChampionRoadResults}>
-            冠军之路结果
           </button>
           <button className="menu-action-button" data-action="handicap-results" onClick={onShowHandicapChallengeResults}>
             四强之路
@@ -1843,50 +1845,25 @@ function ChampionRoadDialog({ dialog, selectedCount, onMove, onClose, onSubmit }
               const team = teamsByKey.get(teamKey);
               if (!team) return null;
               return (
-                <article
+                <button
+                  type="button"
                   className={`champion-rank-row ${draggingKey === teamKey ? 'dragging' : ''} ${locked ? 'locked' : ''}`}
                   key={teamKey}
                   data-rank-team={teamKey}
+                  aria-label={`拖动${team.name}`}
+                  onPointerDown={(event) => {
+                    if (locked) return;
+                    event.preventDefault();
+                    setDraggingKey(teamKey);
+                  }}
                 >
-                  <button
-                    className="champion-drag-handle"
-                    type="button"
-                    aria-label={`拖动${team.name}`}
-                    disabled={locked}
-                    onPointerDown={(event) => {
-                      if (locked) return;
-                      event.preventDefault();
-                      setDraggingKey(teamKey);
-                    }}
-                  >
-                    ≡
-                  </button>
                   <div className="champion-rank-number">{index + 1}</div>
                   <div className="champion-rank-name">
                     <strong>{team.name}</strong>
                     <span>{getChampionRankLabel(index)}</span>
                   </div>
-                  <div className="champion-rank-actions">
-                    <button
-                      className="icon-button"
-                      type="button"
-                      aria-label="上移"
-                      disabled={locked || index === 0}
-                      onClick={() => onMove(index, index - 1)}
-                    >
-                      ↑
-                    </button>
-                    <button
-                      className="icon-button"
-                      type="button"
-                      aria-label="下移"
-                      disabled={locked || index === ranking.length - 1}
-                      onClick={() => onMove(index, index + 1)}
-                    >
-                      ↓
-                    </button>
-                  </div>
-                </article>
+                  <div className="champion-row-hint">按住拖动</div>
+                </button>
               );
             })}
           </div>

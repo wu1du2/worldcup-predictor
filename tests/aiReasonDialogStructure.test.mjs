@@ -80,8 +80,8 @@ test('topbar exposes result exports while AI leaderboard lives in the more menu'
   assert.match(moreMenuSource, /晋级结果/);
   assert.match(moreMenuSource, /data-action="open-advancement-predictions"/);
   assert.match(moreMenuSource, /data-action="advancement-results"/);
-  assert.match(moreMenuSource, /冠军之路结果/);
-  assert.match(moreMenuSource, /data-action="champion-road-results"/);
+  assert.doesNotMatch(moreMenuSource, /冠军之路结果/);
+  assert.doesNotMatch(moreMenuSource, /data-action="champion-road-results"/);
   assert.match(moreMenuSource, /四强之路/);
   assert.match(moreMenuSource, /data-action="handicap-results"/);
   assert.match(moreMenuSource, /AI策略/);
@@ -95,7 +95,7 @@ test('topbar exposes result exports while AI leaderboard lives in the more menu'
 
 test('champion road entry is an inviting ranking card below player picker', () => {
   const entrySource = mainSource.slice(
-    mainSource.indexOf('<section className="advancement-entry-panel"'),
+    mainSource.indexOf('<section className="advancement-entry-panel champion-entry-panel"'),
     mainSource.indexOf("{loadStatus !== 'ready'"),
   );
 
@@ -104,13 +104,19 @@ test('champion road entry is an inviting ranking card below player picker', () =
   assert.match(entrySource, /拖动四队，排出冠军到第四名/);
   assert.match(entrySource, /已排 \$\{championRankedCount\}\/\$\{championDialog\.teams\.length\}/);
   assert.match(entrySource, /data-action="open-champion-road"/);
+  assert.match(entrySource, /data-action="champion-road-results"/);
+  assert.match(entrySource, /冠军结果/);
   assert.match(mainSource, /function ChampionRoadDialog/);
   assert.match(mainSource, /data-action="save-champion-road"/);
+  assert.doesNotMatch(mainSource, /champion-drag-handle/);
+  assert.doesNotMatch(mainSource, /aria-label="上移"/);
+  assert.doesNotMatch(mainSource, /aria-label="下移"/);
   assert.match(mainSource, /className="handicap-payout-highlight"/);
   assert.match(mainSource, /固定成本15/);
   assert.match(stylesSource, /\.advancement-entry-panel[\s\S]*margin-top: 14px/);
   assert.match(stylesSource, /\.advancement-entry-button[\s\S]*min-height: 50px/);
   assert.match(stylesSource, /\.champion-entry-button/);
+  assert.match(stylesSource, /\.champion-result-button/);
   assert.match(stylesSource, /\.champion-rank-row/);
   assert.match(stylesSource, /\.handicap-choice-button[\s\S]*min-height: 54px/);
   assert.match(stylesSource, /\.handicap-entry-button/);

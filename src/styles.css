@@ -115,6 +115,12 @@ h1 {
   margin-bottom: 14px;
 }
 
+.champion-entry-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px;
+  gap: 8px;
+}
+
 .advancement-entry-button {
   display: flex;
   align-items: center;
@@ -192,6 +198,17 @@ h1 {
 
 .champion-entry-button small {
   color: #746447;
+}
+
+.champion-result-button {
+  width: 84px;
+  min-width: 84px;
+  height: auto;
+  min-height: 56px;
+  border-color: #c9bb8b;
+  background: #ffffff;
+  color: #8a5a06;
+  font-size: 13px;
 }
 
 .date-panel {
@@ -929,7 +946,7 @@ h1 {
 
 .champion-rank-row {
   display: grid;
-  grid-template-columns: 34px 34px minmax(0, 1fr) 72px;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   min-height: 58px;
@@ -938,6 +955,9 @@ h1 {
   border-radius: 8px;
   background: #ffffff;
   box-shadow: 0 8px 18px rgba(85, 65, 24, 0.08);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
 }
 
 .champion-rank-row.dragging {
@@ -948,32 +968,14 @@ h1 {
 
 .champion-rank-row.locked {
   background: #f1f2ef;
-}
-
-.champion-drag-handle {
-  width: 34px;
-  height: 40px;
-  border: 0;
-  border-radius: 8px;
-  background: #f4ead0;
-  color: #8a5a06;
-  cursor: grab;
-  font-size: 24px;
-  font-weight: 950;
-  line-height: 1;
-  touch-action: none;
-}
-
-.champion-drag-handle:disabled {
-  color: #9a9d98;
   cursor: default;
 }
 
 .champion-rank-number {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   background: #1f5edc;
   color: #ffffff;
@@ -1002,16 +1004,11 @@ h1 {
   font-weight: 850;
 }
 
-.champion-rank-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 5px;
-}
-
-.champion-rank-actions .icon-button {
-  width: 32px;
-  height: 32px;
-  font-size: 16px;
+.champion-row-hint {
+  color: #9a6b13;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .champion-submit-row {

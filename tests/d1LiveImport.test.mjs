@@ -18,9 +18,9 @@ test('buildLiveDateWindow covers today through the next two China dates', () => 
 });
 
 test('buildRecentLiveDateWindow covers recent finished matches and upcoming live matches', () => {
-  assert.deepEqual(buildRecentLiveDateWindow(new Date('2026-07-04T12:00:00+08:00')), {
+  assert.deepEqual(buildRecentLiveDateWindow(new Date('2026-07-04T12:00:00+08:00'), { pastDays: 7, futureDays: 3 }), {
     from: '2026-06-27',
-    to: '2026-07-06',
+    to: '2026-07-07',
     dates: [
       '2026-06-27',
       '2026-06-28',
@@ -32,6 +32,7 @@ test('buildRecentLiveDateWindow covers recent finished matches and upcoming live
       '2026-07-04',
       '2026-07-05',
       '2026-07-06',
+      '2026-07-07',
     ],
   });
 });
