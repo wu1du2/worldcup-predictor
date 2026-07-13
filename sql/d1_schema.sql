@@ -82,6 +82,18 @@ create table if not exists handicap_challenge_predictions (
 create index if not exists handicap_challenge_predictions_group_player_idx
   on handicap_challenge_predictions(group_id, player_id);
 
+create table if not exists champion_road_predictions (
+  id text primary key,
+  group_id text not null references groups(id) on delete cascade,
+  player_id text not null references players(id) on delete cascade,
+  ranking text not null,
+  updated_at text,
+  unique (group_id, player_id)
+);
+
+create index if not exists champion_road_predictions_group_player_idx
+  on champion_road_predictions(group_id, player_id);
+
 create table if not exists matches (
   match_code text primary key,
   match_date_cn text,

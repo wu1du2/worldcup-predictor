@@ -33,10 +33,12 @@ import {
   createD1BrowserClient,
   createD1GroupPlayer,
   loadD1AdvancementPredictions,
+  loadD1ChampionRoad,
   loadD1HandicapChallenge,
   loadD1LiveBoard,
   loadD1GroupState,
   saveD1AdvancementPredictions,
+  saveD1ChampionRoadPrediction,
   saveD1GroupPredictions,
   saveD1HandicapChallengePredictions,
 } from './d1Data.mjs';
@@ -89,6 +91,13 @@ import {
   getHandicapResultChoice,
   handicapChoiceKeys,
 } from './handicapChallenge.mjs';
+import {
+  buildDefaultChampionRanking,
+  exportChampionRoadText,
+  getChampionRankingSummary,
+  isCompleteChampionRanking,
+  moveChampionRankingItem,
+} from './championRoad.mjs';
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
@@ -140,6 +149,15 @@ function App() {
     matches: [],
     predictionsByPlayer: {},
     draft: {},
+    error: '',
+  });
+  const [championDialog, setChampionDialog] = useState({
+    open: false,
+    status: 'idle',
+    teams: [],
+    predictionsByPlayer: {},
+    draft: [],
+    locked: false,
     error: '',
   });
   const selectedDateButtonRef = useRef(null);
@@ -311,6 +329,16 @@ function App() {
   const handicapSelectedCount = countHandicapSelections(selectedHandicapDraft, handicapDialog.matches);
   const handicapTotalCount = handicapDialog.matches.length || 4;
   const handicapPayout = calculateHandicapChallengePayout(selectedHandicapDraft, handicapDialog.matches);
+  const selectedChampionDraft = championDialog.open
+    ? championDialog.draft
+    : buildChampionDraftFromPredictions(championDialog.predictionsByPlayer, state.selectedPlayerId, championDialog.teams);
+  const hasSavedChampionRanking = isCompleteChampionRanking(
+    championDialog.predictionsByPlayer?.[state.selectedPlayerId]?.ranking || [],
+    championDialog.teams,
+  );
+  const championRankedCount = hasSavedChampionRanking
+    ? countChampionRankingSelections(selectedChampionDraft, championDialog.teams)
+    : 0;
 
   useEffect(() => {
     if (!groupCode) return;
@@ -555,6 +583,99 @@ function App() {
     }
   }
 
+  async function openChampionRoadDialog() {
+    if (!selectedPlayer) {
+      updateState((current) => ({ ...current, flash: '先选择用户名，再填写冠军之路。' }));
+      return;
+    }
+    if (!d1Client) {
+      setChampionDialog({
+        open: true,
+        status: 'error',
+        teams: [],
+        predictionsByPlayer: {},
+        draft: [],
+        locked: false,
+        error: 'D1 API 配置缺失',
+      });
+      return;
+    }
+
+    setChampionDialog((current) => ({
+      ...current,
+      open: true,
+      status: 'loading',
+      error: '',
+    }));
+
+    try {
+      const payload = await loadD1ChampionRoad({ client: d1Client, groupCode });
+      setChampionDialog({
+        open: true,
+        status: 'ready',
+        teams: payload.teams,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        draft: buildChampionDraftFromPredictions(payload.predictionsByPlayer, selectedPlayer.id, payload.teams),
+        locked: payload.locked,
+        error: '',
+      });
+    } catch (error) {
+      setChampionDialog((current) => ({
+        ...current,
+        open: true,
+        status: 'error',
+        error: error.message || '冠军之路加载失败',
+      }));
+    }
+  }
+
+  function moveChampionTeam(fromIndex, toIndex) {
+    if (championDialog.locked) return;
+    setChampionDialog((current) => ({
+      ...current,
+      draft: moveChampionRankingItem(current.draft, fromIndex, toIndex),
+      error: '',
+    }));
+  }
+
+  async function submitChampionRoadPrediction() {
+    if (!selectedPlayer || !d1Client) return;
+    if (!isCompleteChampionRanking(championDialog.draft, championDialog.teams)) {
+      setChampionDialog((current) => ({ ...current, error: '请把四支球队完整排序' }));
+      return;
+    }
+
+    setChampionDialog((current) => ({ ...current, status: 'saving', error: '' }));
+
+    try {
+      await saveD1ChampionRoadPrediction({
+        client: d1Client,
+        groupCode,
+        playerId: selectedPlayer.id,
+        ranking: championDialog.draft,
+      });
+      setChampionDialog((current) => ({
+        ...current,
+        status: 'ready',
+        predictionsByPlayer: {
+          ...current.predictionsByPlayer,
+          [selectedPlayer.id]: {
+            ranking: current.draft,
+            teamNames: current.draft.map((teamKey) => current.teams.find((team) => team.teamKey === teamKey)?.name || teamKey),
+          },
+        },
+        error: '',
+      }));
+      updateState((current) => ({ ...current, flash: '冠军之路已保存。' }));
+    } catch (error) {
+      setChampionDialog((current) => ({
+        ...current,
+        status: 'ready',
+        error: error.message || '冠军之路保存失败',
+      }));
+    }
+  }
+
   function selectHandicapChoice(matchId, choiceKey) {
     const match = handicapDialog.matches.find((item) => item.matchId === matchId);
     if (!match || match.locked || isAdvancementTieLocked(match)) return;
@@ -662,6 +783,45 @@ function App() {
       updateState((current) => ({
         ...current,
         flash: error.message || '四强之路生成失败',
+      }));
+    }
+  }
+
+  async function showChampionRoadResults() {
+    if (!d1Client) {
+      updateState((current) => ({ ...current, flash: '冠军之路需要 D1 API。' }));
+      return;
+    }
+
+    setMoreMenuOpen(false);
+    updateState((current) => ({ ...current, flash: '正在生成冠军之路...' }));
+
+    try {
+      const payload = await loadD1ChampionRoad({ client: d1Client, groupCode });
+      setChampionDialog((current) => ({
+        ...current,
+        teams: payload.teams,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        draft: current.open ? buildChampionDraftFromPredictions(payload.predictionsByPlayer, state.selectedPlayerId, payload.teams) : current.draft,
+        status: current.open ? 'ready' : current.status,
+        locked: payload.locked,
+        error: '',
+      }));
+      const text = exportChampionRoadText({
+        teams: payload.teams,
+        players,
+        predictionsByPlayer: payload.predictionsByPlayer,
+        currentGroupUrl: window.location.href,
+      });
+      updateState((current) => ({
+        ...current,
+        exportText: text,
+        flash: '冠军之路已生成。',
+      }));
+    } catch (error) {
+      updateState((current) => ({
+        ...current,
+        flash: error.message || '冠军之路生成失败',
       }));
     }
   }
@@ -927,9 +1087,6 @@ function App() {
           <button className="ghost-button" data-action="export" onClick={showExport}>
             比分结果
           </button>
-          <button className="ghost-button" data-action="handicap-results" onClick={showHandicapChallengeResults}>
-            四强之路
-          </button>
           <button className="icon-button topbar-menu-button" data-action="more-menu" aria-label="更多" onClick={() => setMoreMenuOpen(true)}>
             ...
           </button>
@@ -982,18 +1139,18 @@ function App() {
 
       <section className="advancement-entry-panel" aria-label="四强挑战入口">
         <button
-          className="advancement-entry-button handicap-entry-button"
-          data-action="open-handicap-challenge"
+          className="advancement-entry-button champion-entry-button"
+          data-action="open-champion-road"
           disabled={!selectedPlayer}
-          onClick={openHandicapChallengeDialog}
+          onClick={openChampionRoadDialog}
         >
           <span>
-            <strong>四强之路</strong>
-            <small>4场 · 每场三选一 · 实时计算已赢和最高可赢</small>
+            <strong>冠军之路</strong>
+            <small>拖动四队，排出冠军到第四名</small>
           </span>
           <em>
             {selectedPlayer
-              ? (handicapDialog.matches.length ? `已选 ${handicapSelectedCount}/${handicapTotalCount} 已赢${formatMaxPayoutOdds(handicapPayout.currentWonOdds)} 最高可赢${formatMaxPayoutOdds(handicapPayout.maxPayoutOdds)}` : '去挑战')
+              ? (hasSavedChampionRanking ? `已排 ${championRankedCount}/${championDialog.teams.length}` : '去排序')
               : '先选用户名'}
           </em>
         </button>
@@ -1062,6 +1219,11 @@ function App() {
             setMoreMenuOpen(false);
             showAdvancementResults();
           }}
+          onShowHandicapChallengeResults={() => {
+            setMoreMenuOpen(false);
+            showHandicapChallengeResults();
+          }}
+          onShowChampionRoadResults={showChampionRoadResults}
           onOpenAiStrategy={() => {
             setMoreMenuOpen(false);
             setAiStrategyOpen(true);
@@ -1149,6 +1311,16 @@ function App() {
         />
       ) : null}
 
+      {championDialog.open ? (
+        <ChampionRoadDialog
+          dialog={championDialog}
+          selectedCount={countChampionRankingSelections(championDialog.draft, championDialog.teams)}
+          onMove={moveChampionTeam}
+          onClose={() => setChampionDialog((current) => ({ ...current, open: false }))}
+          onSubmit={submitChampionRoadPrediction}
+        />
+      ) : null}
+
       {aiRecommendationDialog ? (
         <AiRecommendationDialog
           recommendation={aiRecommendationDialog}
@@ -1208,6 +1380,17 @@ function buildHandicapDraftFromPredictions(predictionsByPlayer, playerId) {
     .map(([matchId, prediction]) => [matchId, prediction.choiceKey]));
 }
 
+function buildChampionDraftFromPredictions(predictionsByPlayer, playerId, teams = []) {
+  const savedRanking = playerId ? predictionsByPlayer?.[playerId]?.ranking || [] : [];
+  return isCompleteChampionRanking(savedRanking, teams)
+    ? savedRanking
+    : buildDefaultChampionRanking(teams);
+}
+
+function countChampionRankingSelections(ranking = [], teams = []) {
+  return isCompleteChampionRanking(ranking, teams) ? ranking.length : 0;
+}
+
 function countHandicapSelections(draft = {}, matches = []) {
   const matchIds = new Set((matches || []).map((match) => match?.matchId).filter(Boolean));
   return Object.entries(draft || {})
@@ -1235,6 +1418,8 @@ function MoreMenuDialog({
   onShowAiStrategyLeaderboard,
   onOpenAdvancementPredictions,
   onShowAdvancementResults,
+  onShowHandicapChallengeResults,
+  onShowChampionRoadResults,
   onOpenAiStrategy,
   onOpenKnockoutStrategy,
 }) {
@@ -1262,6 +1447,12 @@ function MoreMenuDialog({
           </button>
           <button className="menu-action-button" data-action="advancement-results" onClick={onShowAdvancementResults}>
             晋级结果
+          </button>
+          <button className="menu-action-button" data-action="champion-road-results" onClick={onShowChampionRoadResults}>
+            冠军之路结果
+          </button>
+          <button className="menu-action-button" data-action="handicap-results" onClick={onShowHandicapChallengeResults}>
+            四强之路
           </button>
           <button className="menu-action-button" data-action="open-ai-strategy" onClick={onOpenAiStrategy}>
             AI策略
@@ -1595,6 +1786,128 @@ function HandicapChallengeDialog({ dialog, selectedCount, totalCount, payout, on
       </div>
     </DialogBackdrop>
   );
+}
+
+function ChampionRoadDialog({ dialog, selectedCount, onMove, onClose, onSubmit }) {
+  const saving = dialog.status === 'saving';
+  const locked = dialog.locked;
+  const [draggingKey, setDraggingKey] = useState('');
+  const teamsByKey = useMemo(() => new Map(dialog.teams.map((team) => [team.teamKey, team])), [dialog.teams]);
+  const ranking = dialog.draft.length ? dialog.draft : buildDefaultChampionRanking(dialog.teams);
+
+  useEffect(() => {
+    if (!draggingKey) return undefined;
+
+    function handlePointerMove(event) {
+      const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.('[data-rank-team]');
+      const targetKey = target?.getAttribute('data-rank-team');
+      if (!targetKey || targetKey === draggingKey) return;
+      const fromIndex = ranking.indexOf(draggingKey);
+      const toIndex = ranking.indexOf(targetKey);
+      if (fromIndex >= 0 && toIndex >= 0) onMove(fromIndex, toIndex);
+    }
+
+    function handlePointerUp() {
+      setDraggingKey('');
+    }
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp, { once: true });
+    window.addEventListener('pointercancel', handlePointerUp, { once: true });
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+  }, [draggingKey, ranking, onMove]);
+
+  return (
+    <DialogBackdrop ariaLabel="冠军之路" onClose={onClose}>
+      <div className="dialog advancement-dialog champion-road-dialog" data-champion-road-dialog>
+        <div className="advancement-dialog-header">
+          <button className="icon-button advancement-back-button" data-action="close-champion-road" aria-label="返回" onClick={onClose}>
+            ‹
+          </button>
+          <div>
+            <h2>冠军之路</h2>
+            <p>按住拖动排序：第1名冠军，第2名亚军。</p>
+          </div>
+        </div>
+
+        {dialog.status === 'loading' ? <div className="report-empty">正在读取四强球队...</div> : null}
+        {dialog.status === 'error' ? <div className="report-empty">{dialog.error}</div> : null}
+
+        {dialog.status !== 'loading' && dialog.status !== 'error' ? (
+          <div className="champion-rank-list">
+            {ranking.map((teamKey, index) => {
+              const team = teamsByKey.get(teamKey);
+              if (!team) return null;
+              return (
+                <article
+                  className={`champion-rank-row ${draggingKey === teamKey ? 'dragging' : ''} ${locked ? 'locked' : ''}`}
+                  key={teamKey}
+                  data-rank-team={teamKey}
+                >
+                  <button
+                    className="champion-drag-handle"
+                    type="button"
+                    aria-label={`拖动${team.name}`}
+                    disabled={locked}
+                    onPointerDown={(event) => {
+                      if (locked) return;
+                      event.preventDefault();
+                      setDraggingKey(teamKey);
+                    }}
+                  >
+                    ≡
+                  </button>
+                  <div className="champion-rank-number">{index + 1}</div>
+                  <div className="champion-rank-name">
+                    <strong>{team.name}</strong>
+                    <span>{getChampionRankLabel(index)}</span>
+                  </div>
+                  <div className="champion-rank-actions">
+                    <button
+                      className="icon-button"
+                      type="button"
+                      aria-label="上移"
+                      disabled={locked || index === 0}
+                      onClick={() => onMove(index, index - 1)}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      className="icon-button"
+                      type="button"
+                      aria-label="下移"
+                      disabled={locked || index === ranking.length - 1}
+                      onClick={() => onMove(index, index + 1)}
+                    >
+                      ↓
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {dialog.error && dialog.status !== 'error' ? <p className="form-status error">{dialog.error}</p> : null}
+
+        <div className="advancement-submit-row champion-submit-row">
+          <span>{locked ? '已锁定' : `已排 ${selectedCount}/${dialog.teams.length || 4}`}</span>
+          <small>{getChampionRankingSummary(ranking, dialog.teams)}</small>
+          <button className="primary-button" data-action="save-champion-road" disabled={saving || dialog.status === 'loading' || locked} onClick={onSubmit}>
+            {saving ? '保存中...' : '保存排名'}
+          </button>
+        </div>
+      </div>
+    </DialogBackdrop>
+  );
+}
+
+function getChampionRankLabel(index) {
+  return ['冠军', '亚军', '季军', '第四'][index] || `第${index + 1}名`;
 }
 
 function formatOdds(value) {

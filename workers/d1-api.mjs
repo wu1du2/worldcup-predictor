@@ -65,6 +65,18 @@ export default {
         }
       }
 
+      const groupChampionRoadMatch = url.pathname.match(/^\/api\/groups\/([^/]+)\/champion-road$/);
+      if (groupChampionRoadMatch) {
+        const groupCode = decodeURIComponent(groupChampionRoadMatch[1]);
+        if (request.method === 'GET') {
+          return json(await loadChampionRoad(env.DB, groupCode, { now: getNow(env) }));
+        }
+        if (request.method === 'POST') {
+          const payload = await readJsonBody(request);
+          return json(await saveChampionRoadPrediction(env.DB, groupCode, payload, { now: getNow(env) }));
+        }
+      }
+
       return json({ error: 'not_found' }, { status: 404 });
     } catch (error) {
       if (error?.status) {
@@ -301,6 +313,68 @@ export async function saveHandicapChallengePredictions(db, groupCode, payload, {
   return { ok: true, rowsWritten };
 }
 
+export async function loadChampionRoad(db, groupCode, { now = new Date() } = {}) {
+  const { group } = await getOrCreateGroup(db, groupCode);
+  const [teams, predictionsResult] = await Promise.all([
+    loadChampionRoadTeams(db),
+    db
+      .prepare(`
+        select player_id, ranking
+        from champion_road_predictions
+        where group_id = ?
+      `)
+      .bind(group.id)
+      .all(),
+  ]);
+
+  return {
+    teams: teams.map((team) => ({ teamKey: team.teamKey, name: team.name })),
+    locked: isChampionRoadLocked(teams, now),
+    lockAtUtc: getChampionRoadLockAtUtc(teams),
+    predictions: (predictionsResult.results || []).map((row) => ({
+      playerId: row.player_id,
+      ranking: parseTextList(row.ranking),
+    })),
+  };
+}
+
+export async function saveChampionRoadPrediction(db, groupCode, payload, { now = new Date() } = {}) {
+  const { group } = await getOrCreateGroup(db, groupCode);
+  const playerId = String(payload?.playerId || '').trim();
+  if (!playerId) throw httpError(400, 'invalid_player', 'Player is required');
+
+  const player = await db
+    .prepare('select id, name from players where id = ? and group_id = ? limit 1')
+    .bind(playerId, group.id)
+    .first();
+  if (!player) throw httpError(404, 'player_not_found', 'Player not found');
+
+  const teams = await loadChampionRoadTeams(db);
+  if (teams.length !== 4) throw httpError(409, 'champion_road_not_ready', 'Champion road teams are not ready');
+  if (isChampionRoadLocked(teams, now)) {
+    throw httpError(409, 'champion_road_locked', 'Champion road is locked');
+  }
+
+  const teamKeys = teams.map((team) => team.teamKey);
+  const ranking = normalizeChampionRoadRanking(payload?.ranking, teamKeys);
+  if (ranking.length !== teamKeys.length) {
+    throw httpError(400, 'invalid_champion_ranking', 'Champion road ranking must include all teams once');
+  }
+
+  await db
+    .prepare(`
+      insert into champion_road_predictions (id, group_id, player_id, ranking, updated_at)
+      values (?, ?, ?, ?, ?)
+      on conflict(group_id, player_id)
+      do update set ranking = excluded.ranking,
+        updated_at = excluded.updated_at
+    `)
+    .bind(randomId(), group.id, player.id, JSON.stringify(ranking), new Date().toISOString())
+    .run();
+
+  return { ok: true, rowsWritten: 1 };
+}
+
 export async function loadLiveBoard(db, { from, to } = {}) {
   const window = normalizeLiveWindow({ from, to });
   const matchesResult = await db
@@ -397,6 +471,32 @@ function loadHandicapChallengeMatches(db) {
     .all();
 }
 
+async function loadChampionRoadTeams(db) {
+  const result = await db
+    .prepare(`
+      select match_code, match_date_cn, time_cn, kickoff_at_utc, home_cn, away_cn
+      from matches
+      where active = 1 and stage in ('Semifinals', 'Semifinal')
+      order by match_date_cn asc, time_cn asc
+    `)
+    .all();
+  const teams = [];
+  const seen = new Set();
+  for (const row of result.results || []) {
+    for (const name of [row.home_cn, row.away_cn]) {
+      const teamName = String(name || '').trim();
+      if (!teamName || seen.has(teamName)) continue;
+      seen.add(teamName);
+      teams.push({
+        teamKey: teamName,
+        name: teamName,
+        kickoffAtUtc: row.kickoff_at_utc || '',
+      });
+    }
+  }
+  return teams.slice(0, 4);
+}
+
 function toAdvancementTie(row, now) {
   return {
     matchId: row.match_code,
@@ -445,6 +545,26 @@ function isAdvancementLocked(kickoffAtUtc, now = new Date()) {
   const nowMs = now instanceof Date ? now.getTime() : Date.parse(String(now || ''));
   if (!Number.isFinite(kickoffMs) || !Number.isFinite(nowMs)) return false;
   return nowMs >= kickoffMs - 15 * 60 * 1000;
+}
+
+function isChampionRoadLocked(teams = [], now = new Date()) {
+  const firstKickoffAtUtc = getFirstChampionRoadKickoffAtUtc(teams);
+  return isAdvancementLocked(firstKickoffAtUtc, now);
+}
+
+function getChampionRoadLockAtUtc(teams = []) {
+  const firstKickoffAtUtc = getFirstChampionRoadKickoffAtUtc(teams);
+  const kickoffMs = Date.parse(firstKickoffAtUtc || '');
+  if (!Number.isFinite(kickoffMs)) return '';
+  return new Date(kickoffMs - 15 * 60 * 1000).toISOString();
+}
+
+function getFirstChampionRoadKickoffAtUtc(teams = []) {
+  const times = teams
+    .map((team) => team.kickoffAtUtc)
+    .filter(Boolean)
+    .sort();
+  return times[0] || '';
 }
 
 async function loadAiRecommendationsForMatches(db, matchIds) {
@@ -644,9 +764,13 @@ function buildOddsMatchKey(home, away, kickoffLabel) {
 }
 
 function parseScoreList(value) {
+  return parseTextList(value);
+}
+
+function parseTextList(value) {
   try {
     const parsed = JSON.parse(value || '[]');
-    return Array.isArray(parsed) ? parsed.filter((score) => typeof score === 'string') : [];
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : [];
   } catch {
     return [];
   }
@@ -683,6 +807,18 @@ function normalizeScores(scores) {
 
 function isHandicapChoiceKey(value) {
   return ['win', 'draw', 'loss'].includes(value);
+}
+
+function normalizeChampionRoadRanking(ranking, teamKeys) {
+  const allowed = new Set(teamKeys);
+  const seen = new Set();
+  return (Array.isArray(ranking) ? ranking : [])
+    .map((teamKey) => String(teamKey || '').trim())
+    .filter((teamKey) => {
+      if (!allowed.has(teamKey) || seen.has(teamKey)) return false;
+      seen.add(teamKey);
+      return true;
+    });
 }
 
 async function readJsonBody(request) {

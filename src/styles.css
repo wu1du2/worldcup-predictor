@@ -178,6 +178,22 @@ h1 {
   color: #0c6d55;
 }
 
+.champion-entry-button {
+  min-height: 56px;
+  border-color: #c9bb8b;
+  background: #fff8df;
+  color: #4d3511;
+}
+
+.champion-entry-button strong,
+.champion-entry-button em {
+  color: #9a5b00;
+}
+
+.champion-entry-button small {
+  color: #746447;
+}
+
 .date-panel {
   margin-bottom: 12px;
 }
@@ -900,6 +916,127 @@ h1 {
   color: #69766f;
   font-size: 11px;
   font-weight: 850;
+}
+
+.champion-road-dialog {
+  background: #fffdfa;
+}
+
+.champion-rank-list {
+  display: grid;
+  gap: 8px;
+}
+
+.champion-rank-row {
+  display: grid;
+  grid-template-columns: 34px 34px minmax(0, 1fr) 72px;
+  align-items: center;
+  gap: 8px;
+  min-height: 58px;
+  padding: 8px;
+  border: 1px solid #e1d5b6;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 8px 18px rgba(85, 65, 24, 0.08);
+}
+
+.champion-rank-row.dragging {
+  border-color: #b97804;
+  background: #fff4cc;
+  box-shadow: inset 0 0 0 1px #b97804;
+}
+
+.champion-rank-row.locked {
+  background: #f1f2ef;
+}
+
+.champion-drag-handle {
+  width: 34px;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: #f4ead0;
+  color: #8a5a06;
+  cursor: grab;
+  font-size: 24px;
+  font-weight: 950;
+  line-height: 1;
+  touch-action: none;
+}
+
+.champion-drag-handle:disabled {
+  color: #9a9d98;
+  cursor: default;
+}
+
+.champion-rank-number {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #1f5edc;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.champion-rank-name {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.champion-rank-name strong {
+  overflow: hidden;
+  color: #20170a;
+  font-size: 16px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.champion-rank-name span {
+  color: #786844;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.champion-rank-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.champion-rank-actions .icon-button {
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.champion-submit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: center;
+}
+
+.champion-submit-row span,
+.champion-submit-row small {
+  min-width: 0;
+}
+
+.champion-submit-row small {
+  overflow: hidden;
+  color: #786844;
+  font-size: 11px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.champion-submit-row .primary-button {
+  grid-row: span 2;
 }
 
 .compact-dialog {

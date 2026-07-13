@@ -332,6 +332,101 @@ test('D1 worker rejects handicap challenge changes inside the 15 minute lock win
   assert.deepEqual(db.state.handicapPredictions, []);
 });
 
+test('D1 worker returns champion road teams and group rankings', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    matches: [
+      semifinalMatch({ match_code: 'espn-760514', home_cn: '法国', away_cn: '西班牙', kickoff_at_utc: '2026-07-14T19:00:00.000Z' }),
+      semifinalMatch({ match_code: 'espn-760515', match_date_cn: '2026-07-16', home_cn: '英格兰', away_cn: '阿根廷', kickoff_at_utc: '2026-07-15T19:00:00.000Z' }),
+    ],
+    championRoadPredictions: [
+      { group_id: 'g1', player_id: 'p1', ranking: '["法国","阿根廷","西班牙","英格兰"]', updated_at: '2026-07-13T00:00:00.000Z' },
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/champion-road'), {
+    DB: db,
+    TEST_NOW: '2026-07-13T00:00:00.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body.teams, [
+    { teamKey: '法国', name: '法国' },
+    { teamKey: '西班牙', name: '西班牙' },
+    { teamKey: '英格兰', name: '英格兰' },
+    { teamKey: '阿根廷', name: '阿根廷' },
+  ]);
+  assert.equal(body.locked, false);
+  assert.equal(body.lockAtUtc, '2026-07-14T18:45:00.000Z');
+  assert.deepEqual(body.predictions, [
+    { playerId: 'p1', ranking: ['法国', '阿根廷', '西班牙', '英格兰'] },
+  ]);
+});
+
+test('D1 worker saves champion road ranking before first semifinal lock', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    matches: [
+      semifinalMatch({ home_cn: '法国', away_cn: '西班牙', kickoff_at_utc: '2026-07-14T19:00:00.000Z' }),
+      semifinalMatch({ match_code: 'espn-760515', match_date_cn: '2026-07-16', home_cn: '英格兰', away_cn: '阿根廷', kickoff_at_utc: '2026-07-15T19:00:00.000Z' }),
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/champion-road', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      playerId: 'p1',
+      ranking: ['阿根廷', '法国', '西班牙', '英格兰'],
+    }),
+  }), {
+    DB: db,
+    TEST_NOW: '2026-07-14T18:44:59.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.deepEqual(body, { ok: true, rowsWritten: 1 });
+  assert.deepEqual(db.state.championRoadPredictions.map((row) => ({
+    group_id: row.group_id,
+    player_id: row.player_id,
+    ranking: row.ranking,
+  })), [
+    { group_id: 'g1', player_id: 'p1', ranking: '["阿根廷","法国","西班牙","英格兰"]' },
+  ]);
+});
+
+test('D1 worker rejects champion road changes after first semifinal lock', async () => {
+  const db = fakeStatefulDb({
+    groups: [{ id: 'g1', code: 'lzscqjd', name: 'lzscqjd', created_at: '2026-06-12T00:00:00.000Z' }],
+    players: [{ id: 'p1', group_id: 'g1', name: '张三', created_at: '2026-06-12T00:01:00.000Z' }],
+    matches: [
+      semifinalMatch({ home_cn: '法国', away_cn: '西班牙', kickoff_at_utc: '2026-07-14T19:00:00.000Z' }),
+      semifinalMatch({ match_code: 'espn-760515', match_date_cn: '2026-07-16', home_cn: '英格兰', away_cn: '阿根廷', kickoff_at_utc: '2026-07-15T19:00:00.000Z' }),
+    ],
+  });
+
+  const response = await worker.fetch(new Request('https://api.example.com/api/groups/lzscqjd/champion-road', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      playerId: 'p1',
+      ranking: ['阿根廷', '法国', '西班牙', '英格兰'],
+    }),
+  }), {
+    DB: db,
+    TEST_NOW: '2026-07-14T18:45:00.000Z',
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 409);
+  assert.equal(body.error, 'champion_road_locked');
+  assert.deepEqual(db.state.championRoadPredictions, []);
+});
+
 test('D1 worker returns a small live board window with odds and recommendations', async () => {
   const db = fakeLiveBoardDb();
 
@@ -470,6 +565,22 @@ function handicapMatch(overrides = {}) {
   };
 }
 
+function semifinalMatch(overrides = {}) {
+  return {
+    match_code: 'espn-760514',
+    match_date_cn: '2026-07-15',
+    time_cn: '03:00',
+    kickoff_at_utc: '2026-07-14T19:00:00.000Z',
+    home_cn: '法国',
+    away_cn: '西班牙',
+    status: 'pre',
+    status_detail: 'Scheduled',
+    stage: 'Semifinals',
+    active: 1,
+    ...overrides,
+  };
+}
+
 function fakeStatefulDb(initial = {}) {
   const state = {
     groups: [...(initial.groups || [])],
@@ -479,6 +590,7 @@ function fakeStatefulDb(initial = {}) {
     advancementPredictions: [...(initial.advancementPredictions || [])],
     handicapMatches: [...(initial.handicapMatches || [])],
     handicapPredictions: [...(initial.handicapPredictions || [])],
+    championRoadPredictions: [...(initial.championRoadPredictions || [])],
   };
 
   return {
@@ -518,6 +630,10 @@ function fakeStatefulDb(initial = {}) {
             const [groupId] = this.bound;
             return { results: state.handicapPredictions.filter((prediction) => prediction.group_id === groupId) };
           }
+          if (sql.includes('from champion_road_predictions')) {
+            const [groupId] = this.bound;
+            return { results: state.championRoadPredictions.filter((prediction) => prediction.group_id === groupId) };
+          }
           if (sql.includes('from handicap_challenge_matches')) {
             return {
               results: state.handicapMatches
@@ -540,6 +656,13 @@ function fakeStatefulDb(initial = {}) {
             return {
               results: state.matches
                 .filter((match) => match.stage === 'Quarterfinals' && match.active !== 0)
+                .sort((a, b) => `${a.match_date_cn || ''} ${a.time_cn || ''}`.localeCompare(`${b.match_date_cn || ''} ${b.time_cn || ''}`)),
+            };
+          }
+          if (sql.includes('from matches') && sql.includes('Semifinal')) {
+            return {
+              results: state.matches
+                .filter((match) => match.stage === 'Semifinals' && match.active !== 0)
                 .sort((a, b) => `${a.match_date_cn || ''} ${a.time_cn || ''}`.localeCompare(`${b.match_date_cn || ''} ${b.time_cn || ''}`)),
             };
           }
@@ -615,6 +738,25 @@ function fakeStatefulDb(initial = {}) {
                 player_id: playerId,
                 match_id: matchId,
                 choice_key: choiceKey,
+                updated_at: updatedAt,
+              });
+            }
+            return { success: true };
+          }
+          if (normalizedSql.startsWith('insert into champion_road_predictions')) {
+            const [id, groupId, playerId, ranking, updatedAt] = this.bound;
+            const existing = state.championRoadPredictions.find((row) => (
+              row.group_id === groupId && row.player_id === playerId
+            ));
+            if (existing) {
+              existing.ranking = ranking;
+              existing.updated_at = updatedAt;
+            } else {
+              state.championRoadPredictions.push({
+                id,
+                group_id: groupId,
+                player_id: playerId,
+                ranking,
                 updated_at: updatedAt,
               });
             }

@@ -66,9 +66,9 @@ test('topbar exposes result exports while AI leaderboard lives in the more menu'
   const moreMenuSource = componentSource('MoreMenuDialog', 'MatchCard');
 
   assert.match(topbarSource, /比分结果/);
-  assert.match(topbarSource, /四强之路/);
+  assert.doesNotMatch(topbarSource, /四强之路/);
   assert.doesNotMatch(topbarSource, /让球结果/);
-  assert.match(topbarSource, /data-action="handicap-results"/);
+  assert.doesNotMatch(topbarSource, /data-action="handicap-results"/);
   assert.doesNotMatch(topbarSource, /晋级结果/);
   assert.doesNotMatch(topbarSource, /data-action="advancement-results"/);
   assert.doesNotMatch(topbarSource, /AI排行榜/);
@@ -80,6 +80,10 @@ test('topbar exposes result exports while AI leaderboard lives in the more menu'
   assert.match(moreMenuSource, /晋级结果/);
   assert.match(moreMenuSource, /data-action="open-advancement-predictions"/);
   assert.match(moreMenuSource, /data-action="advancement-results"/);
+  assert.match(moreMenuSource, /冠军之路结果/);
+  assert.match(moreMenuSource, /data-action="champion-road-results"/);
+  assert.match(moreMenuSource, /四强之路/);
+  assert.match(moreMenuSource, /data-action="handicap-results"/);
   assert.match(moreMenuSource, /AI策略/);
   assert.match(moreMenuSource, /data-action="open-ai-strategy"/);
   assert.match(mainSource, /function AiStrategyDialog/);
@@ -89,22 +93,25 @@ test('topbar exposes result exports while AI leaderboard lives in the more menu'
   assert.match(stylesSource, /\.strategy-rank-dialog/);
 });
 
-test('handicap challenge entry is an inviting info card below player picker', () => {
+test('champion road entry is an inviting ranking card below player picker', () => {
   const entrySource = mainSource.slice(
     mainSource.indexOf('<section className="advancement-entry-panel"'),
     mainSource.indexOf("{loadStatus !== 'ready'"),
   );
 
-  assert.match(entrySource, /<strong>四强之路<\/strong>/);
+  assert.match(entrySource, /<strong>冠军之路<\/strong>/);
   assert.doesNotMatch(entrySource, /四强之路，舍你其谁/);
-  assert.match(entrySource, /4场 · 每场三选一 · 实时计算已赢和最高可赢/);
-  assert.match(entrySource, /已选 \$\{handicapSelectedCount\}\/\$\{handicapTotalCount\} 已赢/);
-  assert.match(entrySource, /最高可赢/);
-  assert.match(entrySource, /data-action="open-handicap-challenge"/);
+  assert.match(entrySource, /拖动四队，排出冠军到第四名/);
+  assert.match(entrySource, /已排 \$\{championRankedCount\}\/\$\{championDialog\.teams\.length\}/);
+  assert.match(entrySource, /data-action="open-champion-road"/);
+  assert.match(mainSource, /function ChampionRoadDialog/);
+  assert.match(mainSource, /data-action="save-champion-road"/);
   assert.match(mainSource, /className="handicap-payout-highlight"/);
   assert.match(mainSource, /固定成本15/);
   assert.match(stylesSource, /\.advancement-entry-panel[\s\S]*margin-top: 14px/);
   assert.match(stylesSource, /\.advancement-entry-button[\s\S]*min-height: 50px/);
+  assert.match(stylesSource, /\.champion-entry-button/);
+  assert.match(stylesSource, /\.champion-rank-row/);
   assert.match(stylesSource, /\.handicap-choice-button[\s\S]*min-height: 54px/);
   assert.match(stylesSource, /\.handicap-entry-button/);
   assert.match(stylesSource, /\.handicap-payout-highlight/);
