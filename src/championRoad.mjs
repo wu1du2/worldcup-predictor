@@ -1,3 +1,7 @@
+export const AI_CHAMPION_ROAD_PLAYER_NAME = 'AI推荐';
+
+export const DEFAULT_AI_CHAMPION_ROAD_ORDER = ['法国', '英格兰', '西班牙', '阿根廷'];
+
 export function normalizeChampionRoadPayload(payload = {}) {
   if (!payload || typeof payload !== 'object') throw new Error('D1 champion road payload is invalid');
   const teams = normalizeChampionTeams(payload.teams);
@@ -38,6 +42,14 @@ export function normalizeChampionTeams(teams = []) {
 
 export function buildDefaultChampionRanking(teams = []) {
   return normalizeChampionTeams(teams).map((team) => team.teamKey);
+}
+
+export function buildAiChampionRoadRanking(teams = []) {
+  const normalizedTeams = normalizeChampionTeams(teams);
+  const teamKeys = new Set(normalizedTeams.map((team) => team.teamKey));
+  const preferred = DEFAULT_AI_CHAMPION_ROAD_ORDER.filter((teamKey) => teamKeys.has(teamKey));
+  const fallback = normalizedTeams.map((team) => team.teamKey).filter((teamKey) => !preferred.includes(teamKey));
+  return [...preferred, ...fallback];
 }
 
 export function normalizeRanking(ranking = [], allowedTeamKeys = null) {
@@ -83,17 +95,24 @@ export function exportChampionRoadText({
   currentGroupUrl = '',
 } = {}) {
   const normalizedTeams = normalizeChampionTeams(teams);
-  const visiblePlayers = (players || []).filter((player) => player?.id && player?.name && player.name !== 'AI推荐');
+  const teamKeySet = new Set(normalizedTeams.map((team) => team.teamKey));
+  const aiRanking = normalizeRanking(buildAiChampionRoadRanking(normalizedTeams), teamKeySet);
+  const visiblePlayers = (players || []).filter((player) => player?.id && player?.name && player.name !== AI_CHAMPION_ROAD_PLAYER_NAME);
   const lines = ['冠军之路'];
 
   if (normalizedTeams.length) {
     lines.push(`球队：${normalizedTeams.map((team) => team.name).join('、')}`);
   }
 
-  lines.push('【预测】');
+  if (aiRanking.length) {
+    lines.push('【AI推荐】');
+    lines.push(`${AI_CHAMPION_ROAD_PLAYER_NAME}：${getChampionRankingSummary(aiRanking, normalizedTeams)}`);
+  }
+
+  lines.push('【大家预测】');
   const predictionLines = visiblePlayers
     .map((player) => {
-      const ranking = normalizeRanking(predictionsByPlayer?.[player.id]?.ranking || [], new Set(normalizedTeams.map((team) => team.teamKey)));
+      const ranking = normalizeRanking(predictionsByPlayer?.[player.id]?.ranking || [], teamKeySet);
       if (!ranking.length) return '';
       return `${player.name}：${getChampionRankingSummary(ranking, normalizedTeams)}`;
     })
