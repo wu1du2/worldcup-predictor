@@ -19,5 +19,5 @@ test('public live board hydration is not gated or overwritten by group state loa
 test('public live board hydration covers recent finished matches missing from static snapshots', async () => {
   const source = await readFile(new URL('../src/main.jsx', import.meta.url), 'utf8');
 
-  assert.match(source, /buildRecentLiveDateWindow\(new Date\(\), \{ pastDays: 7, futureDays: 3 \}\)/);
+  assert.match(source, /buildRecentLiveDateWindow\(new Date\(\), \{ pastDays: 7, futureDays: 7 \}\)/);
 });

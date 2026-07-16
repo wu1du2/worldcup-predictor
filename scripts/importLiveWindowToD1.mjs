@@ -31,7 +31,7 @@ const outputPath = process.env.D1_LIVE_IMPORT_SQL || new URL('../output/d1-live-
 const d1ApiUrl = process.env.D1_API_URL || process.env.VITE_D1_API_URL || 'https://worldcup-predictor-api.wu1du2.workers.dev';
 const liveWindow = windowArg
   ? buildWindowFromDate(windowArg)
-  : buildLiveDateWindow(new Date(), Number(process.env.LIVE_WINDOW_DAYS || 2));
+  : buildLiveDateWindow(new Date(), Number(process.env.LIVE_WINDOW_DAYS || 7));
 
 await loadLocalEnv();
 await mkdir(new URL('../output/', import.meta.url), { recursive: true });
@@ -145,7 +145,7 @@ async function fetchGb18030WithRetry(urlToFetch, options = {}) {
 
 function buildWindowFromDate(from) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(from)) throw new Error(`Invalid --from date: ${from}`);
-  return buildLiveDateWindow(new Date(`${from}T00:00:00+08:00`), Number(process.env.LIVE_WINDOW_DAYS || 2));
+  return buildLiveDateWindow(new Date(`${from}T00:00:00+08:00`), Number(process.env.LIVE_WINDOW_DAYS || 7));
 }
 
 function getGithubRunUrl() {

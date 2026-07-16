@@ -37,6 +37,17 @@ test('buildRecentLiveDateWindow covers recent finished matches and upcoming live
   });
 });
 
+test('seven-day live window includes the World Cup final four days after today', () => {
+  const window = buildRecentLiveDateWindow(new Date('2026-07-16T12:00:00+08:00'), {
+    pastDays: 7,
+    futureDays: 7,
+  });
+
+  assert.equal(window.from, '2026-07-09');
+  assert.equal(window.to, '2026-07-23');
+  assert.ok(window.dates.includes('2026-07-20'));
+});
+
 test('hasLiveWindowChanged compares normalized matches and odds independent of ordering', () => {
   const current = normalizeLiveComparable({
     matches: [{ id: 'm1', date: '2026-06-30', time: '01:00', home: '巴西', away: '日本', status: 'pre' }],

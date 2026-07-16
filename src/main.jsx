@@ -260,7 +260,7 @@ function App() {
 
   function hydrateLiveBoardFromD1(windowOverride = null) {
     if (!d1Client) return;
-    const liveWindow = windowOverride || buildRecentLiveDateWindow(new Date(), { pastDays: 7, futureDays: 3 });
+    const liveWindow = windowOverride || buildRecentLiveDateWindow(new Date(), { pastDays: 7, futureDays: 7 });
     const windowKey = `${liveWindow.from}:${liveWindow.to}`;
     if (hydratedD1WindowsRef.current.has(windowKey)) return;
     hydratedD1WindowsRef.current.add(windowKey);

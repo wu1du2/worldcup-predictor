@@ -36,7 +36,7 @@ test('live D1 import workflow runs every five minutes and refreshes AI predictio
   assert.match(workflow, /concurrency:\n  group: import-live-d1\n  cancel-in-progress: true/);
   assert.match(workflow, /CLOUDFLARE_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_API_TOKEN \}\}/);
   assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID: ea85b9ad1849253605db55f73ad3be98/);
-  assert.match(workflow, /LIVE_WINDOW_DAYS: 3/);
+  assert.match(workflow, /LIVE_WINDOW_DAYS: 7/);
   assert.match(workflow, /Validate Cloudflare D1 access/);
   assert.match(workflow, /test -n "\$CLOUDFLARE_API_TOKEN"/);
   assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --command "select 1 as ok;"/);
