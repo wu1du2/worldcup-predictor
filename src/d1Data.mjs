@@ -7,7 +7,7 @@ export function createD1BrowserClient() {
 }
 
 export function createD1BrowserClientFromEnv(env = {}) {
-  if (env.VITE_D1_ENABLED !== 'true') return null;
+  if (env.VITE_D1_ENABLED === 'false') return null;
   const baseUrl = env.VITE_D1_API_URL;
   if (!baseUrl) return null;
   return createD1ApiClient({ baseUrl });

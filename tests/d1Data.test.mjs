@@ -14,18 +14,18 @@ import {
   saveD1HandicapChallengePredictions,
 } from '../src/d1Data.mjs';
 
-test('createD1BrowserClientFromEnv keeps D1 disabled unless explicitly enabled', () => {
-  assert.equal(createD1BrowserClientFromEnv({
-    VITE_D1_API_URL: 'https://worldcup-api.example.workers.dev',
-  }), null);
-
+test('createD1BrowserClientFromEnv enables a configured D1 endpoint unless explicitly disabled', () => {
   assert.deepEqual(createD1BrowserClientFromEnv({
-    VITE_D1_ENABLED: 'true',
     VITE_D1_API_URL: 'https://worldcup-api.example.workers.dev',
   }), {
     baseUrl: 'https://worldcup-api.example.workers.dev',
     fetchImpl: fetch,
   });
+
+  assert.equal(createD1BrowserClientFromEnv({
+    VITE_D1_ENABLED: 'false',
+    VITE_D1_API_URL: 'https://worldcup-api.example.workers.dev',
+  }), null);
 });
 
 test('createD1ApiClient accepts same-origin api proxy base without duplicating api path', () => {
