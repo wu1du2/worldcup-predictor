@@ -146,6 +146,13 @@ Stage 1 commands:
 - Homepage create-group acceptance: `npm run acceptance:home` with a local Vite server verifies the no-group homepage, generated group navigation, and one-time share hint, writing `docs/artifacts/stage12/*`.
 - Online other-score odds check: `docs/artifacts/online-other-scores/online-other-0616*` verifies the deployed Render page shows `胜其他` / `平其他` / `负其他` on a date with freshly imported odds.
 
+## Final Decommissioning
+
+- After the tournament, create and verify the full D1 SQL plus per-table JSON backup before stopping any service. Keep D1 itself as a cold backup unless deletion is explicitly requested.
+- Publish the global and per-group static snapshots first, verify the browser requests only same-origin JSON, then remove every import and Worker deployment workflow. Deleting the workflow files makes stale external `workflow_dispatch` cron calls harmless.
+- Delete the Cloudflare API Worker only after the static site is live; verify its endpoint returns 404 and D1 still answers a read-only count query with zero rows written.
+- The Render Static Site is the permanent archive. Suspend the separate Render Web Service after confirming the static URL; do not suspend the Static Site that serves the archive.
+
 ## Current Pitfalls
 
 - The local PATH has `node` but no `npm`, `pnpm`, or `yarn`; use zero-dependency static assets and Node's built-in test runner until a package manager is available.

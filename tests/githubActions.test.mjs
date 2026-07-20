@@ -1,66 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access } from 'node:fs/promises';
 
-test('match import workflow is archived and requires an explicit manual resume', async () => {
-  const workflow = await readFile(new URL('../.github/workflows/import-matches.yml', import.meta.url), 'utf8');
+test('all live import and Worker deployment workflows are removed after archival', async () => {
+  const retiredWorkflows = [
+    'import-matches.yml',
+    'import-odds.yml',
+    'import-live-d1.yml',
+    'deploy-worker.yml',
+  ];
 
-  assert.match(workflow, /workflow_dispatch:/);
-  assert.doesNotMatch(workflow, /schedule:/);
-  assert.match(workflow, /resume_imports:/);
-  assert.match(workflow, /if: \$\{\{ inputs\.resume_imports \}\}/);
-  assert.match(workflow, /concurrency:\n  group: import-matches\n  cancel-in-progress: false/);
-  assert.match(workflow, /SUPABASE_URL: \$\{\{ secrets\.SUPABASE_URL \}\}/);
-  assert.match(workflow, /SUPABASE_SERVICE_ROLE_KEY: \$\{\{ secrets\.SUPABASE_SERVICE_ROLE_KEY \}\}/);
-  assert.match(workflow, /npm run import:matches/);
-  assert.match(workflow, /if: failure\(\)/);
-  assert.match(workflow, /node scripts\/reportActionFailure\.mjs --job=matches/);
-});
-
-test('odds import workflow is paused as a Supabase no-op', async () => {
-  const workflow = await readFile(new URL('../.github/workflows/import-odds.yml', import.meta.url), 'utf8');
-
-  assert.match(workflow, /workflow_dispatch:/);
-  assert.doesNotMatch(workflow, /schedule:/);
-  assert.match(workflow, /concurrency:\n  group: import-odds\n  cancel-in-progress: false/);
-  assert.match(workflow, /Odds import paused/);
-  assert.doesNotMatch(workflow, /SUPABASE_SERVICE_ROLE_KEY/);
-  assert.doesNotMatch(workflow, /npm run import:odds/);
-  assert.doesNotMatch(workflow, /npm run backfill:odds-trends/);
-  assert.match(workflow, /intentionally does not write Supabase/);
-});
-
-test('live D1 import workflow is archived and requires an explicit manual resume', async () => {
-  const workflow = await readFile(new URL('../.github/workflows/import-live-d1.yml', import.meta.url), 'utf8');
-
-  assert.match(workflow, /workflow_dispatch:/);
-  assert.doesNotMatch(workflow, /schedule:/);
-  assert.match(workflow, /resume_imports:/);
-  assert.match(workflow, /if: \$\{\{ inputs\.resume_imports \}\}/);
-  assert.match(workflow, /concurrency:\n  group: import-live-d1\n  cancel-in-progress: true/);
-  assert.match(workflow, /CLOUDFLARE_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_API_TOKEN \}\}/);
-  assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID: ea85b9ad1849253605db55f73ad3be98/);
-  assert.match(workflow, /LIVE_WINDOW_DAYS: 7/);
-  assert.match(workflow, /Validate Cloudflare D1 access/);
-  assert.match(workflow, /test -n "\$CLOUDFLARE_API_TOKEN"/);
-  assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --command "select 1 as ok;"/);
-  assert.match(workflow, /npm run import:live:d1/);
-  assert.match(workflow, /if: hashFiles\('output\/d1-live-import\.sql'\) != ''/);
-  assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --file output\/d1-live-import\.sql/);
-  assert.match(workflow, /npm run ai:predict-router:d1/);
-  assert.match(workflow, /npx wrangler@4\.106\.0 d1 execute worldcup-predictor --remote --file output\/d1-ai-sync\.sql/);
-});
-
-test('D1 API Worker deploys when Worker code changes on master', async () => {
-  const workflow = await readFile(new URL('../.github/workflows/deploy-worker.yml', import.meta.url), 'utf8');
-
-  assert.match(workflow, /workflow_dispatch:/);
-  assert.match(workflow, /branches:\n      - master/);
-  assert.match(workflow, /- \.github\/workflows\/deploy-worker\.yml/);
-  assert.match(workflow, /- workers\/\*\*/);
-  assert.match(workflow, /- wrangler\.toml/);
-  assert.match(workflow, /CLOUDFLARE_API_TOKEN: \$\{\{ secrets\.CLOUDFLARE_API_TOKEN \}\}/);
-  assert.match(workflow, /CLOUDFLARE_ACCOUNT_ID: ea85b9ad1849253605db55f73ad3be98/);
-  assert.match(workflow, /test -n "\$CLOUDFLARE_API_TOKEN"/);
-  assert.match(workflow, /npx wrangler@4\.106\.0 deploy/);
+  for (const workflow of retiredWorkflows) {
+    await assert.rejects(
+      access(new URL(`../.github/workflows/${workflow}`, import.meta.url)),
+      { code: 'ENOENT' },
+    );
+  }
 });
