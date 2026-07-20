@@ -73,6 +73,25 @@ test('exportAdvancementPredictionsText renders settled leaderboard and pending p
   ].join('\n'));
 });
 
+test('exportAdvancementPredictionsText accepts an explicit penalty shootout winner', () => {
+  const text = exportAdvancementPredictionsText({
+    ties: [{
+      matchId: 'm1',
+      home: '瑞士',
+      away: '哥伦比亚',
+      homeScore: 0,
+      awayScore: 0,
+      winnerName: '瑞士',
+      status: 'post',
+    }],
+    players: [{ id: 'p1', name: '张三' }],
+    predictionsByPlayer: { p1: { m1: { winnerName: '瑞士' } } },
+  });
+
+  assert.match(text, /正确答案：瑞士/);
+  assert.match(text, /张三 1\/1/);
+});
+
 test('mergeAdvancementTiesWithMatches fills result fields from live board matches', () => {
   assert.deepEqual(mergeAdvancementTiesWithMatches({
     ties: [{ matchId: 'm1', home: '加拿大', away: '摩洛哥', status: 'pre' }],

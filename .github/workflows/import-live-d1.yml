@@ -2,8 +2,12 @@ name: Import Live D1 Window
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '*/5 * * * *'
+    inputs:
+      resume_imports:
+        description: Resume archived live imports
+        required: true
+        type: boolean
+        default: false
 
 concurrency:
   group: import-live-d1
@@ -11,6 +15,7 @@ concurrency:
 
 jobs:
   import-live-d1:
+    if: ${{ inputs.resume_imports }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:

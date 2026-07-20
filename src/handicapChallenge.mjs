@@ -220,7 +220,10 @@ export function formatMaxPayoutOdds(value) {
 }
 
 function normalizeChoiceNumbers(values = {}) {
-  return Object.fromEntries(handicapChoiceKeys.map((choiceKey) => [choiceKey, Number(values?.[choiceKey])]));
+  return Object.fromEntries(handicapChoiceKeys.map((choiceKey) => {
+    const value = Number(values?.[choiceKey]);
+    return [choiceKey, Number.isFinite(value) ? value : 0];
+  }));
 }
 
 function hasAllChoices(values = {}) {

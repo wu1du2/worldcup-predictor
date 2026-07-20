@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-07-20T07:50:47.218Z",
+  "archiveMode": true,
+  "sourceDatabase": "worldcup-predictor",
+  "counts": {
+    "matches": 104,
+    "score_odds": 3163,
+    "score_odds_trends": 2387,
+    "ai_recommendations": 56,
+    "ai_strategy_stats": 25,
+    "import_reports": 12356,
+    "groups": 67,
+    "players": 205,
+    "predictions": 6210,
+    "advancement_predictions": 42,
+    "handicap_challenge_matches": 4,
+    "handicap_challenge_predictions": 42,
+    "champion_road_predictions": 6
+  },
+  "static": {
+    "groups": 67,
+    "matches": 104,
+    "oddsMatches": 101,
+    "aiRecommendationMatches": 56,
+    "aiStrategies": 25
+  },
+  "finalMatch": {
+    "id": "espn-760517",
+    "date": "2026-07-20",
+    "time": "03:00",
+    "home": "西班牙",
+    "away": "阿根廷",
+    "homeScore": 1,
+    "awayScore": 0,
+    "settlementHomeScore": 0,
+    "settlementAwayScore": 0,
+    "status": "post",
+    "statusDetail": "AET"
+  }
+}

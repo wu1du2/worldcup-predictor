@@ -271,18 +271,22 @@ export function normalizeD1AdvancementPredictions(payload) {
   return {
     ties: (Array.isArray(payload.ties) ? payload.ties : [])
       .filter((tie) => tie?.matchId && tie?.home && tie?.away)
-      .map((tie) => ({
-        matchId: tie.matchId,
-        date: tie.date || '',
-        time: tie.time || '',
-        kickoffAtUtc: tie.kickoffAtUtc || '',
-        home: tie.home,
-        away: tie.away,
-        homeScore: normalizeNullableInteger(tie.homeScore),
-        awayScore: normalizeNullableInteger(tie.awayScore),
-        status: tie.status || 'pre',
-        locked: Boolean(tie.locked),
-      })),
+      .map((tie) => {
+        const normalized = {
+          matchId: tie.matchId,
+          date: tie.date || '',
+          time: tie.time || '',
+          kickoffAtUtc: tie.kickoffAtUtc || '',
+          home: tie.home,
+          away: tie.away,
+          homeScore: normalizeNullableInteger(tie.homeScore),
+          awayScore: normalizeNullableInteger(tie.awayScore),
+          status: tie.status || 'pre',
+          locked: Boolean(tie.locked),
+        };
+        if (tie.winnerName) normalized.winnerName = tie.winnerName;
+        return normalized;
+      }),
     predictionsByPlayer,
   };
 }

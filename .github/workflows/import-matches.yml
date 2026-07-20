@@ -2,8 +2,12 @@ name: Import World Cup Matches
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 * * * *'
+    inputs:
+      resume_imports:
+        description: Resume archived match imports
+        required: true
+        type: boolean
+        default: false
 
 concurrency:
   group: import-matches
@@ -11,6 +15,7 @@ concurrency:
 
 jobs:
   import-matches:
+    if: ${{ inputs.resume_imports }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:

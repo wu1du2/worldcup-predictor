@@ -21,6 +21,7 @@ const args = parseArgs(process.argv.slice(2));
 const fromDate = args.from || getChinaDate(new Date());
 const outputPath = args.output || path.join(repoRoot, 'output', 'd1-ai-sync.sql');
 const predictionDir = path.join(repoRoot, 'strategy_lab', 'predictions');
+const strategyHitDetailsPath = path.join(repoRoot, 'public', 'ai-strategy-hit-details.json');
 
 const tables = await loadD1Tables();
 const matches = await attachMatchStrategyContexts({
@@ -52,7 +53,9 @@ const entries = args.strategy
     historicalResults,
   });
 
-if (!entries.length) throw new Error(`No active D1 matches found on or after ${fromDate}.`);
+if (!entries.length) {
+  console.log('No future matches; refreshing AI strategy stats only.');
+}
 
 const runId = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
 const predictionLog = buildPredictionLog({ fromDate, targetMatches, entries, historicalResults });
@@ -62,6 +65,7 @@ const predictionReportPath = path.join(predictionDir, `strategy_router_d1_${runI
 await Promise.all([
   writeJson(predictionJsonPath, predictionLog),
   writeFile(predictionReportPath, formatPredictionReport(predictionLog), 'utf8'),
+  writeCompactJson(strategyHitDetailsPath, historicalResults),
 ]);
 
 const recommendationRows = buildAiRecommendationRows({
@@ -86,6 +90,7 @@ console.log(`From date: ${fromDate}`);
 console.log(`Groups: ${(tables.groups || []).length}`);
 console.log(`Target matches: ${targetMatches.length}`);
 console.log(`Prediction log: ${predictionJsonPath}`);
+console.log(`AI strategy hit details: ${strategyHitDetailsPath}`);
 console.log(`D1 AI sync SQL: ${outputPath}`);
 for (const entry of entries) {
   console.log(`${entry.route.matchId} ${entry.route.match}: ${entry.scores.join(', ')} | ${entry.route.strategyName} ${entry.route.roiLabel}`);
@@ -342,4 +347,8 @@ function sqlInteger(value) {
 
 function writeJson(filePath, value) {
   return writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function writeCompactJson(filePath, value) {
+  return writeFile(filePath, `${JSON.stringify(value)}\n`, 'utf8');
 }

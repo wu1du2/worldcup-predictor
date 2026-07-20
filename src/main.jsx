@@ -101,6 +101,7 @@ import {
 import './styles.css';
 
 const storageKey = 'worldcup-prediction-stage2';
+const finalArchiveBuild = true;
 
 let aiStrategyHitDetailsIndexCache = null;
 
@@ -130,6 +131,7 @@ function App() {
   const [aiRecommendationsByMatch, setAiRecommendationsByMatch] = useState({});
   const [aiStrategyStats, setAiStrategyStats] = useState([]);
   const [staticSnapshot, setStaticSnapshot] = useState(null);
+  const [staticGroupSnapshot, setStaticGroupSnapshot] = useState(null);
   const [aiStrategyOpen, setAiStrategyOpen] = useState(false);
   const [aiStrategyForm, setAiStrategyForm] = useState({ authorName: '', strategyName: '', strategyPrompt: '', status: 'idle', error: '' });
   const [strategyRankDialog, setStrategyRankDialog] = useState({ open: false, status: 'idle', rows: [], page: 0, hasNext: false, error: '' });
@@ -162,8 +164,8 @@ function App() {
   });
   const selectedDateButtonRef = useRef(null);
   const hydratedD1WindowsRef = useRef(new Set());
-  const client = useMemo(() => createSupabaseBrowserClient(), []);
-  const d1Client = useMemo(() => createD1BrowserClient(), []);
+  const client = useMemo(() => finalArchiveBuild ? null : createSupabaseBrowserClient(), []);
+  const d1Client = useMemo(() => finalArchiveBuild ? null : createD1BrowserClient(), []);
   const groupCode = getGroupCodeFromSearch(window.location.search);
 
   async function refreshGroupState() {
@@ -186,21 +188,52 @@ function App() {
             ? current.selectedDate
             : getDefaultMatchDateCn(snapshot.matches),
         }));
-        hydrateLiveBoardFromD1();
       }
 
-      const staticGroupSnapshot = await loadStaticGroupSnapshot(groupCode);
-      if (staticGroupSnapshot) {
-        setGroup(staticGroupSnapshot.group);
-        setPlayers(staticGroupSnapshot.players);
+      const cachedGroupSnapshot = await loadStaticGroupSnapshot(groupCode);
+      setStaticGroupSnapshot(cachedGroupSnapshot);
+      if (cachedGroupSnapshot) {
+        setGroup(cachedGroupSnapshot.group);
+        setPlayers(cachedGroupSnapshot.players);
+        setAdvancementDialog((current) => ({
+          ...current,
+          status: 'ready',
+          ties: cachedGroupSnapshot.advancement.ties,
+          predictionsByPlayer: cachedGroupSnapshot.advancement.predictionsByPlayer,
+        }));
+        setHandicapDialog((current) => ({
+          ...current,
+          status: 'ready',
+          matches: cachedGroupSnapshot.handicapChallenge.matches,
+          predictionsByPlayer: cachedGroupSnapshot.handicapChallenge.predictionsByPlayer,
+        }));
+        setChampionDialog((current) => ({
+          ...current,
+          status: 'ready',
+          teams: cachedGroupSnapshot.championRoad.teams,
+          predictionsByPlayer: cachedGroupSnapshot.championRoad.predictionsByPlayer,
+          locked: cachedGroupSnapshot.championRoad.locked,
+        }));
         updateState((current) => ({
           ...current,
           selectedPlayerId: current.groupCode === groupCode ? current.selectedPlayerId : '',
           draftPicks: current.groupCode === groupCode ? current.draftPicks : {},
-          predictions: staticGroupSnapshot.predictions,
+          predictions: cachedGroupSnapshot.predictions,
           groupCode,
         }));
       }
+
+      if (snapshot?.archiveMode) {
+        if (!cachedGroupSnapshot) {
+          setLoadStatus('error');
+          setErrorMessage('这个群没有可用的世界杯存档');
+          return;
+        }
+        setLoadStatus('ready');
+        return;
+      }
+
+      if (snapshot?.matches.length) hydrateLiveBoardFromD1();
 
       let loaded;
       try {
@@ -212,7 +245,7 @@ function App() {
       try {
         if (!loaded && client) loaded = await loadGroupState({ client, groupCode });
       } catch (error) {
-        if (staticGroupSnapshot || snapshot?.matches.length) {
+        if (cachedGroupSnapshot || snapshot?.matches.length) {
           console.warn('Failed to load group state; using static cache only', error);
           return;
         }
@@ -220,7 +253,7 @@ function App() {
       }
 
       if (!loaded) {
-        if (staticGroupSnapshot || snapshot?.matches.length) return;
+        if (cachedGroupSnapshot || snapshot?.matches.length) return;
         throw new Error('D1 和 Supabase 配置缺失');
       }
 
@@ -259,7 +292,7 @@ function App() {
   }
 
   function hydrateLiveBoardFromD1(windowOverride = null) {
-    if (!d1Client) return;
+    if (!d1Client || staticSnapshot?.archiveMode) return;
     const liveWindow = windowOverride || buildRecentLiveDateWindow(new Date(), { pastDays: 7, futureDays: 7 });
     const windowKey = `${liveWindow.from}:${liveWindow.to}`;
     if (hydratedD1WindowsRef.current.has(windowKey)) return;
@@ -311,6 +344,7 @@ function App() {
   const aiPlayer = players.find((player) => isAiPlayer(player));
   const aiPredictions = aiPlayer ? state.predictions?.[aiPlayer.id] || {} : {};
   const selectedPlayer = selectablePlayers.find((player) => player.id === state.selectedPlayerId);
+  const archiveMode = finalArchiveBuild || Boolean(staticSnapshot?.archiveMode);
   const dateTabs = buildDateTabs(matches);
   const selectedDate = state.selectedDate || getDefaultMatchDateCn(matches);
   const visibleMatches = matches.filter((match) => match.date === selectedDate);
@@ -393,6 +427,10 @@ function App() {
   }
 
   async function submitAll() {
+    if (archiveMode) {
+      updateState((current) => ({ ...current, flash: '世界杯已结束，当前为只读存档。' }));
+      return;
+    }
     if (!state.selectedPlayerId || (!d1Client && (!group || !client))) return;
 
     const entries = visibleMatches
@@ -438,6 +476,18 @@ function App() {
   async function openAdvancementDialog() {
     if (!selectedPlayer) {
       updateState((current) => ({ ...current, flash: '先选择用户名，再填写晋级预测。' }));
+      return;
+    }
+    const staticAdvancement = staticGroupSnapshot?.advancement;
+    if (staticAdvancement) {
+      setAdvancementDialog({
+        open: true,
+        status: 'ready',
+        ties: staticAdvancement.ties,
+        predictionsByPlayer: staticAdvancement.predictionsByPlayer,
+        draft: buildAdvancementDraftFromPredictions(staticAdvancement.predictionsByPlayer, selectedPlayer.id),
+        error: '',
+      });
       return;
     }
     if (!d1Client) {
@@ -493,6 +543,10 @@ function App() {
   }
 
   async function submitAdvancementPredictions() {
+    if (archiveMode) {
+      setAdvancementDialog((current) => ({ ...current, error: '世界杯已结束，当前为只读存档。' }));
+      return;
+    }
     if (!selectedPlayer || !d1Client) return;
     const entries = buildAdvancementEntries(advancementDialog.draft);
     if (!entries.length) {
@@ -544,6 +598,18 @@ function App() {
       updateState((current) => ({ ...current, flash: '先选择用户名，再参加四强挑战。' }));
       return;
     }
+    const staticHandicapChallenge = staticGroupSnapshot?.handicapChallenge;
+    if (staticHandicapChallenge) {
+      setHandicapDialog({
+        open: true,
+        status: 'ready',
+        matches: staticHandicapChallenge.matches,
+        predictionsByPlayer: staticHandicapChallenge.predictionsByPlayer,
+        draft: buildHandicapDraftFromPredictions(staticHandicapChallenge.predictionsByPlayer, selectedPlayer.id),
+        error: '',
+      });
+      return;
+    }
     if (!d1Client) {
       setHandicapDialog({
         open: true,
@@ -586,6 +652,19 @@ function App() {
   async function openChampionRoadDialog() {
     if (!selectedPlayer) {
       updateState((current) => ({ ...current, flash: '先选择用户名，再填写冠军之路。' }));
+      return;
+    }
+    const staticChampionRoad = staticGroupSnapshot?.championRoad;
+    if (staticChampionRoad) {
+      setChampionDialog({
+        open: true,
+        status: 'ready',
+        teams: staticChampionRoad.teams,
+        predictionsByPlayer: staticChampionRoad.predictionsByPlayer,
+        draft: buildChampionDraftFromPredictions(staticChampionRoad.predictionsByPlayer, selectedPlayer.id, staticChampionRoad.teams),
+        locked: true,
+        error: '',
+      });
       return;
     }
     if (!d1Client) {
@@ -639,6 +718,10 @@ function App() {
   }
 
   async function submitChampionRoadPrediction() {
+    if (archiveMode) {
+      setChampionDialog((current) => ({ ...current, error: '世界杯已结束，当前为只读存档。' }));
+      return;
+    }
     if (!selectedPlayer || !d1Client) return;
     if (!isCompleteChampionRanking(championDialog.draft, championDialog.teams)) {
       setChampionDialog((current) => ({ ...current, error: '请把四支球队完整排序' }));
@@ -690,6 +773,10 @@ function App() {
   }
 
   async function submitHandicapChallengePredictions() {
+    if (archiveMode) {
+      setHandicapDialog((current) => ({ ...current, error: '世界杯已结束，当前为只读存档。' }));
+      return;
+    }
     if (!selectedPlayer || !d1Client) return;
     const entries = buildHandicapChallengeEntries(handicapDialog.draft);
     if (!entries.length) {
@@ -751,6 +838,18 @@ function App() {
   }
 
   async function showHandicapChallengeResults() {
+    const staticHandicapChallenge = staticGroupSnapshot?.handicapChallenge;
+    if (staticHandicapChallenge) {
+      const text = exportHandicapChallengeText({
+        matches: staticHandicapChallenge.matches,
+        players,
+        predictionsByPlayer: staticHandicapChallenge.predictionsByPlayer,
+        currentGroupUrl: window.location.href,
+      });
+      setMoreMenuOpen(false);
+      updateState((current) => ({ ...current, exportText: text, flash: '四强之路已生成。' }));
+      return;
+    }
     if (!d1Client) {
       updateState((current) => ({ ...current, flash: '四强之路需要 D1 API。' }));
       return;
@@ -788,6 +887,18 @@ function App() {
   }
 
   async function showChampionRoadResults() {
+    const staticChampionRoad = staticGroupSnapshot?.championRoad;
+    if (staticChampionRoad) {
+      const text = exportChampionRoadText({
+        teams: staticChampionRoad.teams,
+        players,
+        predictionsByPlayer: staticChampionRoad.predictionsByPlayer,
+        currentGroupUrl: window.location.href,
+      });
+      setMoreMenuOpen(false);
+      updateState((current) => ({ ...current, exportText: text, flash: '冠军之路已生成。' }));
+      return;
+    }
     if (!d1Client) {
       updateState((current) => ({ ...current, flash: '冠军之路需要 D1 API。' }));
       return;
@@ -827,6 +938,18 @@ function App() {
   }
 
   async function showAdvancementResults() {
+    const staticAdvancement = staticGroupSnapshot?.advancement;
+    if (staticAdvancement) {
+      const text = exportAdvancementPredictionsText({
+        ties: staticAdvancement.ties,
+        players,
+        predictionsByPlayer: staticAdvancement.predictionsByPlayer,
+        currentGroupUrl: window.location.href,
+      });
+      setMoreMenuOpen(false);
+      updateState((current) => ({ ...current, exportText: text, flash: '晋级结果已生成。' }));
+      return;
+    }
     if (!d1Client) {
       updateState((current) => ({ ...current, flash: '晋级结果需要 D1 API。' }));
       return;
@@ -865,6 +988,7 @@ function App() {
   }
 
   async function enrichAdvancementTiesWithLiveBoard(ties) {
+    if (archiveMode) return ties;
     const dates = (ties || []).map((tie) => tie.date).filter(Boolean).sort();
     if (!dates.length || !d1Client) return ties;
     try {
@@ -1014,6 +1138,10 @@ function App() {
   }
 
   async function submitAiStrategy() {
+    if (archiveMode) {
+      setAiStrategyForm((current) => ({ ...current, status: 'error', error: '世界杯已结束，当前为只读存档。' }));
+      return;
+    }
     if (!client) {
       setAiStrategyForm((current) => ({ ...current, status: 'error', error: 'Supabase 配置缺失' }));
       return;
@@ -1041,6 +1169,10 @@ function App() {
   }
 
   async function confirmAddPlayer() {
+    if (archiveMode) {
+      updateState((current) => ({ ...current, flash: '世界杯已结束，当前为只读存档。' }));
+      return;
+    }
     if (!d1Client && (!group || !client)) return;
 
     try {
@@ -1082,6 +1214,7 @@ function App() {
       <header className="topbar">
         <div>
           <h1>{dateLabel}比分预测</h1>
+          {archiveMode ? <p className="archive-label">赛事已结束 · 历史存档</p> : null}
         </div>
         <div className="topbar-actions">
           <button className="ghost-button" data-action="export" onClick={showExport}>
@@ -1126,14 +1259,16 @@ function App() {
               {player.name}
             </button>
           ))}
-          <button
-            className="player-chip add-player-chip"
-            data-action="add-player"
-            aria-label="新增名字"
-            onClick={() => setState((current) => ({ ...current, addingPlayer: true, newPlayerName: '' }))}
-          >
-            +
-          </button>
+          {!archiveMode ? (
+            <button
+              className="player-chip add-player-chip"
+              data-action="add-player"
+              aria-label="新增名字"
+              onClick={() => setState((current) => ({ ...current, addingPlayer: true, newPlayerName: '' }))}
+            >
+              +
+            </button>
+          ) : null}
         </div>
       </section>
 
@@ -1186,6 +1321,7 @@ function App() {
               scoreOptions={buildScoreOptionsForMatch(scoreOddsByMatch[match.id])}
               onToggle={toggleMatchScore}
               onOpenAiRecommendation={setAiRecommendationDialog}
+              readOnly={archiveMode}
             />
           );
         })}
@@ -1198,10 +1334,10 @@ function App() {
 
       <div className="submit-bar">
         <div className="submit-copy">
-          {state.flash || (selectedPlayer ? '选好比分后保存预测' : '先选择你的名字')}
+          {state.flash || (archiveMode ? '世界杯已结束，当前为只读存档' : (selectedPlayer ? '选好比分后保存预测' : '先选择你的名字'))}
         </div>
-        <button className="primary-button" data-action="submit" disabled={!selectedPlayer} onClick={submitAll}>
-          确定录入
+        <button className="primary-button" data-action="submit" disabled={!selectedPlayer || archiveMode} onClick={submitAll}>
+          {archiveMode ? '历史存档' : '确定录入'}
         </button>
       </div>
 
@@ -1238,6 +1374,7 @@ function App() {
             setMoreMenuOpen(false);
             setKnockoutStrategyOpen(true);
           }}
+          archiveMode={archiveMode}
         />
       ) : null}
 
@@ -1338,6 +1475,14 @@ function App() {
 }
 
 function HomePage() {
+  const [archiveMode, setArchiveMode] = useState(finalArchiveBuild);
+
+  useEffect(() => {
+    if (finalArchiveBuild) return undefined;
+    void loadStaticSnapshot().then((snapshot) => setArchiveMode(Boolean(snapshot?.archiveMode)));
+    return undefined;
+  }, []);
+
   function createGroupLink() {
     const groupCode = generateGroupCode();
     window.sessionStorage.setItem('created-group-hint', groupCode);
@@ -1346,9 +1491,16 @@ function HomePage() {
 
   return (
     <main className="home-shell" aria-label="创建群链接">
-      <button className="primary-button home-create-button" data-action="create-group-link" onClick={createGroupLink}>
-        创建群链接
-      </button>
+      {archiveMode ? (
+        <section className="archive-home">
+          <h1>世界杯预测存档</h1>
+          <p>赛事已经结束，请使用原群链接查看历史结果。</p>
+        </section>
+      ) : (
+        <button className="primary-button home-create-button" data-action="create-group-link" onClick={createGroupLink}>
+          创建群链接
+        </button>
+      )}
     </main>
   );
 }
@@ -1427,6 +1579,7 @@ function MoreMenuDialog({
   onShowHandicapChallengeResults,
   onOpenAiStrategy,
   onOpenKnockoutStrategy,
+  archiveMode,
 }) {
   return (
     <DialogBackdrop ariaLabel="更多" onClose={onClose}>
@@ -1456,9 +1609,11 @@ function MoreMenuDialog({
           <button className="menu-action-button" data-action="handicap-results" onClick={onShowHandicapChallengeResults}>
             四强之路
           </button>
-          <button className="menu-action-button" data-action="open-ai-strategy" onClick={onOpenAiStrategy}>
-            AI策略
-          </button>
+          {!archiveMode ? (
+            <button className="menu-action-button" data-action="open-ai-strategy" onClick={onOpenAiStrategy}>
+              AI策略
+            </button>
+          ) : null}
           <button className="menu-action-button" data-action="open-knockout-strategy" onClick={onOpenKnockoutStrategy}>
             淘汰赛策略
           </button>
@@ -1478,6 +1633,7 @@ function MatchCard({
   scoreOptions,
   onToggle,
   onOpenAiRecommendation,
+  readOnly,
 }) {
   const strategyTabs = useMemo(() => buildAiStrategyTabsForMatch({
     match,
@@ -1549,7 +1705,7 @@ function MatchCard({
               className={`score-chip ${picks.includes(option.score) ? 'selected' : ''} ${isRecommended ? 'ai-recommended' : ''} ${formatScoreTrendLabel(option) ? 'with-trend' : ''} ${isCorrectScoreOption(match, option) ? 'correct-result' : ''}`}
               data-match-id={match.id}
               data-score={option.score}
-              disabled={!selectedPlayerId}
+              disabled={!selectedPlayerId || readOnly}
               onClick={() => onToggle(match.id, option.score)}
             >
               {isRecommended ? <span className="ai-recommendation-star" aria-label="AI推荐">★</span> : null}

@@ -43,9 +43,9 @@ export function exportAdvancementPredictionsText({
   predictionsByPlayer = {},
   currentGroupUrl = '',
 } = {}) {
-  const lines = ['8进4晋级预测结果'];
   const visiblePlayers = (players || []).filter((player) => player?.id && player?.name && player.name !== 'AI推荐');
   const validTies = (ties || []).filter((tie) => tie?.matchId && tie?.home && tie?.away);
+  const lines = [validTies.length === 8 ? '16进8晋级预测结果' : '8进4晋级预测结果'];
   const settledTies = validTies.filter((tie) => getAdvancementWinnerName(tie));
   const hasPendingTies = validTies.some((tie) => !getAdvancementWinnerName(tie));
 
@@ -90,6 +90,7 @@ export function exportAdvancementPredictionsText({
 }
 
 function getAdvancementWinnerName(tie) {
+  if (tie?.status === 'post' && tie?.winnerName) return tie.winnerName;
   const homeScore = normalizeNullableInteger(tie?.homeScore ?? tie?.home_score);
   const awayScore = normalizeNullableInteger(tie?.awayScore ?? tie?.away_score);
   if (tie?.status !== 'post' || !Number.isInteger(homeScore) || !Number.isInteger(awayScore) || homeScore === awayScore) {

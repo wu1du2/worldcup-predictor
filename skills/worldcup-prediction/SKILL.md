@@ -15,6 +15,15 @@ Before each task, state the goal and acceptance path. Use small changes. For beh
 
 After each completed task, update this skill when new project-specific lessons, UI constraints, test paths, or pitfalls appear.
 
+## Final Archive Mode
+
+- The 2026 tournament is closed. `finalArchiveBuild` must keep browser D1 and Supabase clients unconstructed; archive pages read only `/data-snapshot.json`, `/group-snapshots/<group>.json`, and lazy static artifacts.
+- Before stopping services, run the final ESPN import, confirm knockout 90-minute settlement fields, refresh AI strategy stats even when there are zero future matches, export a full remote D1 SQL backup outside the public repository, then run `npm run snapshot:final:d1`.
+- The final snapshot command must export every D1 table to the private backup directory, generate one non-indexed JSON file per group, mark the global snapshot `archiveMode: true`, and fail if group counts differ, any match is unsettled, or the final/90-minute final scores are wrong.
+- Per-group archives include players, score predictions, advancement predictions, handicap challenge data, and champion-road rankings. Historical advancement ties must be selected by the prediction rows' actual match ids; infer a tied shootout winner from the next-round participants so old `16进8` exports do not become pending or empty after the UI later changes to `8进4`.
+- Scheduled import workflows stay disabled. Manual recovery requires the explicit `resume_imports` workflow input; an old external `workflow_dispatch` request without that input must produce a skipped job.
+- Archive acceptance requires full unit tests and build, a 390x844 Playwright screenshot, zero browser console warnings/errors, and a request log containing only static same-origin assets with no D1 or Supabase calls.
+
 ## UI Rules
 
 - Mobile first: the first screen must show the date, player picker, match board, and clear primary action without hunting.

@@ -14,6 +14,7 @@ import {
 test('normalizeStaticSnapshot keeps public board data and defaults missing maps', () => {
   const snapshot = normalizeStaticSnapshot({
     generatedAt: '2026-06-30T00:00:00.000Z',
+    archiveMode: true,
     matches: [{ id: 'm1', date: '2026-07-01' }],
     scoreOddsByMatch: { m1: [{ score: '1-0', odds: 5.5 }] },
     aiRecommendationsByMatch: { m1: { scores: ['1-0'] } },
@@ -21,6 +22,7 @@ test('normalizeStaticSnapshot keeps public board data and defaults missing maps'
 
   assert.deepEqual(snapshot, {
     generatedAt: '2026-06-30T00:00:00.000Z',
+    archiveMode: true,
     oddsWindow: null,
     matches: [{ id: 'm1', date: '2026-07-01' }],
     scoreOddsByMatch: { m1: [{ score: '1-0', odds: 5.5 }] },
@@ -47,6 +49,19 @@ test('loadStaticGroupSnapshot returns current group players and predictions from
         group: { id: 'g1', code: 'lzscqjd', name: 'lzscqjd' },
         players: [{ id: 'p1', name: '张三' }],
         predictions: [{ player_id: 'p1', match_id: 'm1', scores: ['1-0', 2, '2-1'] }],
+        advancement: {
+          ties: [{ matchId: 'qf1', home: '法国', away: '德国', status: 'post', homeScore: 2, awayScore: 1, locked: true }],
+          predictions: [{ playerId: 'p1', matchId: 'qf1', winnerSide: 'home', winnerName: '法国' }],
+        },
+        handicapChallenge: {
+          matches: [{ matchId: 'h1', home: '法国', away: '德国', handicap: -1, status: 'post' }],
+          predictions: [{ playerId: 'p1', matchId: 'h1', choiceKey: 'draw' }],
+        },
+        championRoad: {
+          teams: [{ teamKey: '法国', name: '法国' }, { teamKey: '西班牙', name: '西班牙' }],
+          locked: true,
+          predictions: [{ playerId: 'p1', ranking: ['法国', '西班牙'] }],
+        },
       }), { status: 200 });
     },
   });
@@ -59,6 +74,24 @@ test('loadStaticGroupSnapshot returns current group players and predictions from
       { id: 'p1', name: '张三' },
     ],
     predictions: { p1: { m1: ['1-0', '2-1'] } },
+    advancement: {
+      ties: [{ matchId: 'qf1', date: '', time: '', kickoffAtUtc: '', home: '法国', away: '德国', homeScore: 2, awayScore: 1, status: 'post', locked: true }],
+      predictionsByPlayer: { p1: { qf1: { winnerSide: 'home', winnerName: '法国' } } },
+    },
+    handicapChallenge: {
+      matches: [{
+        matchId: 'h1', matchCode: '', issue: '', date: '', time: '', kickoffAtUtc: '', home: '法国', away: '德国',
+        handicap: -1, odds: { win: 0, draw: 0, loss: 0 }, probabilities: { win: 0, draw: 0, loss: 0 },
+        homeScore: null, awayScore: null, settlementHomeScore: null, settlementAwayScore: null, status: 'post', locked: false,
+      }],
+      predictionsByPlayer: { p1: { h1: { choiceKey: 'draw' } } },
+    },
+    championRoad: {
+      teams: [{ teamKey: '法国', name: '法国' }, { teamKey: '西班牙', name: '西班牙' }],
+      locked: true,
+      lockAtUtc: '',
+      predictionsByPlayer: { p1: { ranking: ['法国', '西班牙'], teamNames: ['法国', '西班牙'] } },
+    },
   });
 });
 
@@ -85,8 +118,26 @@ test('buildStaticGroupSnapshotsFromBackupTables writes one cache payload per gro
         { id: 'p2', group_id: 'g2', name: '李四', created_at: '2026-06-13T01:00:00Z' },
       ],
       predictions: [
-        { group_id: 'g1', player_id: 'p1', match_id: 'm1', scores: ['1-0'] },
+        { group_id: 'g1', player_id: 'p1', match_id: 'm1', scores: '["1-0"]' },
         { group_id: 'g2', player_id: 'p2', match_id: 'm1', scores: ['2-0'] },
+      ],
+      matches: [
+        { match_code: 'r16-1', match_date_cn: '2026-07-01', time_cn: '01:00', kickoff_at_utc: '2026-06-30T17:00:00Z', home_cn: '法国', away_cn: '德国', home_score: 1, away_score: 0, status: 'post', stage: 'Round of 16', active: 1 },
+        { match_code: 'qf1', match_date_cn: '2026-07-05', time_cn: '01:00', kickoff_at_utc: '2026-07-04T17:00:00Z', home_cn: '法国', away_cn: '德国', home_score: 2, away_score: 1, status: 'post', stage: 'Quarterfinals', active: 1 },
+        { match_code: 'sf1', match_date_cn: '2026-07-15', time_cn: '03:00', kickoff_at_utc: '2026-07-14T19:00:00Z', home_cn: '法国', away_cn: '西班牙', status: 'post', stage: 'Semifinals', active: 1 },
+        { match_code: 'sf2', match_date_cn: '2026-07-16', time_cn: '03:00', kickoff_at_utc: '2026-07-15T19:00:00Z', home_cn: '阿根廷', away_cn: '英格兰', status: 'post', stage: 'Semifinals', active: 1 },
+      ],
+      advancement_predictions: [
+        { group_id: 'g1', player_id: 'p1', match_id: 'r16-1', winner_side: 'home', winner_name: '法国' },
+      ],
+      handicap_challenge_matches: [
+        { match_id: 'h1', match_code: 'qf1', date_cn: '2026-07-05', time_cn: '01:00', kickoff_at_utc: '2026-07-04T17:00:00Z', home_cn: '法国', away_cn: '德国', handicap: -1, odds_win: 3, odds_draw: 3.2, odds_loss: 2, probability_win: 0.3, probability_draw: 0.28, probability_loss: 0.42, active: 1 },
+      ],
+      handicap_challenge_predictions: [
+        { group_id: 'g1', player_id: 'p1', match_id: 'h1', choice_key: 'draw' },
+      ],
+      champion_road_predictions: [
+        { group_id: 'g1', player_id: 'p1', ranking: '["法国","西班牙","阿根廷","英格兰"]' },
       ],
     },
   });
@@ -96,6 +147,14 @@ test('buildStaticGroupSnapshotsFromBackupTables writes one cache payload per gro
   assert.deepEqual(snapshots.a1b2c3.players, [{ id: 'p1', name: '张三' }]);
   assert.deepEqual(snapshots.a1b2c3.predictions, [
     { player_id: 'p1', match_id: 'm1', scores: ['1-0'] },
+  ]);
+  assert.deepEqual(snapshots.a1b2c3.advancement.predictions, [
+    { playerId: 'p1', matchId: 'r16-1', winnerSide: 'home', winnerName: '法国' },
+  ]);
+  assert.deepEqual(snapshots.a1b2c3.advancement.ties.map((tie) => tie.matchId), ['r16-1']);
+  assert.equal(snapshots.a1b2c3.handicapChallenge.matches[0].homeScore, 2);
+  assert.deepEqual(snapshots.a1b2c3.championRoad.predictions, [
+    { playerId: 'p1', ranking: ['法国', '西班牙', '阿根廷', '英格兰'] },
   ]);
   assert.equal(snapshots.z9y8x7.group.id, 'g2');
   assert.deepEqual(snapshots.z9y8x7.predictions, [

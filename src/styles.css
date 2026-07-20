@@ -59,6 +59,25 @@ textarea {
   gap: 8px;
 }
 
+.archive-label {
+  margin: 4px 0 0;
+  color: #68756e;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.archive-home {
+  width: min(100%, 320px);
+  text-align: center;
+}
+
+.archive-home p {
+  margin: 10px 0 0;
+  color: #627069;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
 .ai-strategy-button {
   min-width: 68px;
 }

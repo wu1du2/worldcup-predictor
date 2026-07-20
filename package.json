@@ -45,6 +45,7 @@
     "snapshot:emergency": "node scripts/buildEmergencyStaticSnapshot.mjs",
     "snapshot:from-backup": "node scripts/buildStaticSnapshotFromBackup.mjs",
     "snapshot:groups:from-backup": "node scripts/buildStaticGroupSnapshotsFromBackup.mjs",
+    "snapshot:final:d1": "node scripts/buildFinalStaticArchiveFromD1.mjs",
     "d1:seed:from-backup": "node scripts/buildD1SeedFromBackup.mjs"
   },
   "dependencies": {
